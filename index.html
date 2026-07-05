@@ -180,7 +180,6 @@
                                             </div>
                                         </div>
                                         
-                                        <!-- NEW: VOC Amount Input -->
                                         <div class="pt-3 border-t border-amber-200 mt-2">
                                             <label class="text-[11px] font-bold text-blue-700 block mb-1">VOC AMOUNT (ဆိုင်ဘောက်ချာငွေ)</label>
                                             <input type="number" id="inp_vocAmount" step="1" placeholder="ကွာခြားချက်ရှိပါက ထည့်ရန်" class="form-input font-mono font-bold text-base border-blue-300 focus:border-blue-500 focus:ring-blue-500">
@@ -260,7 +259,6 @@
                         </h2>
                     </div>
 
-                    <!-- Filter Options -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 items-end">
                         <div class="col-span-1 md:col-span-2 lg:col-span-2">
                             <label class="form-label text-slate-600 mb-1">Report အမျိုးအစား ရွေးချယ်ရန်</label>
@@ -287,6 +285,18 @@
                             <label class="form-label text-slate-600 mb-1">နှစ် (Year)</label>
                             <input type="number" id="filterYear" value="2026" min="2020" max="2040" class="form-input py-2">
                         </div>
+
+                        <!-- ဖြည့်စွက်ထားသော နှစ်အပိုင်းအခြားရွေးချယ်ရန် (Year Range Container) -->
+                        <div id="yearRangeFilterContainer" class="col-span-1 md:col-span-2 hidden grid-cols-2 gap-2">
+                            <div>
+                                <label class="form-label text-slate-600 mb-1">စတင်မည့်နှစ်</label>
+                                <input type="number" id="filterStartYear" value="2024" class="form-input py-2">
+                            </div>
+                            <div>
+                                <label class="form-label text-slate-600 mb-1">ဆုံးမည့်နှစ်</label>
+                                <input type="number" id="filterEndYear" value="2026" class="form-input py-2">
+                            </div>
+                        </div>
                         
                         <div id="customDateContainer" class="col-span-1 md:col-span-2 hidden grid-cols-2 gap-2">
                             <div>
@@ -310,7 +320,6 @@
                             </button>
                         </div>
                         
-                        <!-- Adjust Section -->
                         <div class="col-span-1 md:col-span-2 lg:col-span-6 flex items-center space-x-3 bg-amber-50 p-3 rounded-lg border border-amber-200 mt-2">
                             <span class="text-amber-700 font-bold text-sm"><i class="fa-solid fa-scale-balanced mr-2"></i>အတိုး/အလျော့ (Adjust +/-) ပြုလုပ်မည့် ဌာန:</span>
                             <select id="adjustDept" onchange="calculateNetTotal()" class="w-auto px-3 py-1.5 text-slate-900 font-bold rounded-md outline-none border border-amber-300 bg-white">
@@ -351,9 +360,7 @@
                                     <td id="reportTotalLiter" class="p-3 text-right text-emerald-400 font-mono text-base border-r border-slate-700">0</td>
                                     <td colspan="2" class="border-r border-slate-700 bg-slate-800/30"></td>
                                     <td id="reportTotalSum" class="p-3 pr-6 text-right text-emerald-400 font-mono text-base">0</td>
-                                    
                                     <td class="p-3 pr-6 bg-slate-800/30"></td>
-
                                 </tr>
                             </tfoot>
                         </table>
@@ -436,7 +443,6 @@
             }
         }
 
-        // Tweak: Fix Date Format strictly dd/mm/yyyy
         function formatToDDMMYYYY(dateString) {
             if(!dateString) return "";
             let d = new Date(dateString);
@@ -506,7 +512,6 @@
         window.onload = function() {
             initStorage();
             const today = new Date();
-            // Default load format
             document.getElementById('currentDateDisplay').innerText = formatToDDMMYYYY(today.toISOString().split('T')[0]);
             document.getElementById('inp_filledDate').valueAsDate = today;
             document.getElementById('inp_issuedDate').valueAsDate = today;
@@ -514,7 +519,7 @@
             if(WEB_APP_URL) {
                 document.getElementById('webAppUrlInput').value = WEB_APP_URL;
                 updateStatusIndicator(true);
-                fetchSettingsFromSheet(); // Load settings from server
+                fetchSettingsFromSheet(); 
             } else {
                 updateStatusIndicator(false);
             }
@@ -585,9 +590,7 @@
         async function fetchSettingsFromSheet() {
             if(!WEB_APP_URL) return;
             try {
-                let res = await fetch(`${WEB_APP_URL}?action=getSettings`, {
-                    redirect: "follow" 
-                });
+                let res = await fetch(`${WEB_APP_URL}?action=getSettings`, { redirect: "follow" });
                 let data = await res.json();
                 if(data && data.boats && data.depts) {
                     if(data.boats.length > 0) localStorage.setItem('v5_boat_ids', JSON.stringify(data.boats));
@@ -602,27 +605,22 @@
             if(!WEB_APP_URL) return;
             const boats = JSON.parse(localStorage.getItem('v5_boat_ids') || '[]');
             const depts = JSON.parse(localStorage.getItem('v5_departments') || '[]');
-            
             try {
                 await fetch(WEB_APP_URL, {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "text/plain;charset=utf-8"
-                    },
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
                     redirect: "follow",
                     body: JSON.stringify({ action: "saveSettings", boats: boats, depts: depts })
                 });
-                console.log("Settings saved to Sheet successfully.");
             } catch(e) {
                 console.log("Settings save error:", e);
-                alert("စနစ်ချိတ်ဆက်မှု အမှားအယွင်းဖြစ်နေပါသည်။ (CORS Error)");
+                alert("စနစ်ချိတ်ဆက်မှု အမှားအယွင်းဖြစ်နေပါသည်။");
             }
         }
 
         function loadDropdownOptions() {
             const boats = JSON.parse(localStorage.getItem('v5_boat_ids') || '[]');
             const depts = JSON.parse(localStorage.getItem('v5_departments') || '[]');
-            
             const fBoat = document.getElementById('inp_boatId');
             const fDept = document.getElementById('inp_dept');
             const rDept = document.getElementById('filterDept');
@@ -641,7 +639,6 @@
         function updateSettingsLists() {
             const boats = JSON.parse(localStorage.getItem('v5_boat_ids') || '[]');
             const depts = JSON.parse(localStorage.getItem('v5_departments') || '[]');
-            
             const renderList = (arr, type) => arr.map((item, idx) => `
                 <li class="px-4 py-3 flex justify-between items-center hover:bg-white rounded-lg transition border-b border-slate-100 last:border-0 group">
                     <span>${item}</span>
@@ -697,70 +694,64 @@
             document.getElementById('inp_totalAmountDisplay').value = total ? Math.round(total).toLocaleString() : "";
         }
 
-        // Tweak: VOC Adjustment Logic Added
-        // Tweak: VOC Adjustment Logic Added
-function addToDraft(e) {
-    e.preventDefault();
-    
-    const calTotal = parseFloat(document.getElementById('inp_totalAmount').value) || 0;
-    const vocStr = document.getElementById('inp_vocAmount').value;
-    
-    let finalTotalAmount = calTotal;
-    let originalMarks = document.getElementById('inp_marks').value;
-    let finalMarks = originalMarks;
-    
-    // VOC Amount ထည့်သွင်းထားခြင်းရှိမရှိ စစ်ဆေးရန်
-    if (vocStr.trim() !== "") {
-        let vocAmount = parseFloat(vocStr) || 0;
-        let diff = calTotal - vocAmount; // Total Amount နှင့် VOC Amount ခြားနားချက်
-        
-        finalTotalAmount = vocAmount; // Total Amount နေရာတွင် VOC Amount ကို အစားထိုးရန်
-        
-        // ခြားနားချက်ရှိပါက အစွန်းထွက် (+/-) ကို Marks တွင် ထည့်ရန်
-        if (diff !== 0) {
-            let sign = diff > 0 ? "+" : ""; 
-            let diffText = `အစွန်းထွက် (${sign}${diff})`;
-            finalMarks = originalMarks ? originalMarks + ", " + diffText : diffText;
+        function addToDraft(e) {
+            e.preventDefault();
+            
+            const calTotal = parseFloat(document.getElementById('inp_totalAmount').value) || 0;
+            const vocStr = document.getElementById('inp_vocAmount').value;
+            
+            let finalTotalAmount = calTotal;
+            let originalMarks = document.getElementById('inp_marks').value;
+            let finalMarks = originalMarks;
+            
+            if (vocStr.trim() !== "") {
+                let vocAmount = parseFloat(vocStr) || 0;
+                let diff = calTotal - vocAmount;
+                finalTotalAmount = vocAmount; 
+                
+                if (diff !== 0) {
+                    let sign = diff > 0 ? "+" : ""; 
+                    let diffText = `အစွန်းထွက် (${sign}${diff})`;
+                    finalMarks = originalMarks ? originalMarks + ", " + diffText : diffText;
+                }
+            }
+
+            const record = {
+                id: document.getElementById('inp_id').value,
+                filledDate: document.getElementById('inp_filledDate').value,
+                itineraries: document.getElementById('inp_itineraries').value,
+                issuedDate: document.getElementById('inp_issuedDate').value,
+                boatId: document.getElementById('inp_boatId').value,
+                issuedDept: document.getElementById('inp_dept').value,
+                liter: document.getElementById('inp_liter').value,
+                price: document.getElementById('inp_price').value,
+                pricePerDrum: document.getElementById('inp_priceDrum').value,
+                totalAmount: finalTotalAmount, 
+                marks: finalMarks 
+            };
+            
+            if (currentEditIndex !== -1) {
+                DRAFT_DATA[currentEditIndex] = record;
+                currentEditIndex = -1; 
+                document.getElementById('btnSubmitDraft').innerHTML = `<i class="fa-solid fa-arrow-down"></i><span>Draft စာရင်းသို့ ထည့်မည်</span>`;
+            } else {
+                DRAFT_DATA.push(record); 
+            }
+            
+            switchTab('draft-tab');
+            renderDraftTable();
+
+            document.getElementById('inp_liter').value = "";
+            document.getElementById('inp_priceDrum').value = "";
+            document.getElementById('inp_price').value = "";
+            document.getElementById('inp_totalAmount').value = "";
+            document.getElementById('inp_totalAmountDisplay').value = "";
+            document.getElementById('inp_vocAmount').value = ""; 
+            document.getElementById('inp_marks').value = "";
+            
+            fetchNextID(); 
         }
-    }
-
-    const record = {
-        id: document.getElementById('inp_id').value,
-        filledDate: document.getElementById('inp_filledDate').value,
-        itineraries: document.getElementById('inp_itineraries').value,
-        issuedDate: document.getElementById('inp_issuedDate').value,
-        boatId: document.getElementById('inp_boatId').value,
-        issuedDept: document.getElementById('inp_dept').value,
-        liter: document.getElementById('inp_liter').value,
-        price: document.getElementById('inp_price').value,
-        pricePerDrum: document.getElementById('inp_priceDrum').value,
-        totalAmount: finalTotalAmount, // ပြင်ဆင်ထားသော Amount
-        marks: finalMarks // ပြင်ဆင်ထားသော Marks
-    };
-    
-    if (currentEditIndex !== -1) {
-        DRAFT_DATA[currentEditIndex] = record;
-        currentEditIndex = -1; 
-        document.getElementById('btnSubmitDraft').innerHTML = `<i class="fa-solid fa-arrow-down"></i><span>Draft စာရင်းသို့ ထည့်မည်</span>`;
-    } else {
-        DRAFT_DATA.push(record); 
-        // ဤနေရာတွင် မူလက နောက်တစ်ကြောင်းခွဲထုတ်သည့် (adjustRecord) ကို ပယ်ဖျက်လိုက်ပါပြီ။
-    }
-    
-    switchTab('draft-tab');
-    renderDraftTable();
-
-    // Data ရှင်းထုတ်ရန်
-    document.getElementById('inp_liter').value = "";
-    document.getElementById('inp_priceDrum').value = "";
-    document.getElementById('inp_price').value = "";
-    document.getElementById('inp_totalAmount').value = "";
-    document.getElementById('inp_totalAmountDisplay').value = "";
-    document.getElementById('inp_vocAmount').value = ""; // Clear VOC
-    document.getElementById('inp_marks').value = "";
-    
-    fetchNextID(); 
-}
+        
         function startNewForm() {
             currentEditIndex = -1; 
             document.getElementById('btnSubmitDraft').innerHTML = `<i class="fa-solid fa-arrow-down"></i><span>Draft စာရင်းသို့ ထည့်မည်</span>`;
@@ -770,7 +761,7 @@ function addToDraft(e) {
             document.getElementById('inp_price').value = "";
             document.getElementById('inp_totalAmount').value = "";
             document.getElementById('inp_totalAmountDisplay').value = "";
-            document.getElementById('inp_vocAmount').value = ""; // Clear VOC
+            document.getElementById('inp_vocAmount').value = ""; 
             document.getElementById('inp_marks').value = "";
             document.getElementById('inp_itineraries').value = "";
             
@@ -796,7 +787,7 @@ function addToDraft(e) {
             document.getElementById('inp_liter').value = Math.round(parseFloat(record.liter));
             document.getElementById('inp_priceDrum').value = Math.round(parseFloat(record.pricePerDrum));
             document.getElementById('inp_marks').value = record.marks;
-            document.getElementById('inp_vocAmount').value = ""; // Clear VOC for edit mode
+            document.getElementById('inp_vocAmount').value = ""; 
 
             calcPrice(); 
 
@@ -807,9 +798,7 @@ function addToDraft(e) {
         function removeDraft(idx) {
             DRAFT_DATA.splice(idx, 1);
             renderDraftTable();
-            if(currentEditIndex === -1) {
-                fetchNextID(); 
-            }
+            if(currentEditIndex === -1) fetchNextID(); 
         }
 
         function renderDraftTable() {
@@ -855,19 +844,11 @@ function addToDraft(e) {
             for(let i = 0; i < DRAFT_DATA.length; i++) {
                 let record = DRAFT_DATA[i];
                 record.action = "addData";
-
                 try {
-                    let res = await fetch(WEB_APP_URL, {
-                        method: "POST",
-                        body: JSON.stringify(record)
-                    });
+                    let res = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(record) });
                     let result = await res.json();
-                    
-                    if(result.status === "success") {
-                        successCount++;
-                    } else {
-                        errors.push(`Row ${i+1}: ${result.message}`);
-                    }
+                    if(result.status === "success") successCount++;
+                    else errors.push(`Row ${i+1}: ${result.message}`);
                 } catch(e) {
                     errors.push(`Row ${i+1}: Connection Error`);
                 }
@@ -893,43 +874,43 @@ function addToDraft(e) {
             
             document.getElementById('monthFilterContainer').classList.add('hidden');
             document.getElementById('yearFilterContainer').classList.add('hidden');
+            document.getElementById('yearRangeFilterContainer').classList.add('hidden');
+            document.getElementById('yearRangeFilterContainer').classList.remove('grid');
             document.getElementById('customDateContainer').classList.add('hidden');
             document.getElementById('customDateContainer').classList.remove('grid');
 
             if (rType === 'monthly') {
                 document.getElementById('monthFilterContainer').classList.remove('hidden');
-            } else if (rType === 'yearly_detail' || rType === 'yearly_summary') {
+            } else if (rType === 'yearly_detail') {
                 document.getElementById('yearFilterContainer').classList.remove('hidden');
+            } else if (rType === 'yearly_summary') {
+                document.getElementById('yearRangeFilterContainer').classList.remove('hidden');
+                document.getElementById('yearRangeFilterContainer').classList.add('grid');
             } else if (rType === 'custom') {
                 document.getElementById('customDateContainer').classList.remove('hidden');
                 document.getElementById('customDateContainer').classList.add('grid');
             }
         }
 
-        // Tweak: Adust logic for both Subtotal and Last Row of Target Department
         function calculateNetTotal() {
             const adjVal = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
             const adjDept = document.getElementById('adjustDept').value;
             
-            // 1. Reset all values to original
             document.querySelectorAll('.row-amt, .subtotal-amt').forEach(cell => {
                 let orig = parseFloat(cell.getAttribute('data-original')) || 0;
                 cell.innerText = orig.toLocaleString();
             });
 
-            // 2. Add adjustment if specific dept is chosen
             if (adjDept !== 'Grand' && adjVal !== 0) {
-                // To Subtotal Cell
                 let subCell = document.querySelector(`.dept-subtotal-row[data-dept="${adjDept}"] .subtotal-amt`);
                 if (subCell) {
                     let subOrig = parseFloat(subCell.getAttribute('data-original')) || 0;
                     subCell.innerText = (subOrig + adjVal).toLocaleString();
                 }
 
-                // To Last Row of that Department
                 let dataRows = document.querySelectorAll(`tr.data-row[data-dept="${adjDept}"]`);
                 if (dataRows.length > 0) {
-                    let lastRow = dataRows[dataRows.length - 1]; // နောက်ဆုံး row အမြဲယူမည်
+                    let lastRow = dataRows[dataRows.length - 1]; 
                     let rowAmtCell = lastRow.querySelector('.row-amt');
                     if (rowAmtCell) {
                         let rowOrig = parseFloat(rowAmtCell.getAttribute('data-original')) || 0;
@@ -938,599 +919,782 @@ function addToDraft(e) {
                 }
             }
 
-            // 3. Grand Total Calculation
             const netAmount = globalGrandTotalAmount + adjVal;
             document.getElementById('reportTotalSum').innerText = netAmount.toLocaleString();
         }
 
         function generateReport() {
-    if(!WEB_APP_URL) return alert("Google Web App Link ထည့်ပါ။");
+            if(!WEB_APP_URL) return alert("Google Web App Link ထည့်ပါ။");
 
-    isReportGenerated = false;
-    const rType = document.getElementById('reportType').value;
-    const deptFilt = document.getElementById('filterDept').value;
-    const mFilt = document.getElementById('filterMonth').value;
-    const yFilt = document.getElementById('filterYear').value;
-    const customStart = document.getElementById('filterStartDate').value;
-    const customEnd = document.getElementById('filterEndDate').value;
-    
-    const tableBody = document.getElementById('reportTableBody');
-    const tableHeader = document.getElementById('reportTableHeader');
-    
-    if (rType === 'yearly_summary') {
-        tableHeader.innerHTML = `
-            <th class="th-style pl-6 text-slate-200 border-b-0">လ (Month)</th>
-            <th class="th-style text-slate-200 border-b-0" colspan="5">မှတ်ချက် (Remarks)</th>
-            <th class="th-style text-slate-200 text-right border-b-0">Total Liter</th>
-            <th class="th-style text-slate-200 text-right border-b-0" colspan="2"></th>
-            <th class="th-style text-slate-200 text-right border-b-0">Total Amount</th>
-            <th class="th-style pr-6 text-slate-200 border-b-0">Marks</th>
-        `;
-    } else {
-        tableHeader.innerHTML = `
-            <th class="th-style pl-6 text-slate-200 border-b-0">ID</th>
-            <th class="th-style text-slate-200 border-b-0">Filled Date</th>
-            <th class="th-style text-slate-200 border-b-0">Itineraries</th>
-            <th class="th-style text-emerald-400 border-b-0">Issued Date</th>
-            <th class="th-style text-slate-200 border-b-0">Boat ID</th>
-            <th class="th-style text-slate-200 border-b-0">Department</th>
-            <th class="th-style text-slate-200 text-right border-b-0">Liter</th>
-            <th class="th-style text-slate-200 text-right border-b-0">Price/Drum</th>
-            <th class="th-style text-slate-200 text-right border-b-0">Price(1L)</th>
-            <th class="th-style text-slate-200 text-right border-b-0">Total Amount</th>
-            <th class="th-style pr-6 text-slate-200 border-b-0">Marks</th>
-        `;
-    }
-
-    tableBody.innerHTML = `<tr><td colspan="11" class="p-12 text-center text-indigo-500"><i class="fa-solid fa-circle-notch animate-spin text-3xl mb-3 block"></i>ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>`;
-
-    fetch(`${WEB_APP_URL}?action=getData`)
-    .then(res => res.json())
-    .then(rawData => {
-        let data = rawData.map(r => {
-            let deptStr = String(r.issuedDept || "");
-            let isShifted = deptStr.includes("202") || deptStr.includes("T1") || deptStr.includes("-0");
-            if (isShifted) {
-                let calc_liter = 0;
-                let p1L = parseFloat(r.liter) || 0; 
-                let tAmt = parseFloat(r.pricePerDrum) || 0;
-                if (p1L > 0) calc_liter = tAmt / p1L;
-                return {
-                    id: r.id,
-                    filledDate: r.filledDate,
-                    itineraries: r.boatId, 
-                    issuedDate: (r.issuedDept === 0 || !r.issuedDept || String(r.issuedDept).includes("1970")) ? "" : r.issuedDept,
-                    boatId: r.itineraries,
-                    issuedDept: r.issuedDate, 
-                    liter: calc_liter,
-                    pricePerDrum: r.price,
-                    price: r.liter,
-                    totalAmount: r.pricePerDrum,
-                    marks: r.totalAmount
-                };
-            }
-            return r; 
-        });
-
-        let filtered = data.filter(r => {
-            if(!r.filledDate) return false;
-            const d = new Date(r.filledDate);
-            const y = d.getFullYear();
-            const m = String(d.getMonth()+1).padStart(2,'0');
-            if (rType === 'monthly') {
-                if(!mFilt) return true;
-                const [ty, tm] = mFilt.split('-');
-                return y == ty && m == tm;
-            } else if (rType === 'yearly_detail' || rType === 'yearly_summary') {
-                return y == yFilt;
-            } else if (rType === 'custom') {
-                if (customStart && d < new Date(customStart)) return false;
-                if (customEnd && d > new Date(customEnd)) return false;
-                return true;
-            }
-            return true;
-        });
-
-        let groups = {};
-        filtered.forEach(r => {
-            let dpt = r.issuedDept || "Unknown";
-            if(deptFilt !== "all" && dpt !== deptFilt) return;
-            if(!groups[dpt]) groups[dpt] = [];
-            groups[dpt].push(r);
-        });
-
-        tableBody.innerHTML = "";
-        if(Object.keys(groups).length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="11" class="p-12 text-center text-slate-400">ရှာဖွေမှုရလဒ် မရှိပါ။</td></tr>`;
-            document.getElementById('reportTotalLiter').innerText = "0";
-            document.getElementById('reportTotalSum').innerText = "0";
             isReportGenerated = false;
-            return;
-        }
-
-        const adjustSelect = document.getElementById('adjustDept');
-        adjustSelect.innerHTML = '<option value="Grand">Grand Total (အားလုံးစုစုပေါင်း)</option>';
-        for(let dept in groups) {
-            adjustSelect.innerHTML += `<option value="${dept}">${dept}</option>`;
-        }
-
-        let gTotalL = 0, gTotalA = 0;
-
-        for(let dept in groups) {
-            tableBody.innerHTML += `
-                <tr class="bg-indigo-50/80 border-y border-indigo-200">
-                    <td colspan="11" class="p-3 pl-6 font-bold text-[13px] text-indigo-900 ">
-                        <i class="fa-solid fa-building mr-2 text-indigo-600"></i>ဌာနအမည် : <strong>${dept}</strong>
-                    </td>
-                </tr>`;
+            const rType = document.getElementById('reportType').value;
+            const deptFilt = document.getElementById('filterDept').value;
+            const mFilt = document.getElementById('filterMonth').value;
+            const yFilt = document.getElementById('filterYear').value;
+            const startY = parseInt(document.getElementById('filterStartYear').value) || 2020;
+            const endY = parseInt(document.getElementById('filterEndYear').value) || 2040;
+            const customStart = document.getElementById('filterStartDate').value;
+            const customEnd = document.getElementById('filterEndDate').value;
             
-            let dTotalL = 0, dTotalA = 0;
+            const tableBody = document.getElementById('reportTableBody');
+            const tableHeader = document.getElementById('reportTableHeader');
             
             if (rType === 'yearly_summary') {
-                let monthlyData = {};
-                for(let i=1; i<=12; i++) monthlyData[String(i).padStart(2,'0')] = { liter: 0, amount: 0 };
+                tableHeader.innerHTML = `
+                    <th class="th-style pl-6 text-slate-200 border-b-0">လ (Month)</th>
+                    <th class="th-style text-slate-200 border-b-0" colspan="5">မှတ်ချက် (Remarks)</th>
+                    <th class="th-style text-slate-200 text-right border-b-0">Total Liter</th>
+                    <th class="th-style text-slate-200 text-right border-b-0" colspan="2"></th>
+                    <th class="th-style text-slate-200 text-right border-b-0">Total Amount</th>
+                    <th class="th-style pr-6 text-slate-200 border-b-0">Marks</th>
+                `;
+            } else {
+                tableHeader.innerHTML = `
+                    <th class="th-style pl-6 text-slate-200 border-b-0">ID</th>
+                    <th class="th-style text-slate-200 border-b-0">Filled Date</th>
+                    <th class="th-style text-slate-200 border-b-0">Itineraries</th>
+                    <th class="th-style text-emerald-400 border-b-0">Issued Date</th>
+                    <th class="th-style text-slate-200 border-b-0">Boat ID</th>
+                    <th class="th-style text-slate-200 border-b-0">Department</th>
+                    <th class="th-style text-slate-200 text-right border-b-0">Liter</th>
+                    <th class="th-style text-slate-200 text-right border-b-0">Price/Drum</th>
+                    <th class="th-style text-slate-200 text-right border-b-0">Price(1L)</th>
+                    <th class="th-style text-slate-200 text-right border-b-0">Total Amount</th>
+                    <th class="th-style pr-6 text-slate-200 border-b-0">Marks</th>
+                `;
+            }
 
-                groups[dept].forEach(row => {
-                    let d = new Date(row.filledDate);
-                    let m = String(d.getMonth()+1).padStart(2,'0');
-                    monthlyData[m].liter += Math.round(parseFloat(row.liter)) || 0;
-                    monthlyData[m].amount += Math.round(parseFloat(row.totalAmount)) || 0;
-                });
+            tableBody.innerHTML = `<tr><td colspan="11" class="p-12 text-center text-indigo-500"><i class="fa-solid fa-circle-notch animate-spin text-3xl mb-3 block"></i>ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>`;
 
-                for(let m in monthlyData) {
-                    if(monthlyData[m].liter > 0 || monthlyData[m].amount > 0) {
-                        let monthName = new Date(yFilt, parseInt(m)-1, 1).toLocaleString('en-US', { month: 'long' });
-                        dTotalL += monthlyData[m].liter;
-                        dTotalA += monthlyData[m].amount;
-
-                        tableBody.innerHTML += `
-                            <tr class="hover:bg-white transition border-b border-slate-100 data-row" data-dept="${dept}">
-                                <td class="td-style pl-6 font-bold text-slate-700">${monthName}, ${yFilt}</td>
-                                <td class="td-style text-slate-300 text-center" colspan="5">-</td>
-                                <td class="p-3 border-r border-slate-100 text-right font-mono">${monthlyData[m].liter.toLocaleString()}</td>
-                                <td class="p-3 border-r border-slate-100 text-right" colspan="2"></td>
-                                <td class="p-3 text-right font-mono font-bold text-slate-900 row-amt border-r border-slate-100" data-original="${monthlyData[m].amount}">${monthlyData[m].amount.toLocaleString()}</td>
-                                <td class="p-3 pr-6 text-center text-slate-400">-</td>
-                            </tr>`;
+            fetch(`${WEB_APP_URL}?action=getData`)
+            .then(res => res.json())
+            .then(rawData => {
+                let data = rawData.map(r => {
+                    let deptStr = String(r.issuedDept || "");
+                    let isShifted = deptStr.includes("202") || deptStr.includes("T1") || deptStr.includes("-0");
+                    if (isShifted) {
+                        let calc_liter = 0;
+                        let p1L = parseFloat(r.liter) || 0; 
+                        let tAmt = parseFloat(r.pricePerDrum) || 0;
+                        if (p1L > 0) calc_liter = tAmt / p1L;
+                        return {
+                            id: r.id, filledDate: r.filledDate, itineraries: r.boatId, 
+                            issuedDate: (r.issuedDept === 0 || !r.issuedDept || String(r.issuedDept).includes("1970")) ? "" : r.issuedDept,
+                            boatId: r.itineraries, issuedDept: r.issuedDate, 
+                            liter: calc_liter, pricePerDrum: r.price, price: r.liter,
+                            totalAmount: r.pricePerDrum, marks: r.totalAmount
+                        };
                     }
-                }
-            } else {
-                groups[dept].forEach(row => {
-                    let literNum = Math.round(parseFloat(row.liter) || 0);
-                    let amountNum = Math.round(parseFloat(row.totalAmount) || 0);
-                    let priceDrumNum = Math.round(parseFloat(row.pricePerDrum) || 0);
-                    let priceLtrNum = Math.round(parseFloat(row.price) || 0);
-
-                    dTotalL += literNum; 
-                    dTotalA += amountNum;
-                    
-                    tableBody.innerHTML += `
-                        <tr class="hover:bg-white transition border-b border-slate-100 data-row" data-dept="${dept}">
-                            <td class="td-style pl-6 font-mono text-slate-500">${row.id || ''}</td>
-                            <td class="td-style">${formatToDDMMYYYY(row.filledDate)}</td>
-                            <td class="td-style text-slate-600 font-semibold">${row.itineraries || ''}</td>
-                            <td class="td-style text-emerald-600 font-bold">${formatToDDMMYYYY(row.issuedDate)}</td>
-                            <td class="td-style text-slate-800 font-bold">${row.boatId || ''}</td>
-                            <td class="td-style">${row.issuedDept || ''}</td>
-                            <td class="p-3 border-r border-slate-100 text-right font-mono">${literNum.toLocaleString()}</td>
-                            <td class="p-3 border-r border-slate-100 text-right font-mono text-emerald-700">${priceDrumNum.toLocaleString()}</td>
-                            <td class="p-3 border-r border-slate-100 text-right font-mono text-slate-400">${priceLtrNum.toLocaleString()}</td>
-                            <td class="p-3 text-right font-mono font-bold text-slate-900 row-amt border-r border-slate-100" data-original="${amountNum}">${amountNum.toLocaleString()}</td>
-                            <td class="p-3 pr-6 text-slate-600 text-sm td-style break-words">${row.marks || ''}</td>
-                        </tr>`;
+                    return r; 
                 });
-            }
 
-            tableBody.innerHTML += `
-                <tr class="bg-slate-100/60 text-slate-700 font-bold border-b border-slate-200 dept-subtotal-row" data-dept="${dept}">
-                    <td colspan="6" class="p-3 pr-6 text-right text-[11px] uppercase tracking-wider text-slate-500 border-r border-slate-200"><strong>${dept} Sub-total:</strong></td>
-                    <td class="p-3 text-right font-mono text-indigo-700 border-r border-slate-200">${dTotalL.toLocaleString()}</td>
-                    <td colspan="2" class="border-r border-slate-200"></td>
-                    <td class="p-3 text-right font-mono text-indigo-700 subtotal-amt border-r border-slate-200" data-original="${dTotalA}">${dTotalA.toLocaleString()}</td>
-                    <td class="p-3 pr-6"></td>
-                </tr>`;
-                
-            gTotalL += dTotalL; gTotalA += dTotalA;
-        }
+                let filtered = data.filter(r => {
+                    if(!r.filledDate) return false;
+                    const d = new Date(r.filledDate);
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth()+1).padStart(2,'0');
+                    if (rType === 'monthly') {
+                        if(!mFilt) return true;
+                        const [ty, tm] = mFilt.split('-');
+                        return y == ty && m == tm;
+                    } else if (rType === 'yearly_detail') {
+                        return y == yFilt;
+                    } else if (rType === 'yearly_summary') {
+                        return y >= startY && y <= endY;
+                    } else if (rType === 'custom') {
+                        if (customStart && d < new Date(customStart)) return false;
+                        if (customEnd && d > new Date(customEnd)) return false;
+                        return true;
+                    }
+                    return true;
+                });
 
-        globalGrandTotalLiter = gTotalL;
-        globalGrandTotalAmount = gTotalA;
+                let groups = {};
+                filtered.forEach(r => {
+                    let dpt = r.issuedDept || "Unknown";
+                    if(deptFilt !== "all" && dpt !== deptFilt) return;
+                    if(!groups[dpt]) groups[dpt] = [];
+                    groups[dpt].push(r);
+                });
 
-        document.getElementById('reportTotalLiter').innerText = gTotalL.toLocaleString();
-        document.getElementById('reportTotalSum').innerText = gTotalA.toLocaleString();
-        
-        document.getElementById('adjustAmount').value = "";
-        calculateNetTotal();
-        
-        isReportGenerated = true; 
-    })
-    .catch(err => {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="11" class="p-10 text-center text-red-500 font-normal">
-                    <i class="fa-solid fa-triangle-exclamation block text-xl mb-2"></i>
-                    ဒေတာဆွဲယူမှု မအောင်မြင်ပါ (ကွန်ရက် သို့မဟုတ် API ချိတ်ဆက်မှု မှားနေနိုင်ပါသည်)။ Error: ${err}
-                </td>
-            </tr>`;
-        document.getElementById('reportTotalSum').innerText = "0";
-        document.getElementById('reportTotalLiter').innerText = "0";
-    });
-}
-        
-function exportToExcel() {
-    try {
-        if (!isReportGenerated) {
-            alert("ကျေးဇူးပြု၍ 'ရှာဖွေမည်' ခလုတ်ကို အရင်နှိပ်ပြီး Report ထုတ်ပါ။");
-            return;
-        }
-        
-        if (typeof XLSX === 'undefined') {
-            alert("Excel Library ချိတ်ဆက်မှု မအောင်မြင်ပါ။");
-            return;
-        }
-
-        const rType = document.getElementById('reportType').value;
-        let dateStr = "";
-        
-        if (rType === 'monthly') {
-            const mVal = document.getElementById('filterMonth').value; 
-            if (mVal) {
-                const d = new Date(mVal + "-01");
-                dateStr = d.toLocaleString('en-US', { month: 'long' }) + `, ${d.getFullYear()}`; 
-            } else {
-                dateStr = "All Months";
-            }
-        } else if (rType === 'yearly_detail' || rType === 'yearly_summary') {
-            dateStr = "Year " + document.getElementById('filterYear').value;
-        } else if (rType === 'custom') {
-            const sDate = document.getElementById('filterStartDate').value;
-            const eDate = document.getElementById('filterEndDate').value;
-            if(sDate && eDate) dateStr = `${formatToDDMMYYYY(sDate)} to ${formatToDDMMYYYY(eDate)}`;
-            else dateStr = "Custom Date Range";
-        }
-        
-        let titleText = `My Mergui Speed Boat's Fuel Issued Record For ${dateStr}`;
-        if (rType === 'yearly_summary') {
-            titleText = `My Mergui Speed Boat's Fuel Issued Record Monthly Summary ${document.getElementById('filterYear').value}`;
-        }
-
-        function getMainTitleBlock() {
-            return `
-                <tr>
-                    <td colspan="11" style="text-align: center; font-size: 16px; font-weight: bold; color: #1E40AF;">
-                        ${titleText}
-                    </td>
-                </tr>
-                <tr><td colspan="11"></td></tr>
-            `;
-        }
-
-        function getSignatureBlock() {
-            return `
-                <tr><td colspan="11"></td></tr>
-                <tr><td colspan="11"></td></tr>
-                <tr><td colspan="11"></td></tr>
-                <tr><td colspan="11"></td></tr>
-                <tr>
-                    <td colspan="8"></td>
-                    <td colspan="3" style="text-align: center; font-weight: bold; color: #1E3A8A; font-size: 12px;">
-                        Recorded and Proved By
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="8"></td>
-                    <td colspan="3" style="text-align: center; font-weight: bold; color: #DC2626; font-size: 12px;">
-                        NAY LIN HTIKE
-                    </td>
-                </tr>
-            `;
-        }
-
-        const originalTable = document.getElementById('excelReportTable');
-        const headerHTML = originalTable.querySelector('thead').innerHTML;
-        const originalTbodyRows = originalTable.querySelectorAll('tbody tr');
-        
-        let summaryData = [];
-        let htmlString = `<table><tbody>`;
-        let isFirstDepartment = true;
-        let currentDeptName = "Unknown Department"; 
-
-        originalTbodyRows.forEach((row, index) => {
-            const rowText = row.innerText || row.textContent;
-            
-            if (rowText.includes("ဌာနအမည်")) {
-                let extractedName = rowText.replace(/ဌာနအမည်/g, "").replace(/[:\-]/g, "").trim();
-                if (extractedName !== "") {
-                    currentDeptName = extractedName;
+                tableBody.innerHTML = "";
+                if(Object.keys(groups).length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="11" class="p-12 text-center text-slate-400">ရှာဖွေမှုရလဒ် မရှိပါ။</td></tr>`;
+                    document.getElementById('reportTotalLiter').innerText = "0";
+                    document.getElementById('reportTotalSum').innerText = "0";
+                    isReportGenerated = false;
+                    return;
                 }
 
-                if (!isFirstDepartment) {
-                    htmlString += getSignatureBlock();
-                    htmlString += `<tr><td colspan="11"></td></tr>`; 
+                const adjustSelect = document.getElementById('adjustDept');
+                adjustSelect.innerHTML = '<option value="Grand">Grand Total (အားလုံးစုစုပေါင်း)</option>';
+                for(let dept in groups) {
+                    adjustSelect.innerHTML += `<option value="${dept}">${dept}</option>`;
                 }
-                isFirstDepartment = false;
+
+                let gTotalL = 0, gTotalA = 0;
+
+                for(let dept in groups) {
+                    tableBody.innerHTML += `
+                        <tr class="bg-indigo-50/80 border-y border-indigo-200">
+                            <td colspan="11" class="p-3 pl-6 font-bold text-[13px] text-indigo-900 ">
+                                <i class="fa-solid fa-building mr-2 text-indigo-600"></i>ဌာနအမည် : <strong>${dept}</strong>
+                            </td>
+                        </tr>`;
+                    
+                    let dTotalL = 0, dTotalA = 0;
+                    
+                    if (rType === 'yearly_summary') {
+                        for (let y = startY; y <= endY; y++) {
+                            let monthlyData = {};
+                            for(let i=1; i<=12; i++) monthlyData[String(i).padStart(2,'0')] = { liter: 0, amount: 0 };
+
+                            let hasDataForYear = false;
+                            groups[dept].forEach(row => {
+                                let d = new Date(row.filledDate);
+                                if (d.getFullYear() === y) {
+                                    let m = String(d.getMonth()+1).padStart(2,'0');
+                                    monthlyData[m].liter += Math.round(parseFloat(row.liter)) || 0;
+                                    monthlyData[m].amount += Math.round(parseFloat(row.totalAmount)) || 0;
+                                    hasDataForYear = true;
+                                }
+                            });
+
+                            if (hasDataForYear) {
+                                tableBody.innerHTML += `
+                                    <tr class="bg-slate-100 data-row year-header" data-dept="${dept}" data-year="${y}">
+                                        <td class="td-style pl-6 font-bold text-slate-800" colspan="11">Year : ${y}</td>
+                                    </tr>`;
+
+                                for(let m in monthlyData) {
+                                    if(monthlyData[m].liter > 0 || monthlyData[m].amount > 0) {
+                                        let monthName = new Date(y, parseInt(m)-1, 1).toLocaleString('en-US', { month: 'long' });
+                                        dTotalL += monthlyData[m].liter;
+                                        dTotalA += monthlyData[m].amount;
+
+                                        tableBody.innerHTML += `
+                                            <tr class="hover:bg-white transition border-b border-slate-100 data-row" data-dept="${dept}">
+                                                <td class="td-style pl-6 font-bold text-slate-700">${monthName}, ${y}</td>
+                                                <td class="td-style text-slate-300 text-center" colspan="5">-</td>
+                                                <td class="p-3 border-r border-slate-100 text-right font-mono">${monthlyData[m].liter.toLocaleString()}</td>
+                                                <td class="p-3 border-r border-slate-100 text-right" colspan="2"></td>
+                                                <td class="p-3 text-right font-mono font-bold text-slate-900 row-amt border-r border-slate-100" data-original="${monthlyData[m].amount}">${monthlyData[m].amount.toLocaleString()}</td>
+                                                <td class="p-3 pr-6 text-center text-slate-400">-</td>
+                                            </tr>`;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        groups[dept].forEach(row => {
+                            let literNum = Math.round(parseFloat(row.liter) || 0);
+                            let amountNum = Math.round(parseFloat(row.totalAmount) || 0);
+                            let priceDrumNum = Math.round(parseFloat(row.pricePerDrum) || 0);
+                            let priceLtrNum = Math.round(parseFloat(row.price) || 0);
+
+                            dTotalL += literNum; 
+                            dTotalA += amountNum;
+                            
+                            tableBody.innerHTML += `
+                                <tr class="hover:bg-white transition border-b border-slate-100 data-row" data-dept="${dept}">
+                                    <td class="td-style pl-6 font-mono text-slate-500">${row.id || ''}</td>
+                                    <td class="td-style">${formatToDDMMYYYY(row.filledDate)}</td>
+                                    <td class="td-style text-slate-600 font-semibold">${row.itineraries || ''}</td>
+                                    <td class="td-style text-emerald-600 font-bold">${formatToDDMMYYYY(row.issuedDate)}</td>
+                                    <td class="td-style text-slate-800 font-bold">${row.boatId || ''}</td>
+                                    <td class="td-style">${row.issuedDept || ''}</td>
+                                    <td class="p-3 border-r border-slate-100 text-right font-mono">${literNum.toLocaleString()}</td>
+                                    <td class="p-3 border-r border-slate-100 text-right font-mono text-emerald-700">${priceDrumNum.toLocaleString()}</td>
+                                    <td class="p-3 border-r border-slate-100 text-right font-mono text-slate-400">${priceLtrNum.toLocaleString()}</td>
+                                    <td class="p-3 text-right font-mono font-bold text-slate-900 row-amt border-r border-slate-100" data-original="${amountNum}">${amountNum.toLocaleString()}</td>
+                                    <td class="p-3 pr-6 text-slate-600 text-sm td-style break-words">${row.marks || ''}</td>
+                                </tr>`;
+                        });
+                    }
+
+                    tableBody.innerHTML += `
+                        <tr class="bg-slate-100/60 text-slate-700 font-bold border-b border-slate-200 dept-subtotal-row" data-dept="${dept}">
+                            <td colspan="6" class="p-3 pr-6 text-right text-[11px] uppercase tracking-wider text-slate-500 border-r border-slate-200"><strong>${dept} Sub-total:</strong></td>
+                            <td class="p-3 text-right font-mono text-indigo-700 border-r border-slate-200">${dTotalL.toLocaleString()}</td>
+                            <td colspan="2" class="border-r border-slate-200"></td>
+                            <td class="p-3 text-right font-mono text-indigo-700 subtotal-amt border-r border-slate-200" data-original="${dTotalA}">${dTotalA.toLocaleString()}</td>
+                            <td class="p-3 pr-6"></td>
+                        </tr>`;
+                        
+                    gTotalL += dTotalL; gTotalA += dTotalA;
+                }
+
+                globalGrandTotalLiter = gTotalL;
+                globalGrandTotalAmount = gTotalA;
+
+                document.getElementById('reportTotalLiter').innerText = gTotalL.toLocaleString();
+                document.getElementById('reportTotalSum').innerText = gTotalA.toLocaleString();
                 
-                htmlString += getMainTitleBlock();
-                htmlString += headerHTML; 
-            }
+                document.getElementById('adjustAmount').value = "";
+                calculateNetTotal();
+                
+                isReportGenerated = true; 
+            })
+            .catch(err => {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="11" class="p-10 text-center text-red-500 font-normal">
+                            <i class="fa-solid fa-triangle-exclamation block text-xl mb-2"></i>
+                            ဒေတာဆွဲယူမှု မအောင်မြင်ပါ (ကွန်ရက် သို့မဟုတ် API ချိတ်ဆက်မှု မှားနေနိုင်ပါသည်)။ Error: ${err}
+                        </td>
+                    </tr>`;
+                document.getElementById('reportTotalSum').innerText = "0";
+                document.getElementById('reportTotalLiter').innerText = "0";
+            });
+        }
+        
+        function exportToExcel() {
+            try {
+                if (!isReportGenerated) {
+                    alert("ကျေးဇူးပြု၍ 'ရှာဖွေမည်' ခလုတ်ကို အရင်နှိပ်ပြီး Report ထုတ်ပါ။");
+                    return;
+                }
+                
+                if (typeof XLSX === 'undefined') {
+                    alert("Excel Library ချိတ်ဆက်မှု မအောင်မြင်ပါ။");
+                    return;
+                }
 
-            if (rowText.toLowerCase().includes("sub-total") || rowText.toLowerCase().includes("sub total")) {
-                let cells = Array.from(row.querySelectorAll('td, th'));
-                let numberValues = [];
+                const rType = document.getElementById('reportType').value;
 
-                cells.forEach(cell => {
-                    let rawText = (cell.innerText || cell.textContent).trim();
-                    if (!rawText.toLowerCase().includes("total") && !rawText.toLowerCase().includes("sub")) {
-                        let cleanNumStr = rawText.replace(/,/g, '').trim();
-                        if (cleanNumStr !== "" && !isNaN(cleanNumStr)) {
-                            numberValues.push(parseFloat(cleanNumStr));
+                if (rType === 'yearly_summary') {
+                    exportYearlySummaryToExcel();
+                    return; 
+                }
+
+                let dateStr = "";
+                
+                if (rType === 'monthly') {
+                    const mVal = document.getElementById('filterMonth').value; 
+                    if (mVal) {
+                        const d = new Date(mVal + "-01");
+                        dateStr = d.toLocaleString('en-US', { month: 'long' }) + `, ${d.getFullYear()}`; 
+                    } else {
+                        dateStr = "All Months";
+                    }
+                } else if (rType === 'yearly_detail') {
+                    dateStr = "Year " + document.getElementById('filterYear').value;
+                } else if (rType === 'custom') {
+                    const sDate = document.getElementById('filterStartDate').value;
+                    const eDate = document.getElementById('filterEndDate').value;
+                    if(sDate && eDate) dateStr = `${formatToDDMMYYYY(sDate)} to ${formatToDDMMYYYY(eDate)}`;
+                    else dateStr = "Custom Date Range";
+                }
+                
+                let titleText = `My Mergui Speed Boat's Fuel Issued Record For ${dateStr}`;
+
+                function getMainTitleBlock() {
+                    return `
+                        <tr>
+                            <td colspan="11" style="text-align: center; font-size: 16px; font-weight: bold; color: #1E40AF;">
+                                ${titleText}
+                            </td>
+                        </tr>
+                        <tr><td colspan="11"></td></tr>
+                    `;
+                }
+
+                // ပုံမှန် Excel ထုတ်ရာတွင်လည်း ၄ ကြောင်းချန်ပြီးမှ Signature ကို ပြပေးမည့် Block
+                function getSignatureBlock() {
+                    return `
+                        <tr><td colspan="11"></td></tr>
+                        <tr><td colspan="11"></td></tr>
+                        <tr><td colspan="11"></td></tr>
+                        <tr><td colspan="11"></td></tr>
+                        <tr>
+                            <td colspan="8"></td>
+                            <td colspan="3" style="text-align: center; font-weight: bold; color: #1E3A8A; font-size: 12px;">
+                                Recorded and Proved By
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="8"></td>
+                            <td colspan="3" style="text-align: center; font-weight: bold; color: #DC2626; font-size: 12px;">
+                                NAY LIN HTIKE
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                const originalTable = document.getElementById('excelReportTable');
+                const headerHTML = originalTable.querySelector('thead').innerHTML;
+                const originalTbodyRows = originalTable.querySelectorAll('tbody tr');
+                
+                let summaryData = [];
+                let htmlString = `<table><tbody>`;
+                let isFirstDepartment = true;
+                let currentDeptName = "Unknown Department"; 
+
+                originalTbodyRows.forEach((row, index) => {
+                    const rowText = row.innerText || row.textContent;
+                    
+                    if (rowText.includes("ဌာနအမည်")) {
+                        let extractedName = rowText.replace(/ဌာနအမည်/g, "").replace(/[:\-]/g, "").trim();
+                        if (extractedName !== "") {
+                            currentDeptName = extractedName;
+                        }
+
+                        if (!isFirstDepartment) {
+                            htmlString += getSignatureBlock();
+                            htmlString += `<tr><td colspan="11"></td></tr>`; 
+                        }
+                        isFirstDepartment = false;
+                        
+                        htmlString += getMainTitleBlock();
+                        htmlString += headerHTML; 
+                    }
+
+                    if (rowText.toLowerCase().includes("sub-total") || rowText.toLowerCase().includes("sub total")) {
+                        let cells = Array.from(row.querySelectorAll('td, th'));
+                        let numberValues = [];
+
+                        cells.forEach(cell => {
+                            let rawText = (cell.innerText || cell.textContent).trim();
+                            if (!rawText.toLowerCase().includes("total") && !rawText.toLowerCase().includes("sub")) {
+                                let cleanNumStr = rawText.replace(/,/g, '').trim();
+                                if (cleanNumStr !== "" && !isNaN(cleanNumStr)) {
+                                    numberValues.push(parseFloat(cleanNumStr));
+                                }
+                            }
+                        });
+
+                        let liters = 0, amount = 0;
+                        if (numberValues.length > 0) {
+                            liters = numberValues[0]; 
+                            amount = numberValues[numberValues.length - 1]; 
+                        }
+
+                        if (liters > 0 || amount > 0) {
+                            summaryData.push({
+                                name: currentDeptName, 
+                                liters: liters,
+                                amount: amount
+                            });
                         }
                     }
+                    htmlString += row.outerHTML;
                 });
 
-                let liters = 0, amount = 0;
-                if (numberValues.length > 0) {
-                    liters = numberValues[0]; 
-                    amount = numberValues[numberValues.length - 1]; 
-                }
-
-                if (liters > 0 || amount > 0) {
-                    summaryData.push({
-                        name: currentDeptName, 
-                        liters: liters,
-                        amount: amount
-                    });
-                }
-            }
-            htmlString += row.outerHTML;
-        });
-
-        if (!isFirstDepartment) htmlString += getSignatureBlock();
-        
-        const tfootHTML = originalTable.querySelector('tfoot').innerHTML;
-        htmlString += tfootHTML;
-        htmlString += `</tbody></table>`; 
-
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlString;
-        
-        const tempTable = tempDiv.querySelector('table');
-        const wsMain = XLSX.utils.table_to_sheet(tempTable);
-        // ထပ်တိုး Marks ကော်လံအတွက် အကျယ် ({ wch: 25 }) ကို အဆုံးတွင် ပေါင်းထည့်ထားပါသည်
-        wsMain['!cols'] = [ { wch: 20 }, { wch: 11 }, { wch: 55}, { wch: 11 }, { wch: 12 }, { wch: 20 }, { wch: 10 }, { wch: 11 }, { wch: 9 }, { wch: 18 }, { wch: 17 } ];
-
-        function addBorderToCell(cell) {
-            cell.s.border = {
-                top: { style: "thin", color: { rgb: "000000" } },
-                bottom: { style: "thin", color: { rgb: "000000" } },
-                left: { style: "thin", color: { rgb: "000000" } },
-                right: { style: "thin", color: { rgb: "000000" } }
-            };
-        }
-
-        const rangeMain = XLSX.utils.decode_range(wsMain['!ref']);
-        for (let R = rangeMain.s.r; R <= rangeMain.e.r; ++R) {
-            let isHeaderRow = false, isMainTitleRow = false, isSignatureRow = false, isFooterRow = false, isEmptyRow = true;
-
-            for (let c = rangeMain.s.c; c <= rangeMain.e.c; ++c) {
-                let cellRef = XLSX.utils.encode_cell({c: c, r: R});
-                let val = wsMain[cellRef] ? String(wsMain[cellRef].v).trim() : "";
-                if (val !== "") isEmptyRow = false;
-                if (val === titleText) isMainTitleRow = true;
-                if (val === "ID" || val === "လ (Month)") isHeaderRow = true;
-                if (val.includes("Recorded and Proved By") || val.includes("NAY LIN HTIKE")) isSignatureRow = true;
-                if (val.includes("Grand Total")) isFooterRow = true;
-            }
-
-            let isDataRow = !isEmptyRow && !isMainTitleRow && !isSignatureRow && !isHeaderRow;
-
-            for (let C = rangeMain.s.c; C <= rangeMain.e.c; ++C) {
-                const cellRef = XLSX.utils.encode_cell({c: C, r: R});
-                if (!wsMain[cellRef]) wsMain[cellRef] = { v: "", t: "s" }; 
-                if (!wsMain[cellRef].s) wsMain[cellRef].s = {}; 
-
-                const cellVal = String(wsMain[cellRef].v || "");
-                wsMain[cellRef].s.alignment = { vertical: "center" };
-                if (C === 2) wsMain[cellRef].s.alignment.wrapText = true;
-
-                if (isHeaderRow || isDataRow || isFooterRow) addBorderToCell(wsMain[cellRef]);
-
-                if (isMainTitleRow) {
-                    if (wsMain[cellRef].v === titleText) {
-                        wsMain[cellRef].s.font = { bold: true, sz: 14, color: { rgb: "1E40AF" } };
-                        wsMain[cellRef].s.alignment.horizontal = "center";
-                        wsMain[cellRef].s.border = {}; 
-                    }
-                } 
-                else if (isHeaderRow) {
-                    wsMain[cellRef].s.fill = { fgColor: { rgb: "172554" } }; 
-                    wsMain[cellRef].s.font = { bold: true, color: { rgb: "FFFFFF" } };
-                    wsMain[cellRef].s.alignment.horizontal = "center";
-                } 
-                else if (isSignatureRow) {
-                    if (cellVal.includes("Recorded and")) wsMain[cellRef].s.font = { bold: true, color: { rgb: "1E3A8A" } };
-                    if (cellVal.includes("NAY LIN HTIKE")) wsMain[cellRef].s.font = { bold: true, color: { rgb: "DC2626" } };
-                    wsMain[cellRef].s.alignment.horizontal = "center";
-                    wsMain[cellRef].s.border = {}; 
-                } 
-                else if (isDataRow || isFooterRow) {
-                    if (C >= 6 && (typeof wsMain[cellRef].v === 'number' || /^[\d,]+(\.\d+)?$/.test(cellVal))) {
-                        wsMain[cellRef].s.alignment.horizontal = "right";
-                    }
-                    if (C === 0 && parseInt(cellVal) > 0 && !cellVal.includes("MMFA")) {
-                         wsMain[cellRef].s.alignment.horizontal = "center";
-                    }
-                    if (cellVal.includes("ဌာနအမည်") || cellVal.includes("Sub-total") || isFooterRow) {
-                        wsMain[cellRef].s.font = { bold: true };
-                        if (cellVal.includes("ဌာနအမည်")) wsMain[cellRef].s.alignment.horizontal = "left";
-                    }
-                }
-            }
-        }
-
-        let summaryTitleText = `My Mergui Speed Boat's Fuel Issued Record Summary For ${dateStr}`;
-        if (rType === 'yearly_summary') {
-            summaryTitleText = `My Mergui Speed Boat's Fuel Issued Record Summary ${document.getElementById('filterYear').value}`;
-        }
-
-        let summaryHtmlString = `
-            <table>
-                <thead>
-                    <tr>
-                        <th colspan="4" style="text-align: center; font-size: 16px; font-weight: bold; color: #1E40AF;">
-                            ${summaryTitleText}
-                        </th>
-                    </tr>
-                    <tr><td colspan="4"></td></tr>
-                    <tr>
-                        <th>No.</th>
-                        <th>Department Description</th>
-                        <th>Total Liters</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-        `;
-        
-        let grandTotalLiters = 0;
-        let grandTotalAmount = 0;
-        
-        let adjDept = document.getElementById('adjustDept').value;
-        let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
-
-        if (summaryData.length === 0) {
-            summaryHtmlString += `<tr><td colspan="4" style="text-align:center;">No summary data found.</td></tr>`;
-        } else {
-            summaryData.forEach((item, i) => {
-                let currentItemAmount = item.amount;
-                grandTotalLiters += item.liters;
-                grandTotalAmount += currentItemAmount;
+                if (!isFirstDepartment) htmlString += getSignatureBlock();
                 
-                summaryHtmlString += `
-                    <tr>
-                        <td>${i + 1}</td>
-                        <td>${item.name}</td>
-                        <td>${item.liters}</td>
-                        <td>${currentItemAmount}</td>
-                    </tr>
+                const tfootHTML = originalTable.querySelector('tfoot').innerHTML;
+                htmlString += tfootHTML;
+                htmlString += `</tbody></table>`; 
+
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlString;
+                
+                const tempTable = tempDiv.querySelector('table');
+                const wsMain = XLSX.utils.table_to_sheet(tempTable);
+                wsMain['!cols'] = [ { wch: 20 }, { wch: 11 }, { wch: 55}, { wch: 11 }, { wch: 12 }, { wch: 20 }, { wch: 10 }, { wch: 11 }, { wch: 9 }, { wch: 18 }, { wch: 25 } ];
+
+                // လှပသော Bold Border မျဉ်းများ တိတိကျကျဖော်ပြခြင်း
+                function addBorderToCell(cell) {
+                    if (!cell.s) cell.s = {};
+                    cell.s.border = {
+                        top: { style: "medium", color: { rgb: "000000" } },
+                        bottom: { style: "medium", color: { rgb: "000000" } },
+                        left: { style: "medium", color: { rgb: "000000" } },
+                        right: { style: "medium", color: { rgb: "000000" } }
+                    };
+                }
+
+                const rangeMain = XLSX.utils.decode_range(wsMain['!ref']);
+                for (let R = rangeMain.s.r; R <= rangeMain.e.r; ++R) {
+                    let isHeaderRow = false, isMainTitleRow = false, isSignatureRow = false, isFooterRow = false, isEmptyRow = true;
+
+                    for (let c = rangeMain.s.c; c <= rangeMain.e.c; ++c) {
+                        let cellRef = XLSX.utils.encode_cell({c: c, r: R});
+                        let val = wsMain[cellRef] ? String(wsMain[cellRef].v).trim() : "";
+                        if (val !== "") isEmptyRow = false;
+                        if (val === titleText) isMainTitleRow = true;
+                        if (val === "ID" || val === "လ (Month)") isHeaderRow = true;
+                        if (val.includes("Recorded and Proved By") || val.includes("NAY LIN HTIKE")) isSignatureRow = true;
+                        if (val.includes("Grand Total")) isFooterRow = true;
+                    }
+
+                    let isDataRow = !isEmptyRow && !isMainTitleRow && !isSignatureRow && !isHeaderRow;
+
+                    for (let C = rangeMain.s.c; C <= rangeMain.e.c; ++C) {
+                        const cellRef = XLSX.utils.encode_cell({c: C, r: R});
+                        if (!wsMain[cellRef]) wsMain[cellRef] = { v: "", t: "s" }; 
+                        if (!wsMain[cellRef].s) wsMain[cellRef].s = {}; 
+
+                        const cellVal = String(wsMain[cellRef].v || "");
+                        wsMain[cellRef].s.alignment = { vertical: "center" };
+                        if (C === 2) wsMain[cellRef].s.alignment.wrapText = true;
+
+                        // Date Format ကို (05/06/2026) ပုံစံ String (Text) အနေဖြင့်အတင်းပြောင်းခြင်း
+                        if (cellVal.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                            wsMain[cellRef].t = "s";
+                            wsMain[cellRef].v = cellVal;
+                        }
+
+                        if (isHeaderRow || isDataRow || isFooterRow) addBorderToCell(wsMain[cellRef]);
+
+                        if (isMainTitleRow) {
+                            if (wsMain[cellRef].v === titleText) {
+                                wsMain[cellRef].s.font = { bold: true, sz: 14, color: { rgb: "1E40AF" } };
+                                wsMain[cellRef].s.alignment.horizontal = "center";
+                                wsMain[cellRef].s.border = {}; 
+                            }
+                        } 
+                        else if (isHeaderRow) {
+                            wsMain[cellRef].s.fill = { fgColor: { rgb: "172554" } }; 
+                            wsMain[cellRef].s.font = { bold: true, color: { rgb: "FFFFFF" } };
+                            wsMain[cellRef].s.alignment.horizontal = "center";
+                        } 
+                        else if (isSignatureRow) {
+                            if (cellVal.includes("Recorded and")) wsMain[cellRef].s.font = { bold: true, color: { rgb: "1E3A8A" } };
+                            if (cellVal.includes("NAY LIN HTIKE")) wsMain[cellRef].s.font = { bold: true, color: { rgb: "DC2626" } };
+                            wsMain[cellRef].s.alignment.horizontal = "center";
+                            wsMain[cellRef].s.border = {}; 
+                        } 
+                        else if (isDataRow || isFooterRow) {
+                            if (C >= 6 && (typeof wsMain[cellRef].v === 'number' || /^[\d,]+(\.\d+)?$/.test(cellVal))) {
+                                wsMain[cellRef].s.alignment.horizontal = "right";
+                            }
+                            if (C === 0 && parseInt(cellVal) > 0 && !cellVal.includes("MMFA")) {
+                                 wsMain[cellRef].s.alignment.horizontal = "center";
+                            }
+                            if (cellVal.includes("ဌာနအမည်") || cellVal.includes("Sub-total") || isFooterRow) {
+                                wsMain[cellRef].s.font = { bold: true };
+                                if (cellVal.includes("ဌာနအမည်")) wsMain[cellRef].s.alignment.horizontal = "left";
+                            }
+                        }
+                    }
+                }
+
+                let summaryTitleText = `My Mergui Speed Boat's Fuel Issued Record Summary For ${dateStr}`;
+
+                let summaryHtmlString = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th colspan="4" style="text-align: center; font-size: 16px; font-weight: bold; color: #1E40AF;">
+                                    ${summaryTitleText}
+                                </th>
+                            </tr>
+                            <tr><td colspan="4"></td></tr>
+                            <tr>
+                                <th>No.</th>
+                                <th>Department Description</th>
+                                <th>Total Liters</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                 `;
+                
+                let grandTotalLiters = 0;
+                let grandTotalAmount = 0;
+                
+                let adjDept = document.getElementById('adjustDept').value;
+                let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
+
+                if (summaryData.length === 0) {
+                    summaryHtmlString += `<tr><td colspan="4" style="text-align:center;">No summary data found.</td></tr>`;
+                } else {
+                    summaryData.forEach((item, i) => {
+                        let currentItemAmount = item.amount;
+                        grandTotalLiters += item.liters;
+                        grandTotalAmount += currentItemAmount;
+                        
+                        summaryHtmlString += `
+                            <tr>
+                                <td>${i + 1}</td>
+                                <td>${item.name}</td>
+                                <td>${item.liters}</td>
+                                <td>${currentItemAmount}</td>
+                            </tr>
+                        `;
+                    });
+
+                    if (adjDept === 'Grand') {
+                        grandTotalAmount += adjInput;
+                    }
+
+                    summaryHtmlString += `
+                        <tr>
+                            <td colspan="2">Grand Total:</td>
+                            <td>${grandTotalLiters}</td>
+                            <td>${grandTotalAmount}</td>
+                        </tr>
+                    `;
+                }
+                
+                function getSummarySignatureBlock() {
+                    return `
+                        <tr><td colspan="4"></td></tr>
+                        <tr><td colspan="4"></td></tr>
+                        <tr><td colspan="4"></td></tr>
+                        <tr><td colspan="4"></td></tr>
+                        <tr>
+                            <td colspan="2"></td>
+                            <td colspan="2" style="text-align: center; font-weight: bold; color: #1E3A8A; font-size: 12px;">
+                                Recorded and Proved By
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"></td>
+                            <td colspan="2" style="text-align: center; font-weight: bold; color: #DC2626; font-size: 12px;">
+                                NAY LIN HTIKE
+                            </td>
+                        </tr>
+                    `;
+                }
+                
+                summaryHtmlString += getSummarySignatureBlock();
+                summaryHtmlString += `</tbody></table>`;
+
+                const tempSumDiv = document.createElement('div');
+                tempSumDiv.innerHTML = summaryHtmlString;
+                const tempSumTable = tempSumDiv.querySelector('table');
+                const wsSummary = XLSX.utils.table_to_sheet(tempSumTable);
+
+                wsSummary['!cols'] = [ { wch: 10 }, { wch: 45 }, { wch: 15 }, { wch: 18 } ];
+
+                if (wsSummary['!ref']) {
+                    const rangeSum = XLSX.utils.decode_range(wsSummary['!ref']);
+                    for (let R = rangeSum.s.r; R <= rangeSum.e.r; ++R) {
+                        let isSummaryTitle = false;
+                        let isSummaryEmpty = true;
+                        let isSummaryHeader = false;
+                        let isSummarySignature = false;
+                        
+                        for (let c = rangeSum.s.c; c <= rangeSum.e.c; ++c) {
+                            let cellRef = XLSX.utils.encode_cell({c: c, r: R});
+                            let val = wsSummary[cellRef] ? String(wsSummary[cellRef].v).trim() : "";
+                            if (val !== "") isSummaryEmpty = false;
+                            if (val === summaryTitleText) isSummaryTitle = true;
+                            if (val === "Department Description" || val === "No.") isSummaryHeader = true;
+                            if (val.includes("Recorded and Proved By") || val.includes("NAY LIN HTIKE")) isSummarySignature = true;
+                        }
+                        
+                        let isSummaryData = !isSummaryEmpty && !isSummaryTitle && !isSummarySignature && !isSummaryHeader;
+
+                        for (let C = rangeSum.s.c; C <= rangeSum.e.c; ++C) {
+                            const cellRef = XLSX.utils.encode_cell({c: C, r: R});
+                            if (!wsSummary[cellRef]) wsSummary[cellRef] = { v: "", t: "s" };
+                            if (!wsSummary[cellRef].s) wsSummary[cellRef].s = {};
+                            
+                            wsSummary[cellRef].s.alignment = { vertical: "center" };
+                            const valStr = String(wsSummary[cellRef].v || "");
+                            
+                            if (isSummaryHeader || isSummaryData) {
+                                addBorderToCell(wsSummary[cellRef]);
+                            }
+                            
+                            if (isSummaryTitle) {
+                                if (valStr === summaryTitleText) {
+                                    wsSummary[cellRef].s.font = { bold: true, sz: 14, color: { rgb: "1E40AF" } };
+                                    wsSummary[cellRef].s.alignment.horizontal = "center";
+                                }
+                            } 
+                            else if (isSummaryHeader) {
+                                wsSummary[cellRef].s.fill = { fgColor: { rgb: "172554" } };
+                                wsSummary[cellRef].s.font = { bold: true, color: { rgb: "FFFFFF" } };
+                                wsSummary[cellRef].s.alignment.horizontal = "center";
+                            }
+                            else if (isSummarySignature) {
+                                if (valStr.includes("Recorded and")) wsSummary[cellRef].s.font = { bold: true, color: { rgb: "1E3A8A" } };
+                                if (valStr.includes("NAY LIN HTIKE")) wsSummary[cellRef].s.font = { bold: true, color: { rgb: "DC2626" } };
+                                wsSummary[cellRef].s.alignment.horizontal = "center";
+                            }
+                            else if (isSummaryData) {
+                                if (valStr.includes("Total")) {
+                                    wsSummary[cellRef].s.font = { bold: true };
+                                    if (C === 0) wsSummary[cellRef].s.alignment.horizontal = "right";
+                                }
+                                if (C >= 2) wsSummary[cellRef].s.alignment.horizontal = "right";
+                                if (C === 0 && !valStr.includes("Total")) wsSummary[cellRef].s.alignment.horizontal = "center";
+                            }
+                        }
+                    }
+                }
+
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, wsMain, "Fuel_Report"); 
+                XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");  
+
+                const fileName = `Fuel_Report_${dateStr.replace(/[^a-zA-Z0-9 -]/g, '_').trim()}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+                
+            } catch (error) {
+                console.error(error);
+                alert("Excel ထုတ်ရာတွင် အမှားအယွင်းဖြစ်နေပါသည်။ Error: " + error.message);
+            }
+        }
+
+        // နှစ်အပိုင်းအခြားဖြင့် (Yearly Range) Excel သီးသန့်ထုတ်ပေးမည့် Function
+        function exportYearlySummaryToExcel() {
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            let rows = document.querySelectorAll('#reportTableBody tr.data-row:not(.year-header)');
+            let yearlyData = {}; 
+            
+            rows.forEach(row => {
+                let monthYearStr = row.cells[0].innerText.trim(); 
+                let parts = monthYearStr.split(',');
+                if(parts.length === 2) {
+                    let m = parts[0].trim();
+                    let y = parts[1].trim();
+                    
+                    let liter = parseFloat(row.cells[2].innerText.replace(/,/g, '')) || 0;
+                    let amtCell = row.querySelector('.row-amt');
+                    let amount = amtCell ? (parseFloat(amtCell.innerText.replace(/,/g, '')) || 0) : 0;
+                    
+                    if(!yearlyData[y]) {
+                        yearlyData[y] = {};
+                        monthNames.forEach(mn => yearlyData[y][mn] = { l: 0, a: 0 });
+                    }
+                    if(yearlyData[y][m]) {
+                        yearlyData[y][m].l += liter;
+                        yearlyData[y][m].a += amount;
+                    }
+                }
             });
 
-            if (adjDept === 'Grand') {
-                grandTotalAmount += adjInput;
+            if(Object.keys(yearlyData).length === 0) {
+                alert("Excel ထုတ်ယူရန် လုံလောက်သောဒေတာမရှိပါ။");
+                return;
             }
 
-            summaryHtmlString += `
-                <tr>
-                    <td colspan="2">Grand Total:</td>
-                    <td>${grandTotalLiters}</td>
-                    <td>${grandTotalAmount}</td>
-                </tr>
-            `;
-        }
-        
-        function getSummarySignatureBlock() {
-            return `
-                <tr><td colspan="4"></td></tr>
-                <tr><td colspan="4"></td></tr>
-                <tr><td colspan="4"></td></tr>
-                <tr><td colspan="4"></td></tr>
-                <tr>
-                    <td colspan="2"></td>
-                    <td colspan="2" style="text-align: center; font-weight: bold; color: #1E3A8A; font-size: 12px;">
-                        Recorded and Proved By
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2"></td>
-                    <td colspan="2" style="text-align: center; font-weight: bold; color: #DC2626; font-size: 12px;">
-                        NAY LIN HTIKE
-                    </td>
-                </tr>
-            `;
-        }
-        
-        summaryHtmlString += getSummarySignatureBlock();
-        summaryHtmlString += `</tbody></table>`;
+            let wsData = [];
+            let merges = [];
+            let currentRow = 0;
+            
+            let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
+            let years = Object.keys(yearlyData).sort();
 
-        const tempSumDiv = document.createElement('div');
-        tempSumDiv.innerHTML = summaryHtmlString;
-        const tempSumTable = tempSumDiv.querySelector('table');
-        const wsSummary = XLSX.utils.table_to_sheet(tempSumTable);
+            let titleRowIndices = [];
+            let headerRowIndices = [];
+            let yearRowIndices = [];
+            let dataRowIndices = [];
 
-        wsSummary['!cols'] = [ { wch: 10 }, { wch: 45 }, { wch: 15 }, { wch: 18 } ];
-
-        if (wsSummary['!ref']) {
-            const rangeSum = XLSX.utils.decode_range(wsSummary['!ref']);
-            for (let R = rangeSum.s.r; R <= rangeSum.e.r; ++R) {
-                let isSummaryTitle = false;
-                let isSummaryEmpty = true;
-                let isSummaryHeader = false;
-                let isSummarySignature = false;
-                
-                for (let c = rangeSum.s.c; c <= rangeSum.e.c; ++c) {
-                    let cellRef = XLSX.utils.encode_cell({c: c, r: R});
-                    let val = wsSummary[cellRef] ? String(wsSummary[cellRef].v).trim() : "";
-                    if (val !== "") isSummaryEmpty = false;
-                    if (val === summaryTitleText) isSummaryTitle = true;
-                    if (val === "Department Description" || val === "No.") isSummaryHeader = true;
-                    if (val.includes("Recorded and Proved By") || val.includes("NAY LIN HTIKE")) isSummarySignature = true;
+            years.forEach((y, yIndex) => {
+                if (yIndex > 0) {
+                    wsData.push(["", "", "", "", ""]);
+                    wsData.push(["", "", "", "", ""]);
+                    currentRow += 2;
                 }
-                
-                let isSummaryData = !isSummaryEmpty && !isSummaryTitle && !isSummarySignature && !isSummaryHeader;
 
-                for (let C = rangeSum.s.c; C <= rangeSum.e.c; ++C) {
-                    const cellRef = XLSX.utils.encode_cell({c: C, r: R});
-                    if (!wsSummary[cellRef]) wsSummary[cellRef] = { v: "", t: "s" };
-                    if (!wsSummary[cellRef].s) wsSummary[cellRef].s = {};
-                    
-                    wsSummary[cellRef].s.alignment = { vertical: "center" };
-                    const valStr = String(wsSummary[cellRef].v || "");
-                    
-                    if (isSummaryHeader || isSummaryData) {
-                        addBorderToCell(wsSummary[cellRef]);
+                titleRowIndices.push(currentRow);
+                wsData.push(["My Mergui Fuel Issued Recorded Summary For Yearly", "", "", "", ""]);
+                merges.push({ s: {r: currentRow, c: 0}, e: {r: currentRow, c: 4} });
+                currentRow++;
+                
+                wsData.push(["", "", "", "", ""]);
+                currentRow++;
+
+                headerRowIndices.push(currentRow);
+                wsData.push(["No.", "Month", "Total Litter", "Total Amount", "Marks"]);
+                currentRow++;
+
+                yearRowIndices.push(currentRow);
+                wsData.push([`Year : ${y}`, "", "", "", ""]);
+                merges.push({ s: {r: currentRow, c: 0}, e: {r: currentRow, c: 4} });
+                currentRow++;
+
+                let no = 1;
+                let yTotalL = 0;
+                let yTotalA = 0;
+
+                monthNames.forEach(m => {
+                    let l = yearlyData[y][m].l;
+                    let a = yearlyData[y][m].a;
+                    if (l > 0 || a > 0) {
+                        dataRowIndices.push(currentRow);
+                        wsData.push([no++, m, l, a, ""]);
+                        yTotalL += l;
+                        yTotalA += a;
+                        currentRow++;
                     }
+                });
+                
+                if (yIndex === years.length - 1 && adjInput !== 0) {
+                    yTotalA += adjInput;
+                    dataRowIndices.push(currentRow);
+                    wsData.push(["", "Adjust Amount", "", adjInput, ""]);
+                    currentRow++;
+                }
+
+                dataRowIndices.push(currentRow);
+                wsData.push(["", "Total", yTotalL, yTotalA, ""]);
+                currentRow++;
+
+                // လေးကြောင်းချန်ပြီးမှ Signature ကို ပြပေးမည့် Block 
+                wsData.push(["", "", "", "", ""]);
+                wsData.push(["", "", "", "", ""]);
+                wsData.push(["", "", "", "", ""]);
+                wsData.push(["", "", "", "", ""]);
+                wsData.push(["", "", "", "Recorded and Proved By", ""]);
+                wsData.push(["", "", "", "NAY LIN HTIKE", ""]);
+                currentRow += 6;
+            });
+
+            let ws = XLSX.utils.aoa_to_sheet(wsData);
+            ws['!merges'] = merges;
+            ws['!cols'] = [ { wch: 10 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 25 } ];
+
+            // Bolder line ဘောင်များကို သတ်မှတ်ပေးခြင်း
+            function addBorder(cell) {
+                cell.s.border = {
+                    top: { style: "medium", color: { rgb: "000000" } },
+                    bottom: { style: "medium", color: { rgb: "000000" } },
+                    left: { style: "medium", color: { rgb: "000000" } },
+                    right: { style: "medium", color: { rgb: "000000" } }
+                };
+            }
+
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            for (let R = range.s.r; R <= range.e.r; ++R) {
+                for (let C = range.s.c; C <= range.e.c; ++C) {
+                    let cellRef = XLSX.utils.encode_cell({c: C, r: R});
+                    if (!ws[cellRef]) ws[cellRef] = { v: "", t: "s" };
+                    if (!ws[cellRef].s) ws[cellRef].s = {};
                     
-                    if (isSummaryTitle) {
-                        if (valStr === summaryTitleText) {
-                            wsSummary[cellRef].s.font = { bold: true, sz: 14, color: { rgb: "1E40AF" } };
-                            wsSummary[cellRef].s.alignment.horizontal = "center";
-                        }
-                    } 
-                    else if (isSummaryHeader) {
-                        wsSummary[cellRef].s.fill = { fgColor: { rgb: "172554" } };
-                        wsSummary[cellRef].s.font = { bold: true, color: { rgb: "FFFFFF" } };
-                        wsSummary[cellRef].s.alignment.horizontal = "center";
-                    }
-                    else if (isSummarySignature) {
-                        if (valStr.includes("Recorded and")) wsSummary[cellRef].s.font = { bold: true, color: { rgb: "1E3A8A" } };
-                        if (valStr.includes("NAY LIN HTIKE")) wsSummary[cellRef].s.font = { bold: true, color: { rgb: "DC2626" } };
-                        wsSummary[cellRef].s.alignment.horizontal = "center";
-                    }
-                    else if (isSummaryData) {
-                        if (valStr.includes("Total")) {
-                            wsSummary[cellRef].s.font = { bold: true };
-                            if (C === 0) wsSummary[cellRef].s.alignment.horizontal = "right";
-                        }
-                        if (C >= 2) wsSummary[cellRef].s.alignment.horizontal = "right";
-                        if (C === 0 && !valStr.includes("Total")) wsSummary[cellRef].s.alignment.horizontal = "center";
+                    let val = String(ws[cellRef].v);
+                    ws[cellRef].s.alignment = { vertical: "center" };
+                    
+                    if (titleRowIndices.includes(R)) {
+                        ws[cellRef].s.font = { bold: true, sz: 14, color: { rgb: "1E40AF" } };
+                        ws[cellRef].s.alignment.horizontal = "center";
+                    } else if (headerRowIndices.includes(R)) {
+                        ws[cellRef].s.fill = { fgColor: { rgb: "172554" } };
+                        ws[cellRef].s.font = { bold: true, color: { rgb: "FFFFFF" } };
+                        ws[cellRef].s.alignment.horizontal = "center";
+                        addBorder(ws[cellRef]);
+                    } else if (yearRowIndices.includes(R)) {
+                        ws[cellRef].s.font = { bold: true };
+                        ws[cellRef].s.alignment.horizontal = "left";
+                        ws[cellRef].s.fill = { fgColor: { rgb: "F1F5F9" } };
+                        addBorder(ws[cellRef]);
+                    } else if (dataRowIndices.includes(R)) {
+                        addBorder(ws[cellRef]);
+                        if (C >= 2) ws[cellRef].s.alignment.horizontal = "right";
+                        if (C === 0) ws[cellRef].s.alignment.horizontal = "center";
+                        if (C === 1 && (val === "Total" || val === "Adjust Amount")) ws[cellRef].s.font = { bold: true };
+                    } else if (val.includes("Recorded") || val.includes("NAY LIN HTIKE")) {
+                        if (val.includes("Recorded")) ws[cellRef].s.font = { bold: true, color: { rgb: "1E3A8A" } };
+                        if (val.includes("NAY LIN HTIKE")) ws[cellRef].s.font = { bold: true, color: { rgb: "DC2626" } };
+                        ws[cellRef].s.alignment.horizontal = "center";
                     }
                 }
             }
+
+            let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Yearly_Summary");
+            
+            let sYear = document.getElementById('filterStartYear').value || "Start";
+            let eYear = document.getElementById('filterEndYear').value || "End";
+            XLSX.writeFile(wb, `Yearly_Summary_${sYear}_to_${eYear}.xlsx`);
         }
 
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, wsMain, "Fuel_Report"); 
-        XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");  
-
-        const fileName = `Fuel_Report_${dateStr.replace(/[^a-zA-Z0-9 -]/g, '_').trim()}.xlsx`;
-        XLSX.writeFile(wb, fileName);
-        
-    } catch (error) {
-        console.error(error);
-        alert("Excel ထုတ်ရာတွင် အမှားအယွင်းဖြစ်နေပါသည်။ Error: " + error.message);
-    }
-}
     </script>
 </body>
 </html>
