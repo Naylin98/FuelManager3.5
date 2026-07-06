@@ -11,7 +11,1844 @@
         /* သေချာသော မြန်မာဖောင့်များကို ဦးစားပေးစီစဉ်ထားခြင်း */
         @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
         body { 
+            font-family: 'Pyidaungsu', 'My<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuel Management Pro System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="xlsx.js"></script>
+    <style>
+        /* သေချာသော မြန်မာဖောင့်များကို ဦးစားပေးစီစဉ်ထားခြင်း */
+        @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
+        body { 
             font-family: 'Pyidaungsu', 'Myanmar Text', 'Padauk', sans-serif; 
+            background-color: #f8fafc;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Form Inputs */
+        .form-input {
+            width: 100%; padding: 0.75rem 1rem; background-color: #f8fafc; border: 1px solid #e2e8f0; 
+            border-radius: 0.5rem; font-size: 0.875rem; transition: all 0.2s ease; outline: none;
+            color: #1e293b;
+        }
+        .form-input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15); background-color: #ffffff; }
+        .form-label { display: block; font-size: 0.75rem; font-weight: 700; color: #475569;   }
+        
+        /* Table Styles (Auto Width for Content) */
+        .th-style { padding: 12px 16px; font-size: 0.75rem; font-weight: 700;  }
+        .td-style { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
+        
+        /* Gradient Backgrounds */
+        .bg-gradient-header { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col lg:flex-row overflow-hidden">
+
+    <div class="w-full lg:w-72 bg-gradient-header text-slate-200 flex flex-col shrink-0 h-screen shadow-2xl z-20">
+        <div class="p-6 border-b border-slate-700/50 flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-900/50">
+                <i class="fa-solid fa-gas-pump text-white text-xl"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-white text-lg leading-tight tracking-wide">Fuel Manager</h1>
+                <p class="text-[11px] text-indigo-300 font-semibold tracking-wider uppercase mt-1">Enterprise System</p>
+            </div>
+        </div>
+        
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
+            <button onclick="switchTab('form-tab')" id="btn-form-tab" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl bg-indigo-600 text-white shadow-md transition duration-200 font-bold text-sm">
+                <i class="fa-solid fa-file-pen w-5 text-center text-lg"></i>
+                <span>စာရင်းသွင်းရန် Form</span>
+            </button>
+            <button onclick="switchTab('draft-tab')" id="btn-draft-tab" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition duration-200 font-bold text-sm">
+                <i class="fa-solid fa-list-check w-5 text-center text-lg"></i>
+                <span>စစ်ဆေးရန် Draft</span>
+            </button>
+            <button onclick="switchTab('report-tab')" id="btn-report-tab" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition duration-200 font-bold text-sm">
+                <i class="fa-solid fa-chart-pie w-5 text-center text-lg"></i>
+                <span>စာရင်းချုပ် Reports</span>
+            </button>
+            <button onclick="switchTab('settings-tab')" id="btn-settings-tab" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition duration-200 font-bold text-sm">
+                <i class="fa-solid fa-gears w-5 text-center text-lg"></i>
+                <span>စနစ်ဆက်တင်များ</span>
+            </button>
+        </nav>
+
+        <div class="p-5 border-t border-slate-800">
+            <div class="flex items-center space-x-3 p-3 rounded-xl bg-slate-900 border border-slate-700 text-xs">
+                <span class="relative flex h-2.5 w-2.5 shrink-0">
+                    <span id="statusPulse" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span id="statusDot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                </span>
+                <span id="statusText" class="text-slate-300 font-semibold truncate">Link မချိတ်ရသေးပါ</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-100 relative z-10">
+        
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0 shadow-sm z-10">
+            <div class="flex items-center space-x-3">
+                <span class="text-sm font-bold text-slate-800" id="activeTabTitle">ဆီထုတ်ပေးမှု မှတ်တမ်းအသစ်သွင်းရန်</span>
+            </div>
+            <div class="text-sm text-indigo-700 font-bold flex items-center space-x-2 bg-indigo-50 px-4 py-2 rounded-lg border border-indigo-100">
+                <i class="fa-regular fa-calendar-check"></i>
+                <span id="currentDateDisplay"></span>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8">
+            
+            <!-- 1. FORM TAB -->
+            <div id="form-tab" class="tab-content max-w-7xl mx-auto space-y-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-6 py-4 flex justify-between items-center">
+                        <h2 class="text-base font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-pen-to-square text-indigo-400"></i>
+                            <span>အချက်အလက်ဖြည့်စွက်ရန်</span>
+                        </h2>
+                        <button onclick="switchTab('draft-tab')" class="text-sm text-slate-200 hover:text-white flex items-center font-semibold">
+                            စစ်ဆေးရန် Draft သို့သွားမည် <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+
+                    <form id="entryForm" class="p-6 md:p-8" onsubmit="addToDraft(event)">
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 mb-6">
+                            <h3 class="text-xs font-bold text-slate-500 mb-4 border-b border-slate-200 pb-2">အခြေခံအချက်အလက်များ</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                                <div>
+                                    <label class="form-label text-slate-700">ID / အမှတ်စဉ်</label>
+                                    <input type="text" id="inp_id" required placeholder="ခေါ်ယူနေပါသည်..." class="form-input bg-white border-slate-300">
+                                </div>
+                                <div>
+                                    <label class="form-label text-slate-700">Filled Date</label>
+                                    <input type="date" id="inp_filledDate" required class="form-input bg-white border-slate-300 text-slate-700">
+                                </div>
+                                <div>
+                                    <label class="form-label text-slate-700">Boat ID / ရေယာဉ်</label>
+                                    <select id="inp_boatId" required class="form-input bg-white border-slate-300 cursor-pointer">
+                                        <option value="">-- ရွေးချယ်ရန် --</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label text-slate-700">Department / ဌာန</label>
+                                    <select id="inp_dept" required class="form-input bg-white border-slate-300 cursor-pointer">
+                                        <option value="">-- ရွေးချယ်ရန် --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                            <div class="lg:col-span-2 space-y-5">
+                                <div class="bg-indigo-50/50 border border-indigo-100 rounded-xl p-5 h-full">
+                                    <h3 class="text-xs font-bold text-indigo-600 mb-4 border-b border-indigo-100 pb-2">ခရီးစဉ်အသေးစိတ်</h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
+                                        <div class="md:col-span-2">
+                                            <label class="form-label text-indigo-900">Itineraries (ခရီးစဉ်)</label>
+                                            <input type="text" id="inp_itineraries" required placeholder="သွားရောက်မည့် ခရီးစဉ်ရေးရန်" class="form-input border-indigo-200">
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                        <div>
+                                            <label class="form-label text-emerald-700">Issued Date</label>
+                                            <input type="date" id="inp_issuedDate" required class="form-input border-emerald-300 bg-emerald-50/50 text-emerald-800">
+                                        </div>
+                                        <div>
+                                            <label class="form-label text-slate-600">Marks (မှတ်ချက်)</label>
+                                            <input type="text" id="inp_marks" placeholder="မှတ်သားရန်ရှိပါက..." class="form-input">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="lg:col-span-1">
+                                <div class="bg-amber-50/50 border border-amber-200 rounded-xl p-5 h-full">
+                                    <h3 class="text-xs font-bold text-amber-700 mb-4 border-b border-amber-200 pb-2 flex items-center"><i class="fa-solid fa-calculator mr-2"></i> တွက်ချက်မှု</h3>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="form-label text-slate-700">Liter (လီတာ)</label>
+                                            <input type="number" id="inp_liter" oninput="calcPrice()" required step="1" placeholder="0" class="form-input font-mono font-bold text-lg border-amber-300 focus:border-amber-500 focus:ring-amber-500">
+                                        </div>
+                                        <div>
+                                            <label class="form-label text-slate-700">Price/Drum (စည်ဈေး)</label>
+                                            <input type="number" id="inp_priceDrum" oninput="calcPrice()" required step="1" placeholder="0" class="form-input font-mono font-bold text-lg border-amber-300 focus:border-amber-500 focus:ring-amber-500">
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-3 pt-2">
+                                            <div>
+                                                <label class="text-[10px] font-bold text-slate-400 block mb-1">PRICE 1L (AUTO)</label>
+                                                <input type="number" id="inp_price" readonly class="w-full bg-transparent border-none text-slate-500 font-mono text-sm outline-none cursor-not-allowed px-1" placeholder="0">
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] font-bold text-emerald-600 block mb-1">TOTAL (AUTO)</label>
+                                                <input type="text" id="inp_totalAmountDisplay" readonly class="w-full bg-transparent border-none text-emerald-700 font-mono font-bold text-lg outline-none cursor-not-allowed px-1" placeholder="0">
+                                                <input type="hidden" id="inp_totalAmount">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="pt-3 border-t border-amber-200 mt-2">
+                                            <label class="text-[11px] font-bold text-blue-700 block mb-1">VOC AMOUNT (ဆိုင်ဘောက်ချာငွေ)</label>
+                                            <input type="number" id="inp_vocAmount" step="1" placeholder="ကွာခြားချက်ရှိပါက ထည့်ရန်" class="form-input font-mono font-bold text-base border-blue-300 focus:border-blue-500 focus:ring-blue-500">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-2">
+                            <button type="submit" id="btnSubmitDraft" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/30 transition duration-200 flex items-center space-x-2">
+                                <i class="fa-solid fa-arrow-down"></i>
+                                <span>Draft စာရင်းသို့ ထည့်မည်</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 2. DRAFT TAB -->
+            <div id="draft-tab" class="tab-content hidden max-w-7xl mx-auto space-y-6">
+                <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm">
+                    <div>
+                        <h4 class="text-sm font-bold text-indigo-800"><i class="fa-solid fa-rotate-left mr-2"></i>အမှားပြင်ဆင်ရန် ဒေတာပြန်ခေါ်မည် (Edit Data)</h4>
+                        <p class="text-xs text-indigo-600 mt-1">ပို့ပြီးသားစာရင်းများကို လအလိုက် ပြန်ခေါ်၍ ပြင်ဆင်ပြီး Sheet သို့ ပြန်သိမ်းနိုင်ပါသည်။</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <input type="month" id="fetchEditMonth" class="form-input py-2 bg-white border-indigo-300 font-bold text-sm">
+                        <button onclick="fetchDataForEdit()" id="btnFetchEdit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-lg shadow-md transition whitespace-nowrap">
+                            ဆွဲယူမည်
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                    <div class="bg-slate-50 border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800 flex items-center space-x-2">
+                                <i class="fa-solid fa-list-check text-indigo-600"></i>
+                                <span>စစ်ဆေးရန် ယာယီစာရင်းများ (Draft & Edit)</span>
+                            </h3>
+                        </div>
+                        <div class="flex flex-wrap items-center space-x-3">
+                            <button onclick="startNewForm()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-md transition duration-200 flex items-center space-x-2">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>အသစ်ထပ်သွင်းမည် (New)</span>
+                            </button>
+                            <button onclick="submitDraftToSheet()" id="btnSubmitToSheet" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <span>Sheet သို့ သိမ်းမည်</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-800">
+                                    <th class="th-style text-slate-200 pl-6 border-b-0">ID</th>
+                                    <th class="th-style text-slate-200 border-b-0">Filled Date</th>
+                                    <th class="th-style text-slate-200 border-b-0">Itineraries</th>
+                                    <th class="th-style text-emerald-400 border-b-0">Issued Date</th>
+                                    <th class="th-style text-slate-200 border-b-0">Boat ID</th>
+                                    <th class="th-style text-slate-200 border-b-0">Department</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">Liter</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">Total (MMK)</th>
+                                    <th class="th-style text-slate-200 text-center border-b-0">Status</th>
+                                    <th class="th-style text-slate-200 pr-6 text-center border-b-0">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="draftTableBody" class="divide-y divide-slate-100 font-medium">
+                                <tr>
+                                    <td colspan="10" class="p-10 text-center text-slate-400">
+                                        <i class="fa-regular fa-folder-open text-3xl mb-2 text-slate-300 block"></i>
+                                        အပေါ်မှ Form ကိုအရင်ဖြည့်ပါ သို့မဟုတ် ဒေတာပြန်ခေါ်ပါ။
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. REPORT TAB -->
+            <div id="report-tab" class="tab-content hidden max-w-7xl mx-auto space-y-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="border-b border-slate-100 pb-4 mb-5">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+                            <i class="fa-solid fa-chart-line text-emerald-600"></i>
+                            <span>လချုပ် / နှစ်ချုပ် / စိတ်ကြိုက် Report ထုတ်ရန်</span>
+                        </h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 items-end">
+                        <div class="col-span-1 md:col-span-2 lg:col-span-2">
+                            <label class="form-label text-slate-600 mb-1">Report အမျိုးအစား ရွေးချယ်ရန်</label>
+                            <select id="reportType" onchange="toggleFilterView()" class="form-input py-2 bg-indigo-50 border-indigo-200 font-bold text-indigo-700">
+                                <option value="monthly">၁။ လချုပ် အသေးစိတ်ကြည့်ရန်</option>
+                                <option value="yearly_detail">၂။ နှစ်ချုပ် အသေးစိတ်ကြည့်ရန် (ဌာနအလိုက်ပုံစံ)</option>
+                                <option value="yearly_summary">၃။ နှစ်ချုပ် လအလိုက် ရှင်းတမ်း (Summary)</option>
+                                <option value="custom">၄။ စိတ်ကြိုက် ရက်စွဲသတ်မှတ်ကြည့်ရန်</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label text-slate-600 mb-1">Department (ဌာန)</label>
+                            <select id="filterDept" class="form-input py-2">
+                                <option value="all">အားလုံး (All)</option>
+                            </select>
+                        </div>
+                        
+                        <div id="monthFilterContainer" class="col-span-1">
+                            <label class="form-label text-slate-600 mb-1">လ (Month)</label>
+                            <input type="month" id="filterMonth" class="form-input py-2 text-slate-700">
+                        </div>
+                        
+                        <div id="yearFilterContainer" class="col-span-1 hidden">
+                            <label class="form-label text-slate-600 mb-1">နှစ် (Year)</label>
+                            <input type="number" id="filterYear" value="2026" min="2020" max="2040" class="form-input py-2">
+                        </div>
+
+                        <div id="yearRangeFilterContainer" class="col-span-1 md:col-span-2 hidden grid-cols-2 gap-2">
+                            <div>
+                                <label class="form-label text-slate-600 mb-1">စတင်မည့်နှစ်</label>
+                                <input type="number" id="filterStartYear" value="2024" class="form-input py-2">
+                            </div>
+                            <div>
+                                <label class="form-label text-slate-600 mb-1">ဆုံးမည့်နှစ်</label>
+                                <input type="number" id="filterEndYear" value="2026" class="form-input py-2">
+                            </div>
+                        </div>
+                        
+                        <div id="customDateContainer" class="col-span-1 md:col-span-2 hidden grid-cols-2 gap-2">
+                            <div>
+                                <label class="form-label text-slate-600 mb-1">စတင်ရက်</label>
+                                <input type="date" id="filterStartDate" class="form-input py-2 text-[12px]">
+                            </div>
+                            <div>
+                                <label class="form-label text-slate-600 mb-1">ဆုံးမည့်ရက်</label>
+                                <input type="date" id="filterEndDate" class="form-input py-2 text-[12px]">
+                            </div>
+                        </div>
+
+                        <div class="col-span-1 md:col-span-2 lg:col-span-2 flex space-x-3">
+                            <button onclick="generateReport()" class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-lg shadow-sm transition duration-200 flex items-center justify-center space-x-2 h-[40px]">
+                                <i class="fa-solid fa-search"></i>
+                                <span>ရှာဖွေမည်</span>
+                            </button>
+                            <button onclick="exportToExcel()" class="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow-sm transition duration-200 flex items-center justify-center space-x-2 h-[40px]">
+                                <i class="fa-solid fa-file-excel"></i>
+                                <span>Excel ထုတ်မည်</span>
+                            </button>
+                        </div>
+                        
+                        <div class="col-span-1 md:col-span-2 lg:col-span-6 flex items-center space-x-3 bg-amber-50 p-3 rounded-lg border border-amber-200 mt-2">
+                            <span class="text-amber-700 font-bold text-sm"><i class="fa-solid fa-scale-balanced mr-2"></i>အတိုး/အလျော့ (Adjust +/-) ပြုလုပ်မည့် ဌာန:</span>
+                            <select id="adjustDept" onchange="calculateNetTotal()" class="w-auto px-3 py-1.5 text-slate-900 font-bold rounded-md outline-none border border-amber-300 bg-white">
+                                <option value="Grand">Grand Total (အားလုံးစုစုပေါင်း)</option>
+                            </select>
+                            <input type="number" step="1" id="adjustAmount" oninput="calculateNetTotal()" class="w-40 px-3 py-1.5 text-right text-slate-900 font-mono font-bold rounded-md outline-none border border-amber-300 focus:border-amber-500 transition" placeholder="Amount (0)">
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto border border-slate-300 rounded-xl custom-scrollbar max-h-[600px] shadow-sm">
+                        <table id="excelReportTable" class="w-full text-left border-collapse bg-white">
+                            <thead class="sticky top-0 z-10 shadow-sm">
+                                <tr class="bg-slate-800" id="reportTableHeader">
+                                    <th class="th-style pl-6 text-slate-200 border-b-0">ID</th>
+                                    <th class="th-style text-slate-200 border-b-0">Filled Date</th>
+                                    <th class="th-style text-slate-200 border-b-0">Itineraries</th>
+                                    <th class="th-style text-emerald-400 border-b-0">Issued Date</th>
+                                    <th class="th-style text-slate-200 border-b-0">Boat ID</th>
+                                    <th class="th-style text-slate-200 border-b-0">Department</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">Liter</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">Price/Drum</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">Price(1L)</th>
+                                    <th class="th-style pr-6 text-slate-200 text-right border-b-0">Total Amount</th>
+                                    <th class="th-style pr-6 text-slate-200 border-b-0">Marks</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportTableBody" class="divide-y divide-slate-100 bg-white">
+                                <tr>
+                                    <td colspan="11" class="p-12 text-center text-slate-400 font-normal">
+                                        <i class="fa-solid fa-table-cells-large text-4xl mb-4 text-slate-200 block"></i>
+                                        အပေါ်ရှိ 'ရှာဖွေမည်' ခလုတ်ကိုနှိပ်၍ Report ထုတ်ပါ။
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot class="sticky bottom-0 z-10 bg-slate-900 text-white shadow-lg">
+                                <tr class="font-bold text-sm">
+                                    <td colspan="6" class="p-3 pr-6 text-right border-r border-slate-700">Grand Total (အားလုံးစုစုပေါင်း):</td>
+                                    <td id="reportTotalLiter" class="p-3 text-right text-emerald-400 font-mono text-base border-r border-slate-700">0</td>
+                                    <td colspan="2" class="border-r border-slate-700 bg-slate-800/30"></td>
+                                    <td id="reportTotalSum" class="p-3 pr-6 text-right text-emerald-400 font-mono text-base">0</td>
+                                    <td class="p-3 pr-6 bg-slate-800/30"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. SETTINGS TAB -->
+            <div id="settings-tab" class="tab-content hidden max-w-5xl mx-auto space-y-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="border-b border-slate-100 pb-3 mb-5">
+                        <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+                            <i class="fa-solid fa-link text-indigo-600"></i>
+                            <span>Google Apps Script Link</span>
+                        </h2>
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <input type="url" id="webAppUrlInput" placeholder="https://script.google.com/..." class="form-input font-mono flex-1 border-indigo-200 bg-indigo-50/20">
+                        <button onclick="saveWebAppUrl()" class="px-6 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 transition shadow-md shrink-0">
+                            Save API Link & Sync
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col h-[400px]">
+                        <div class="border-b border-slate-100 pb-3 mb-4 shrink-0 flex justify-between items-center">
+                            <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                                <i class="fa-solid fa-ship text-blue-500"></i>
+                                <span>Boat ID စာရင်းများ</span>
+                            </h3>
+                        </div>
+                        <div class="flex space-x-3 mb-4 shrink-0">
+                            <input type="text" id="newBoatInput" placeholder="ရေယာဉ်အသစ်..." class="form-input py-2">
+                            <button id="btn-add-boat" onclick="addListItem('boat')" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold rounded-xl transition"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                        <div class="flex-1 overflow-y-auto custom-scrollbar border border-slate-200 rounded-xl bg-slate-50 p-2 shadow-inner">
+                            <ul id="boatListGrid" class="divide-y divide-slate-200 text-sm font-semibold text-slate-700"></ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col h-[400px]">
+                        <div class="border-b border-slate-100 pb-3 mb-4 shrink-0 flex justify-between items-center">
+                            <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
+                                <i class="fa-solid fa-building text-purple-500"></i>
+                                <span>Department ဌာနများ</span>
+                            </h3>
+                        </div>
+                        <div class="flex space-x-3 mb-4 shrink-0">
+                            <input type="text" id="newDeptInput" placeholder="ဌာနအသစ်..." class="form-input py-2">
+                            <button id="btn-add-dept" onclick="addListItem('dept')" class="px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold rounded-xl transition"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+                        <div class="flex-1 overflow-y-auto custom-scrollbar border border-slate-200 rounded-xl bg-slate-50 p-2 shadow-inner">
+                            <ul id="deptListGrid" class="divide-y divide-slate-200 text-sm font-semibold text-slate-700"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        /* =========================================
+           1. INITIALIZATION & STATE
+           ========================================= */
+        let WEB_APP_URL = localStorage.getItem('v5_google_web_app_url') || "";
+        let DRAFT_DATA = [];
+        let REPORT_GROUPS_DATA = {}; 
+        let isReportGenerated = false;
+        let currentEditIndex = -1;
+        let globalGrandTotalAmount = 0;
+        let globalGrandTotalLiter = 0;
+
+        function initStorage() {
+            if (!localStorage.getItem('v5_boat_ids')) {
+                localStorage.setItem('v5_boat_ids', JSON.stringify(['Boat-A', 'Boat-B']));
+            }
+            if (!localStorage.getItem('v5_departments')) {
+                localStorage.setItem('v5_departments', JSON.stringify(['Operation', 'Logistics']));
+            }
+        }
+
+        function formatToDDMMYYYY(dateString) {
+            if(!dateString) return "";
+            let d = new Date(dateString);
+            if (isNaN(d.getTime())) {
+                if (dateString.includes('-')) {
+                    let parts = dateString.split('-');
+                    if (parts.length === 3) {
+                        let y = parts[0].length === 4 ? parts[0] : parts[2];
+                        let m = String(parts[1]).padStart(2, '0');
+                        let day = String(parts[0].length === 4 ? parts[2] : parts[0]).padStart(2, '0');
+                        return `${day}/${m}/${y}`;
+                    }
+                }
+                return dateString;
+            }
+            let day = String(d.getDate()).padStart(2, '0');
+            let month = String(d.getMonth() + 1).padStart(2, '0');
+            let year = d.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        function fetchNextID() {
+            let draftMax = 0;
+            if (DRAFT_DATA.length > 0) {
+                let newDrafts = DRAFT_DATA.filter(d => !d._isServerData);
+                if(newDrafts.length > 0) {
+                    let lastId = newDrafts[newDrafts.length - 1].id;
+                    let match = lastId.match(/MMFA-(\d+)/);
+                    if (match) draftMax = parseInt(match[1], 10);
+                }
+            }
+
+            if (!WEB_APP_URL) {
+                document.getElementById('inp_id').value = generateIdString(draftMax + 1);
+                return;
+            }
+
+            fetch(`${WEB_APP_URL}?action=getData`)
+                .then(res => res.json())
+                .then(rawData => {
+                    let sheetMax = 0;
+                    rawData.forEach(row => {
+                         let idStr = row.id || "";
+                         let match = String(idStr).match(/MMFA-(\d+)/);
+                         if (match) {
+                             let num = parseInt(match[1], 10);
+                             if (num > sheetMax) sheetMax = num;
+                         }
+                    });
+                    let nextNum = Math.max(sheetMax, draftMax) + 1;
+                    document.getElementById('inp_id').value = generateIdString(nextNum);
+                })
+                .catch(err => {
+                    document.getElementById('inp_id').value = generateIdString(draftMax + 1);
+                });
+        }
+
+        function generateIdString(num) {
+            const today = new Date();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const year = today.getFullYear();
+            const paddedNum = String(num).padStart(5, '0');
+            return `MMFA-${paddedNum}/${month}/${year}`;
+        }
+
+        window.onload = function() {
+            initStorage();
+            const today = new Date();
+            document.getElementById('currentDateDisplay').innerText = formatToDDMMYYYY(today.toISOString().split('T')[0]);
+            document.getElementById('inp_filledDate').valueAsDate = today;
+            document.getElementById('inp_issuedDate').valueAsDate = today;
+            
+            if(WEB_APP_URL) {
+                document.getElementById('webAppUrlInput').value = WEB_APP_URL;
+                updateStatusIndicator(true);
+                fetchSettingsFromSheet(); 
+            } else {
+                updateStatusIndicator(false);
+            }
+
+            refreshUI(); 
+            renderDraftTable();
+            fetchNextID(); 
+        };
+
+        function refreshUI() {
+            loadDropdownOptions();
+            updateSettingsLists();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            const tabs = ['form-tab', 'draft-tab', 'report-tab', 'settings-tab'];
+            const titles = { 
+                'form-tab': 'ဆီထုတ်ပေးမှု မှတ်တမ်းအသစ်သွင်းရန်', 
+                'draft-tab': 'စစ်ဆေးရန် ယာယီစာရင်းများ (Draft & Edit)',
+                'report-tab': 'လချုပ် / နှစ်ချုပ် / စိတ်ကြိုက် Report', 
+                'settings-tab': 'စနစ်ဆက်တင်များ' 
+            };
+            
+            tabs.forEach(t => {
+                let btn = document.getElementById('btn-' + t);
+                if (btn) btn.className = "w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition duration-200 font-bold text-sm";
+            });
+            
+            let activeBtn = document.getElementById('btn-' + tabId);
+            if (activeBtn) activeBtn.className = "w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl bg-indigo-600 text-white shadow-md transition duration-200 font-bold text-sm";
+            document.getElementById('activeTabTitle').innerText = titles[tabId];
+        }
+
+        function updateStatusIndicator(isConnected) {
+            const pulse = document.getElementById('statusPulse');
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            if(isConnected) {
+                pulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
+                dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500";
+                text.className = "text-emerald-400 font-bold";
+                text.innerText = "Link ချိတ်ဆက်ထားသည်";
+            } else {
+                pulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75";
+                dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500";
+                text.className = "text-red-400 font-bold";
+                text.innerText = "Link မချိတ်ရသေးပါ";
+            }
+        }
+
+        /* =========================================
+           2. SETTINGS & SYNC LOGIC
+           ========================================= */
+        function saveWebAppUrl() {
+            const urlVal = document.getElementById('webAppUrlInput').value.trim();
+            if(!urlVal) return alert("URL ထည့်ပါ။");
+            localStorage.setItem('v5_google_web_app_url', urlVal);
+            WEB_APP_URL = urlVal;
+            updateStatusIndicator(true);
+            alert("API URL သိမ်းဆည်းပြီးပါပြီ။");
+            fetchSettingsFromSheet();
+            fetchNextID();
+        }
+
+        async function fetchSettingsFromSheet() {
+            if(!WEB_APP_URL) return;
+            try {
+                let res = await fetch(`${WEB_APP_URL}?action=getSettings`, { redirect: "follow" });
+                let data = await res.json();
+                if(data && data.boats && data.depts) {
+                    if(data.boats.length > 0) localStorage.setItem('v5_boat_ids', JSON.stringify(data.boats));
+                    if(data.depts.length > 0) localStorage.setItem('v5_departments', JSON.stringify(data.depts));
+                    refreshUI();
+                }
+            } catch(e) {
+                console.log("Settings fetch error:", e);
+            }
+        }
+        async function saveSettingsToSheet() {
+            if(!WEB_APP_URL) return;
+            const boats = JSON.parse(localStorage.getItem('v5_boat_ids') || '[]');
+            const depts = JSON.parse(localStorage.getItem('v5_departments') || '[]');
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    redirect: "follow",
+                    body: JSON.stringify({ action: "saveSettings", boats: boats, depts: depts })
+                });
+            } catch(e) {
+                console.log("Settings save error:", e);
+                alert("စနစ်ချိတ်ဆက်မှု အမှားအယွင်းဖြစ်နေပါသည်။");
+            }
+        }
+
+        function loadDropdownOptions() {
+            const boats = JSON.parse(localStorage.getItem('v5_boat_ids') || '[]');
+            const depts = JSON.parse(localStorage.getItem('v5_departments') || '[]');
+            const fBoat = document.getElementById('inp_boatId');
+            const fDept = document.getElementById('inp_dept');
+            const rDept = document.getElementById('filterDept');
+            
+            fBoat.innerHTML = '<option value="">-- ရွေးပါ --</option>';
+            boats.forEach(b => fBoat.innerHTML += `<option value="${b}">${b}</option>`);
+            
+            fDept.innerHTML = '<option value="">-- ရွေးပါ --</option>';
+            rDept.innerHTML = '<option value="all">ဌာနအားလုံး (All)</option>';
+            depts.forEach(d => {
+                fDept.innerHTML += `<option value="${d}">${d}</option>`;
+                rDept.innerHTML += `<option value="${d}">${d}</option>`;
+            });
+        }
+
+        function updateSettingsLists() {
+            const boats = JSON.parse(localStorage.getItem('v5_boat_ids') || '[]');
+            const depts = JSON.parse(localStorage.getItem('v5_departments') || '[]');
+            const renderList = (arr, type) => arr.map((item, idx) => `
+                <li class="px-4 py-3 flex justify-between items-center hover:bg-white rounded-lg transition border-b border-slate-100 last:border-0 group">
+                    <span>${item}</span>
+                    <button type="button" onclick="deleteListItem('${type}', ${idx})" class="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition p-1"><i class="fa-solid fa-trash-can"></i></button>
+                </li>`).join('');
+                
+            document.getElementById('boatListGrid').innerHTML = boats.length ? renderList(boats, 'boat') : '<li class="p-3 text-slate-400 text-center">စာရင်းလွတ်နေပါသည်</li>';
+            document.getElementById('deptListGrid').innerHTML = depts.length ? renderList(depts, 'dept') : '<li class="p-3 text-slate-400 text-center">စာရင်းလွတ်နေပါသည်</li>';
+        }
+
+        async function addListItem(type) {
+            const inputId = type === 'boat' ? 'newBoatInput' : 'newDeptInput';
+            const storageKey = type === 'boat' ? 'v5_boat_ids' : 'v5_departments';
+            const btnId = type === 'boat' ? 'btn-add-boat' : 'btn-add-dept';
+            const val = document.getElementById(inputId).value.trim();
+            if(!val) return;
+            
+            let btn = document.getElementById(btnId);
+            let originalHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i>`;
+            
+            let list = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            if(!list.includes(val)) {
+                list.push(val);
+                localStorage.setItem(storageKey, JSON.stringify(list));
+                await saveSettingsToSheet();
+            }
+            document.getElementById(inputId).value = '';
+            btn.innerHTML = originalHtml;
+            refreshUI();
+        }
+
+        async function deleteListItem(type, idx) {
+            const storageKey = type === 'boat' ? 'v5_boat_ids' : 'v5_departments';
+            let list = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            list.splice(idx, 1);
+            localStorage.setItem(storageKey, JSON.stringify(list));
+            await saveSettingsToSheet();
+            refreshUI();
+        }
+
+        /* =========================================
+           3. FORM, DRAFT & FETCH FOR EDIT LOGIC
+           ========================================= */
+        function calcPrice() {
+            const l = Math.round(parseFloat(document.getElementById('inp_liter').value)) || 0;
+            const pDrum = Math.round(parseFloat(document.getElementById('inp_priceDrum').value)) || 0;
+            const pLiter = l > 0 ? (pDrum / 220) : 0;
+            const total = l * pLiter;
+            
+            document.getElementById('inp_price').value = pLiter ? Math.round(pLiter) : "";
+            document.getElementById('inp_totalAmount').value = total ? Math.round(total) : "";
+            document.getElementById('inp_totalAmountDisplay').value = total ? Math.round(total).toLocaleString() : "";
+        }
+
+        function fetchDataForEdit() {
+            let monthVal = document.getElementById('fetchEditMonth').value;
+            if(!monthVal) return alert("ကျေးဇူးပြု၍ လ နှင့် နှစ် ရွေးချယ်ပါ။");
+            if(!WEB_APP_URL) return alert("API Link မချိတ်ရသေးပါ။");
+
+            let btn = document.getElementById('btnFetchEdit');
+            let oriTxt = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i>';
+            btn.disabled = true;
+
+            fetch(`${WEB_APP_URL}?action=getData`)
+            .then(res => res.json())
+            .then(rawData => {
+                const [y, m] = monthVal.split('-');
+                
+                let data = rawData.map(r => {
+                    let deptStr = String(r.issuedDept || "");
+                    let isShifted = deptStr.includes("202") || deptStr.includes("T1") || deptStr.includes("-0");
+                    if (isShifted) {
+                        let calc_liter = 0;
+                        let p1L = parseFloat(r.liter) || 0; 
+                        let tAmt = parseFloat(r.pricePerDrum) || 0;
+                        if (p1L > 0) calc_liter = tAmt / p1L;
+                        return {
+                            id: r.id, filledDate: r.filledDate, itineraries: r.boatId, 
+                            issuedDate: (r.issuedDept === 0 || !r.issuedDept || String(r.issuedDept).includes("1970")) ? "" : r.issuedDept,
+                            boatId: r.itineraries, issuedDept: r.issuedDate, 
+                            liter: calc_liter, pricePerDrum: r.price, price: r.liter,
+                            totalAmount: r.pricePerDrum, marks: r.totalAmount
+                        };
+                    }
+                    return r; 
+                });
+
+                let filtered = data.filter(r => {
+                    if(!r.filledDate) return false;
+                    const d = new Date(r.filledDate);
+                    return d.getFullYear() == y && String(d.getMonth()+1).padStart(2,'0') == m;
+                });
+
+                if(filtered.length === 0) {
+                    alert("ရွေးချယ်ထားသောလအတွက် အချက်အလက်မရှိပါ။");
+                } else {
+                    filtered.forEach(r => {
+                        if(!DRAFT_DATA.find(d => d.id === r.id)) {
+                            r._isServerData = true; 
+                            DRAFT_DATA.push(r);
+                        }
+                    });
+                    renderDraftTable();
+                    alert(`${filtered.length} ကြောင်း ဆွဲယူရရှိပါသည်။`);
+                }
+                btn.innerHTML = oriTxt;
+                btn.disabled = false;
+            })
+            .catch(err => {
+                btn.innerHTML = oriTxt;
+                btn.disabled = false;
+                alert("ဒေတာဆွဲယူရာတွင် Error ဖြစ်နေပါသည်။");
+            });
+        }
+
+        function addToDraft(e) {
+            e.preventDefault();
+            
+            const calTotal = parseFloat(document.getElementById('inp_totalAmount').value) || 0;
+            const vocStr = document.getElementById('inp_vocAmount').value;
+            
+            let finalTotalAmount = calTotal;
+            let originalMarks = document.getElementById('inp_marks').value;
+            let finalMarks = originalMarks;
+            
+            if (vocStr.trim() !== "") {
+                let vocAmount = parseFloat(vocStr) || 0;
+                let diff = calTotal - vocAmount;
+                finalTotalAmount = vocAmount; 
+                
+                if (diff !== 0) {
+                    let sign = diff > 0 ? "+" : ""; 
+                    let diffText = `အစွန်းထွက် (${sign}${diff})`;
+                    finalMarks = originalMarks ? originalMarks + ", " + diffText : diffText;
+                }
+            }
+
+            const record = {
+                id: document.getElementById('inp_id').value,
+                filledDate: document.getElementById('inp_filledDate').value,
+                itineraries: document.getElementById('inp_itineraries').value,
+                issuedDate: document.getElementById('inp_issuedDate').value,
+                boatId: document.getElementById('inp_boatId').value,
+                issuedDept: document.getElementById('inp_dept').value,
+                liter: document.getElementById('inp_liter').value,
+                price: document.getElementById('inp_price').value,
+                pricePerDrum: document.getElementById('inp_priceDrum').value,
+                totalAmount: finalTotalAmount, 
+                marks: finalMarks 
+            };
+            
+            if (currentEditIndex !== -1) {
+                if(DRAFT_DATA[currentEditIndex]._isServerData) {
+                    record._isServerData = true;
+                }
+                DRAFT_DATA[currentEditIndex] = record;
+                currentEditIndex = -1; 
+                document.getElementById('btnSubmitDraft').innerHTML = `<i class="fa-solid fa-arrow-down"></i><span>Draft စာရင်းသို့ ထည့်မည်</span>`;
+            } else {
+                DRAFT_DATA.push(record); 
+            }
+            
+            switchTab('draft-tab');
+            renderDraftTable();
+
+            document.getElementById('inp_liter').value = "";
+            document.getElementById('inp_priceDrum').value = "";
+            document.getElementById('inp_price').value = "";
+            document.getElementById('inp_totalAmount').value = "";
+            document.getElementById('inp_totalAmountDisplay').value = "";
+            document.getElementById('inp_vocAmount').value = ""; 
+            document.getElementById('inp_marks').value = "";
+            
+            fetchNextID(); 
+        }
+        
+        function startNewForm() {
+            currentEditIndex = -1; 
+            document.getElementById('btnSubmitDraft').innerHTML = `<i class="fa-solid fa-arrow-down"></i><span>Draft စာရင်းသို့ ထည့်မည်</span>`;
+            
+            document.getElementById('inp_liter').value = "";
+            document.getElementById('inp_priceDrum').value = "";
+            document.getElementById('inp_price').value = "";
+            document.getElementById('inp_totalAmount').value = "";
+            document.getElementById('inp_totalAmountDisplay').value = "";
+            document.getElementById('inp_vocAmount').value = ""; 
+            document.getElementById('inp_marks').value = "";
+            document.getElementById('inp_itineraries').value = "";
+            
+            const today = new Date();
+            document.getElementById('inp_filledDate').valueAsDate = today;
+            document.getElementById('inp_issuedDate').valueAsDate = today;
+
+            fetchNextID();
+            switchTab('form-tab');
+            document.getElementById('inp_itineraries').focus();
+        }
+
+        function editDraft(idx) {
+            currentEditIndex = idx;
+            const record = DRAFT_DATA[idx];
+
+            document.getElementById('inp_id').value = record.id;
+            
+            let fDate = new Date(record.filledDate);
+            if(!isNaN(fDate)) document.getElementById('inp_filledDate').valueAsDate = fDate;
+            let iDate = new Date(record.issuedDate);
+            if(!isNaN(iDate)) document.getElementById('inp_issuedDate').valueAsDate = iDate;
+
+            document.getElementById('inp_itineraries').value = record.itineraries;
+            document.getElementById('inp_boatId').value = record.boatId;
+            document.getElementById('inp_dept').value = record.issuedDept;
+            document.getElementById('inp_liter').value = Math.round(parseFloat(record.liter));
+            document.getElementById('inp_priceDrum').value = Math.round(parseFloat(record.pricePerDrum));
+            document.getElementById('inp_marks').value = record.marks || "";
+            document.getElementById('inp_vocAmount').value = ""; 
+
+            calcPrice(); 
+
+            document.getElementById('btnSubmitDraft').innerHTML = `<i class="fa-solid fa-pen"></i><span>ပြင်ဆင်ချက်ကို အတည်ပြုမည်</span>`;
+            switchTab('form-tab');
+        }
+
+        function removeDraft(idx) {
+            DRAFT_DATA.splice(idx, 1);
+            renderDraftTable();
+            if(currentEditIndex === -1) fetchNextID(); 
+        }
+
+        function renderDraftTable() {
+            const tbody = document.getElementById('draftTableBody');
+            const btn = document.getElementById('btnSubmitToSheet');
+            
+            if(DRAFT_DATA.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-slate-400"><i class="fa-regular fa-folder-open text-3xl mb-2 text-slate-300 block"></i>Form တွင် အရင်ဖြည့်ပါ သို့မဟုတ် အမှားပြင်ရန် ဆွဲယူပါ။</td></tr>`;
+                btn.disabled = true;
+                return;
+            }
+            
+            btn.disabled = false;
+            tbody.innerHTML = DRAFT_DATA.map((r, idx) => `
+                <tr class="hover:bg-indigo-50/30 transition">
+                    <td class="td-style pl-6 font-mono font-bold text-slate-700">${r.id}</td>
+                    <td class="td-style">${formatToDDMMYYYY(r.filledDate)}</td>
+                    <td class="td-style font-semibold text-slate-600">${r.itineraries || ''}</td>
+                    <td class="td-style text-emerald-600 font-bold">${formatToDDMMYYYY(r.issuedDate)}</td>
+                    <td class="td-style text-indigo-600 font-bold">${r.boatId}</td>
+                    <td class="td-style">${r.issuedDept}</td>
+                    <td class="td-style text-right font-mono">${Math.round(r.liter)}</td>
+                    <td class="td-style text-right font-mono font-bold text-slate-900">${Math.round(r.totalAmount).toLocaleString()}</td>
+                    <td class="td-style text-center">
+                        ${r._isServerData ? '<span class="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold">Edit Mode</span>' : '<span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded font-bold">New</span>'}
+                    </td>
+                    <td class="td-style pr-6 text-center whitespace-nowrap">
+                        <button onclick="editDraft(${idx})" title="ပြင်ဆင်မည်" class="text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="removeDraft(${idx})" title="ဖျက်မည်" class="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded transition"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function submitDraftToSheet() {
+            if(!WEB_APP_URL) return alert("Google Web App Link မချိတ်ရသေးပါ။ Settings တွင် သွားထည့်ပါ။");
+            if(DRAFT_DATA.length === 0) return;
+
+            const btn = document.getElementById('btnSubmitToSheet');
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>ပေးပို့နေပါသည် (${DRAFT_DATA.length})...</span>`;
+            btn.disabled = true;
+
+            let successCount = 0;
+            let errors = [];
+
+            for(let i = 0; i < DRAFT_DATA.length; i++) {
+                let record = DRAFT_DATA[i];
+                record.action = record._isServerData ? "updateData" : "addData";
+                try {
+                    let res = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(record) });
+                    let result = await res.json();
+                    if(result.status === "success") successCount++;
+                    else errors.push(`Row ${i+1}: ${result.message}`);
+                } catch(e) {
+                    errors.push(`Row ${i+1}: Connection Error`);
+                }
+            }
+
+            if(errors.length === 0) {
+                alert(`အချက်အလက် ${successCount} ခုစလုံးကို Sheet ထဲသို့ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။`);
+                DRAFT_DATA = []; 
+                fetchNextID(); 
+            } else {
+                alert(`အချို့ဒေတာများ ပို့ရာတွင် Error တက်ပါသည်။\nအောင်မြင်: ${successCount}\nErrors:\n${errors.join('\n')}`);
+            }
+            
+            btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Sheet သို့ သိမ်းမည်</span>`;
+            renderDraftTable();
+        }
+
+        /* =========================================
+           4. REPORT GENERATION & HTML RENDERING
+           ========================================= */
+        function toggleFilterView() {
+            const rType = document.getElementById('reportType').value;
+            
+            document.getElementById('monthFilterContainer').classList.add('hidden');
+            document.getElementById('yearFilterContainer').classList.add('hidden');
+            document.getElementById('yearRangeFilterContainer').classList.add('hidden');
+            document.getElementById('yearRangeFilterContainer').classList.remove('grid');
+            document.getElementById('customDateContainer').classList.add('hidden');
+            document.getElementById('customDateContainer').classList.remove('grid');
+
+            if (rType === 'monthly') {
+                document.getElementById('monthFilterContainer').classList.remove('hidden');
+            } else if (rType === 'yearly_detail') {
+                document.getElementById('yearFilterContainer').classList.remove('hidden');
+            } else if (rType === 'yearly_summary') {
+                document.getElementById('yearRangeFilterContainer').classList.remove('hidden');
+                document.getElementById('yearRangeFilterContainer').classList.add('grid');
+            } else if (rType === 'custom') {
+                document.getElementById('customDateContainer').classList.remove('hidden');
+                document.getElementById('customDateContainer').classList.add('grid');
+            }
+        }
+
+        function calculateNetTotal() {
+            const adjVal = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
+            const adjDept = document.getElementById('adjustDept').value;
+            
+            document.querySelectorAll('.row-amt, .subtotal-amt').forEach(cell => {
+                let orig = parseFloat(cell.getAttribute('data-original')) || 0;
+                cell.innerText = orig.toLocaleString();
+            });
+
+            if (adjDept !== 'Grand' && adjVal !== 0) {
+                let subCell = document.querySelector(`.dept-subtotal-row[data-dept="${adjDept}"] .subtotal-amt`);
+                if (subCell) {
+                    let subOrig = parseFloat(subCell.getAttribute('data-original')) || 0;
+                    subCell.innerText = (subOrig + adjVal).toLocaleString();
+                }
+
+                let dataRows = document.querySelectorAll(`tr.data-row[data-dept="${adjDept}"]`);
+                if (dataRows.length > 0) {
+                    let lastRow = dataRows[dataRows.length - 1]; 
+                    let rowAmtCell = lastRow.querySelector('.row-amt');
+                    if (rowAmtCell) {
+                        let rowOrig = parseFloat(rowAmtCell.getAttribute('data-original')) || 0;
+                        rowAmtCell.innerText = (rowOrig + adjVal).toLocaleString();
+                    }
+                }
+            }
+
+            const netAmount = globalGrandTotalAmount + adjVal;
+            document.getElementById('reportTotalSum').innerText = netAmount.toLocaleString();
+        }
+
+        function generateReport() {
+            if(!WEB_APP_URL) return alert("Google Web App Link ထည့်ပါ။");
+
+            isReportGenerated = false;
+            const rType = document.getElementById('reportType').value;
+            const deptFilt = document.getElementById('filterDept').value;
+            const mFilt = document.getElementById('filterMonth').value;
+            const yFilt = document.getElementById('filterYear').value;
+            const startY = parseInt(document.getElementById('filterStartYear').value) || 2020;
+            const endY = parseInt(document.getElementById('filterEndYear').value) || 2040;
+            const customStart = document.getElementById('filterStartDate').value;
+            const customEnd = document.getElementById('filterEndDate').value;
+            
+            const tableBody = document.getElementById('reportTableBody');
+            const tableHeader = document.getElementById('reportTableHeader');
+            
+            if (rType === 'yearly_summary') {
+                tableHeader.innerHTML = `
+                    <th class="th-style pl-6 text-slate-200 border-b-0">လ (Month)</th>
+                    <th class="th-style text-slate-200 border-b-0" colspan="5">မှတ်ချက် (Remarks)</th>
+                    <th class="th-style text-slate-200 text-right border-b-0">Total Liter</th>
+                    <th class="th-style text-slate-200 text-right border-b-0" colspan="2"></th>
+                    <th class="th-style text-slate-200 text-right border-b-0">Total Amount</th>
+                    <th class="th-style pr-6 text-slate-200 border-b-0">Marks</th>
+                `;
+            } else {
+                tableHeader.innerHTML = `
+                    <th class="th-style pl-6 text-slate-200 border-b-0">ID</th>
+                    <th class="th-style text-slate-200 border-b-0">Filled Date</th>
+                    <th class="th-style text-slate-200 border-b-0">Itineraries</th>
+                    <th class="th-style text-emerald-400 border-b-0">Issued Date</th>
+                    <th class="th-style text-slate-200 border-b-0">Boat ID</th>
+                    <th class="th-style text-slate-200 border-b-0">Department</th>
+                    <th class="th-style text-slate-200 text-right border-b-0">Liter</th>
+                    <th class="th-style text-slate-200 text-right border-b-0">Price/Drum</th>
+                    <th class="th-style text-slate-200 text-right border-b-0">Price(1L)</th>
+                    <th class="th-style text-slate-200 text-right border-b-0">Total Amount</th>
+                    <th class="th-style pr-6 text-slate-200 border-b-0">Marks</th>
+                `;
+            }
+
+            tableBody.innerHTML = `<tr><td colspan="11" class="p-12 text-center text-indigo-500"><i class="fa-solid fa-circle-notch animate-spin text-3xl mb-3 block"></i>ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>`;
+
+            fetch(`${WEB_APP_URL}?action=getData`)
+            .then(res => res.json())
+            .then(rawData => {
+                let data = rawData.map(r => {
+                    let deptStr = String(r.issuedDept || "");
+                    let isShifted = deptStr.includes("202") || deptStr.includes("T1") || deptStr.includes("-0");
+                    if (isShifted) {
+                        let calc_liter = 0;
+                        let p1L = parseFloat(r.liter) || 0; 
+                        let tAmt = parseFloat(r.pricePerDrum) || 0;
+                        if (p1L > 0) calc_liter = tAmt / p1L;
+                        return {
+                            id: r.id, filledDate: r.filledDate, itineraries: r.boatId, 
+                            issuedDate: (r.issuedDept === 0 || !r.issuedDept || String(r.issuedDept).includes("1970")) ? "" : r.issuedDept,
+                            boatId: r.itineraries, issuedDept: r.issuedDate, 
+                            liter: calc_liter, pricePerDrum: r.price, price: r.liter,
+                            totalAmount: r.pricePerDrum, marks: r.totalAmount
+                        };
+                    }
+                    return r; 
+                });
+
+                let filtered = data.filter(r => {
+                    if(!r.filledDate) return false;
+                    const d = new Date(r.filledDate);
+                    const y = d.getFullYear();
+                    const m = String(d.getMonth()+1).padStart(2,'0');
+                    if (rType === 'monthly') {
+                        if(!mFilt) return true;
+                        const [ty, tm] = mFilt.split('-');
+                        return y == ty && m == tm;
+                    } else if (rType === 'yearly_detail') {
+                        return y == yFilt;
+                    } else if (rType === 'yearly_summary') {
+                        return y >= startY && y <= endY;
+                    } else if (rType === 'custom') {
+                        if (customStart && d < new Date(customStart)) return false;
+                        if (customEnd && d > new Date(customEnd)) return false;
+                        return true;
+                    }
+                    return true;
+                });
+
+                let groups = {};
+                filtered.forEach(r => {
+                    let dpt = r.issuedDept || "Unknown";
+                    if(deptFilt !== "all" && dpt !== deptFilt) return;
+                    if(!groups[dpt]) groups[dpt] = [];
+                    groups[dpt].push(r);
+                });
+
+                REPORT_GROUPS_DATA = groups; 
+                tableBody.innerHTML = "";
+                
+                if(Object.keys(groups).length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="11" class="p-12 text-center text-slate-400">ရှာဖွေမှုရလဒ် မရှိပါ။</td></tr>`;
+                    document.getElementById('reportTotalLiter').innerText = "0";
+                    document.getElementById('reportTotalSum').innerText = "0";
+                    isReportGenerated = false;
+                    return;
+                }
+
+                const adjustSelect = document.getElementById('adjustDept');
+                adjustSelect.innerHTML = '<option value="Grand">Grand Total (အားလုံးစုစုပေါင်း)</option>';
+                for(let dept in groups) {
+                    adjustSelect.innerHTML += `<option value="${dept}">${dept}</option>`;
+                }
+
+                let gTotalL = 0, gTotalA = 0;
+
+                for(let dept in groups) {
+                    tableBody.innerHTML += `
+                        <tr class="bg-indigo-50/80 border-y border-indigo-200">
+                            <td colspan="11" class="p-3 pl-6 font-bold text-[13px] text-indigo-900 ">
+                                <i class="fa-solid fa-building mr-2 text-indigo-600"></i>ဌာနအမည် : <strong>${dept}</strong>
+                            </td>
+                        </tr>`;
+                    
+                    let dTotalL = 0, dTotalA = 0;
+                    
+                    if (rType === 'yearly_summary') {
+                        for (let y = startY; y <= endY; y++) {
+                            let monthlyData = {};
+                            for(let i=1; i<=12; i++) monthlyData[String(i).padStart(2,'0')] = { liter: 0, amount: 0 };
+
+                            let hasDataForYear = false;
+                            groups[dept].forEach(row => {
+                                let d = new Date(row.filledDate);
+                                if (d.getFullYear() === y) {
+                                    let m = String(d.getMonth()+1).padStart(2,'0');
+                                    monthlyData[m].liter += Math.round(parseFloat(row.liter)) || 0;
+                                    monthlyData[m].amount += Math.round(parseFloat(row.totalAmount)) || 0;
+                                    hasDataForYear = true;
+                                }
+                            });
+
+                            if (hasDataForYear) {
+                                tableBody.innerHTML += `
+                                    <tr class="bg-slate-100 data-row year-header" data-dept="${dept}" data-year="${y}">
+                                        <td class="td-style pl-6 font-bold text-slate-800" colspan="11">Year : ${y}</td>
+                                    </tr>`;
+
+                                for(let m in monthlyData) {
+                                    if(monthlyData[m].liter > 0 || monthlyData[m].amount > 0) {
+                                        let monthName = new Date(y, parseInt(m)-1, 1).toLocaleString('en-US', { month: 'long' });
+                                        dTotalL += monthlyData[m].liter;
+                                        dTotalA += monthlyData[m].amount;
+
+                                        tableBody.innerHTML += `
+                                            <tr class="hover:bg-white transition border-b border-slate-100 data-row" data-dept="${dept}">
+                                                <td class="td-style pl-6 font-bold text-slate-700">${monthName}, ${y}</td>
+                                                <td class="td-style text-slate-300 text-center" colspan="5">-</td>
+                                                <td class="p-3 border-r border-slate-100 text-right font-mono">${monthlyData[m].liter.toLocaleString()}</td>
+                                                <td class="p-3 border-r border-slate-100 text-right" colspan="2"></td>
+                                                <td class="p-3 text-right font-mono font-bold text-slate-900 row-amt border-r border-slate-100" data-original="${monthlyData[m].amount}">${monthlyData[m].amount.toLocaleString()}</td>
+                                                <td class="p-3 pr-6 text-center text-slate-400">-</td>
+                                            </tr>`;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        groups[dept].forEach(row => {
+                            let literNum = Math.round(parseFloat(row.liter) || 0);
+                            let amountNum = Math.round(parseFloat(row.totalAmount) || 0);
+                            let priceDrumNum = Math.round(parseFloat(row.pricePerDrum) || 0);
+                            let priceLtrNum = Math.round(parseFloat(row.price) || 0);
+
+                            dTotalL += literNum; 
+                            dTotalA += amountNum;
+                            
+                            tableBody.innerHTML += `
+                                <tr class="hover:bg-white transition border-b border-slate-100 data-row" data-dept="${dept}">
+                                    <td class="td-style pl-6 font-mono text-slate-500">${row.id || ''}</td>
+                                    <td class="td-style">${formatToDDMMYYYY(row.filledDate)}</td>
+                                    <td class="td-style text-slate-600 font-semibold">${row.itineraries || ''}</td>
+                                    <td class="td-style text-emerald-600 font-bold">${formatToDDMMYYYY(row.issuedDate)}</td>
+                                    <td class="td-style text-slate-800 font-bold">${row.boatId || ''}</td>
+                                    <td class="td-style">${row.issuedDept || ''}</td>
+                                    <td class="p-3 border-r border-slate-100 text-right font-mono">${literNum.toLocaleString()}</td>
+                                    <td class="p-3 border-r border-slate-100 text-right font-mono text-emerald-700">${priceDrumNum.toLocaleString()}</td>
+                                    <td class="p-3 border-r border-slate-100 text-right font-mono text-slate-400">${priceLtrNum.toLocaleString()}</td>
+                                    <td class="p-3 text-right font-mono font-bold text-slate-900 row-amt border-r border-slate-100" data-original="${amountNum}">${amountNum.toLocaleString()}</td>
+                                    <td class="p-3 pr-6 text-slate-600 text-sm td-style break-words">${row.marks || ''}</td>
+                                </tr>`;
+                        });
+                    }
+
+                    tableBody.innerHTML += `
+                        <tr class="bg-slate-100/60 text-slate-700 font-bold border-b border-slate-200 dept-subtotal-row" data-dept="${dept}">
+                            <td colspan="6" class="p-3 pr-6 text-right text-[11px] uppercase tracking-wider text-slate-500 border-r border-slate-200"><strong>${dept} Sub-total:</strong></td>
+                            <td class="p-3 text-right font-mono text-indigo-700 border-r border-slate-200">${dTotalL.toLocaleString()}</td>
+                            <td colspan="2" class="border-r border-slate-200"></td>
+                            <td class="p-3 text-right font-mono text-indigo-700 subtotal-amt border-r border-slate-200" data-original="${dTotalA}">${dTotalA.toLocaleString()}</td>
+                            <td class="p-3 pr-6"></td>
+                        </tr>`;
+                        
+                    gTotalL += dTotalL; gTotalA += dTotalA;
+                }
+
+                globalGrandTotalLiter = gTotalL;
+                globalGrandTotalAmount = gTotalA;
+
+                document.getElementById('reportTotalLiter').innerText = gTotalL.toLocaleString();
+                document.getElementById('reportTotalSum').innerText = gTotalA.toLocaleString();
+                
+                document.getElementById('adjustAmount').value = "";
+                calculateNetTotal();
+                
+                isReportGenerated = true; 
+            })
+            .catch(err => {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="11" class="p-10 text-center text-red-500 font-normal">
+                            <i class="fa-solid fa-triangle-exclamation block text-xl mb-2"></i>
+                            ဒေတာဆွဲယူမှု မအောင်မြင်ပါ (ကွန်ရက် သို့မဟုတ် API ချိတ်ဆက်မှု မှားနေနိုင်ပါသည်)။ Error: ${err}
+                        </td>
+                    </tr>`;
+                document.getElementById('reportTotalSum').innerText = "0";
+                document.getElementById('reportTotalLiter').innerText = "0";
+            });
+        }
+        
+        /* =========================================
+           5. EXCEL EXPORT LOGIC
+           ========================================= */
+        function exportToExcel() {
+            try {
+                if (!isReportGenerated) {
+                    alert("ကျေးဇူးပြု၍ 'ရှာဖွေမည်' ခလုတ်ကို အရင်နှိပ်ပြီး Report ထုတ်ပါ။");
+                    return;
+                }
+                if (typeof XLSX === 'undefined') {
+                    alert("Excel Library ချိတ်ဆက်မှု မအောင်မြင်ပါ။");
+                    return;
+                }
+
+                const rType = document.getElementById('reportType').value;
+                if (rType === 'yearly_summary') return exportYearlySummaryToExcel();
+                if (rType === 'yearly_detail') return exportYearlyDetailToExcel();
+
+                let dateStr = "";
+                if (rType === 'monthly') {
+                    const mVal = document.getElementById('filterMonth').value; 
+                    if (mVal) {
+                        const d = new Date(mVal + "-01");
+                        dateStr = d.toLocaleString('en-US', { month: 'long' }) + `, ${d.getFullYear()}`; 
+                    } else {
+                        dateStr = "All Months";
+                    }
+                } else if (rType === 'custom') {
+                    const sDate = document.getElementById('filterStartDate').value;
+                    const eDate = document.getElementById('filterEndDate').value;
+                    if(sDate && eDate) dateStr = `${formatToDDMMYYYY(sDate)} to ${formatToDDMMYYYY(eDate)}`;
+                    else dateStr = "Custom Date Range";
+                }
+                
+                let titleText = `My Mergui Speed Boat's Fuel Issued Record For ${dateStr}`;
+
+                function getMainTitleBlock() {
+                    return `
+                        <tr><td colspan="11" style="text-align: center; font-size: 16px; font-weight: bold; color: #1E40AF;">${titleText}</td></tr>
+                        <tr><td colspan="11"></td></tr>
+                    `;
+                }
+
+                function getSignatureBlock() {
+                    return `
+                        <tr><td colspan="11"></td></tr><tr><td colspan="11"></td></tr>
+                        <tr><td colspan="11"></td></tr><tr><td colspan="11"></td></tr>
+                        <tr>
+                            <td colspan="8"></td>
+                            <td colspan="3" style="text-align: center; font-weight: bold; color: #1E3A8A; font-size: 12px;">Recorded and Proved By</td>
+                        </tr>
+                        <tr>
+                            <td colspan="8"></td>
+                            <td colspan="3" style="text-align: center; font-weight: bold; color: #DC2626; font-size: 12px;">NAY LIN HTIKE</td>
+                        </tr>
+                    `;
+                }
+
+                const originalTable = document.getElementById('excelReportTable');
+                const headerHTML = originalTable.querySelector('thead').innerHTML;
+                const originalTbodyRows = originalTable.querySelectorAll('tbody tr');
+                
+                let summaryData = [];
+                let htmlString = `<table><tbody>`;
+                let isFirstDepartment = true;
+                let currentDeptName = "Unknown Department"; 
+
+                originalTbodyRows.forEach((row, index) => {
+                    const rowText = row.innerText || row.textContent;
+                    
+                    if (rowText.includes("ဌာနအမည်")) {
+                        let extractedName = rowText.replace(/ဌာနအမည်/g, "").replace(/[:\-]/g, "").trim();
+                        if (extractedName !== "") currentDeptName = extractedName;
+
+                        if (!isFirstDepartment) {
+                            htmlString += getSignatureBlock();
+                            htmlString += `<tr><td colspan="11"></td></tr>`; 
+                        }
+                        isFirstDepartment = false;
+                        
+                        htmlString += getMainTitleBlock();
+                        htmlString += headerHTML; 
+                    }
+
+                    if (rowText.toLowerCase().includes("sub-total") || rowText.toLowerCase().includes("sub total")) {
+                        let cells = Array.from(row.querySelectorAll('td, th'));
+                        let numberValues = [];
+
+                        cells.forEach(cell => {
+                            let rawText = (cell.innerText || cell.textContent).trim();
+                            if (!rawText.toLowerCase().includes("total") && !rawText.toLowerCase().includes("sub")) {
+                                let cleanNumStr = rawText.replace(/,/g, '').trim();
+                                if (cleanNumStr !== "" && !isNaN(cleanNumStr)) numberValues.push(parseFloat(cleanNumStr));
+                            }
+                        });
+                        let liters = 0, amount = 0;
+                        if (numberValues.length > 0) {
+                            liters = numberValues[0]; 
+                            amount = numberValues[numberValues.length - 1]; 
+                        }
+                        if (liters > 0 || amount > 0) {
+                            summaryData.push({ name: currentDeptName, liters: liters, amount: amount });
+                        }
+                    }
+                    htmlString += row.outerHTML;
+                });
+
+                if (!isFirstDepartment) htmlString += getSignatureBlock();
+                
+                const tfootHTML = originalTable.querySelector('tfoot').innerHTML;
+                htmlString += tfootHTML;
+                htmlString += `</tbody></table>`; 
+
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlString;
+                const tempTable = tempDiv.querySelector('table');
+                const wsMain = XLSX.utils.table_to_sheet(tempTable);
+                wsMain['!cols'] = [ { wch: 20 }, { wch: 11 }, { wch: 55}, { wch: 11 }, { wch: 12 }, { wch: 20 }, { wch: 10 }, { wch: 11 }, { wch: 9 }, { wch: 18 }, { wch: 25 } ];
+
+                const rangeMain = XLSX.utils.decode_range(wsMain['!ref']);
+                let wsRows = [];
+                for (let R = rangeMain.s.r; R <= rangeMain.e.r; ++R) {
+                    wsRows.push({hpt: 25}); 
+                    let isHeaderRow = false, isMainTitleRow = false, isSignatureRow = false, isFooterRow = false, isEmptyRow = true, isSubTotal = false;
+
+                    for (let c = rangeMain.s.c; c <= rangeMain.e.c; ++c) {
+                        let cellRef = XLSX.utils.encode_cell({c: c, r: R});
+                        let val = wsMain[cellRef] ? String(wsMain[cellRef].v).trim() : "";
+                        if (val !== "") isEmptyRow = false;
+                        if (val === titleText) isMainTitleRow = true;
+                        if (val === "ID") isHeaderRow = true;
+                        if (val.includes("Recorded and Proved By") || val.includes("NAY LIN HTIKE")) isSignatureRow = true;
+                        if (val.includes("Grand Total")) isFooterRow = true;
+                        if (val.includes("Sub-total") || val.includes("Sub total")) isSubTotal = true;
+                    }
+
+                    let isDataRow = !isEmptyRow && !isMainTitleRow && !isSignatureRow && !isHeaderRow;
+
+                    for (let C = rangeMain.s.c; C <= rangeMain.e.c; ++C) {
+                        const cellRef = XLSX.utils.encode_cell({c: C, r: R});
+                        if (!wsMain[cellRef]) wsMain[cellRef] = { v: "", t: "s" }; 
+                        if (!wsMain[cellRef].s) wsMain[cellRef].s = {}; 
+
+                        const cellVal = String(wsMain[cellRef].v || "");
+                        wsMain[cellRef].s.alignment = { vertical: "center" };
+                        if (C === 2) wsMain[cellRef].s.alignment.wrapText = true;
+
+                        if (cellVal.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                            wsMain[cellRef].t = "s";
+                            wsMain[cellRef].v = cellVal;
+                        }
+
+                        if (isHeaderRow || (isDataRow && !isSubTotal)) {
+                            wsMain[cellRef].s.border = {
+                                top: { style: "thin", color: { rgb: "000000" } },
+                                bottom: { style: "thin", color: { rgb: "000000" } },
+                                left: { style: "thin", color: { rgb: "000000" } },
+                                right: { style: "thin", color: { rgb: "000000" } }
+                            };
+                        }
+
+                        if (isSubTotal || isFooterRow) {
+                            wsMain[cellRef].s.border = {}; 
+                            if (C === 6 || C === 9) {
+                                wsMain[cellRef].s.border = {
+                                    top: { style: "thin", color: { rgb: "000000" } },
+                                    bottom: { style: "thin", color: { rgb: "000000" } },
+                                    left: { style: "thin", color: { rgb: "000000" } },
+                                    right: { style: "thin", color: { rgb: "000000" } }
+                                };
+                            }
+                        }
+
+                        if (isMainTitleRow) {
+                            if (wsMain[cellRef].v === titleText) {
+                                wsMain[cellRef].s.font = { bold: true, sz: 14, color: { rgb: "1E40AF" } };
+                                wsMain[cellRef].s.alignment.horizontal = "center";
+                                wsMain[cellRef].s.border = {}; 
+                            }
+                        } 
+                        else if (isHeaderRow) {
+                            wsMain[cellRef].s.fill = { fgColor: { rgb: "172554" } }; 
+                            wsMain[cellRef].s.font = { bold: true, color: { rgb: "FFFFFF" } };
+                            wsMain[cellRef].s.alignment.horizontal = "center";
+                        } 
+                        else if (isSignatureRow) {
+                            if (cellVal.includes("Recorded and")) wsMain[cellRef].s.font = { bold: true, color: { rgb: "1E3A8A" } };
+                            if (cellVal.includes("NAY LIN HTIKE")) wsMain[cellRef].s.font = { bold: true, color: { rgb: "DC2626" } };
+                            wsMain[cellRef].s.alignment.horizontal = "center";
+                            wsMain[cellRef].s.border = {}; 
+                        } 
+                        else if (isDataRow || isFooterRow) {
+                            if (C >= 6 && (typeof wsMain[cellRef].v === 'number' || /^[\d,]+(\.\d+)?$/.test(cellVal))) {
+                                wsMain[cellRef].s.alignment.horizontal = "right";
+                            }
+                            if (C === 0 && parseInt(cellVal) > 0 && !cellVal.includes("MMFA")) {
+                                 wsMain[cellRef].s.alignment.horizontal = "center";
+                            }
+                            if (cellVal.includes("ဌာနအမည်") || isSubTotal || isFooterRow) {
+                                wsMain[cellRef].s.font = { bold: true };
+                            }
+                        }
+                    }
+                }
+                wsMain['!rows'] = wsRows;
+
+                // ==========================================
+                // SUMMARY SHEET GENERATION & FIXED STYLING
+                // ==========================================
+                let summaryTitleText = `My Mergui Speed Boat's Fuel Issued Record Summary For ${dateStr}`;
+                let summaryHtmlString = `
+                    <table><thead>
+                        <tr><th colspan="4" style="text-align: center; font-size: 16px; font-weight: bold; color: #1E40AF;">${summaryTitleText}</th></tr>
+                        <tr><td colspan="4"></td></tr>
+                        <tr><th>No.</th><th>Department Description</th><th>Total Liters</th><th>Amount</th></tr>
+                    </thead><tbody>
+                `;
+                let grandTotalLiters = 0, grandTotalAmount = 0;
+                let adjDept = document.getElementById('adjustDept').value;
+                let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
+
+                if (summaryData.length > 0) {
+                    summaryData.forEach((item, i) => {
+                        grandTotalLiters += item.liters;
+                        grandTotalAmount += item.amount;
+                        summaryHtmlString += `<tr><td>${i + 1}</td><td>${item.name}</td><td>${item.liters}</td><td>${item.amount}</td></tr>`;
+                    });
+                    if (adjDept === 'Grand') grandTotalAmount += adjInput;
+                    summaryHtmlString += `<tr><td colspan="2">Grand Total:</td><td>${grandTotalLiters}</td><td>${grandTotalAmount}</td></tr>`;
+                }
+                summaryHtmlString += `
+                    <tr><td colspan="4"></td></tr><tr><td colspan="4"></td></tr><tr><td colspan="4"></td></tr><tr><td colspan="4"></td></tr>
+                    <tr><td colspan="2"></td><td colspan="2" style="text-align: center; font-weight: bold; color: #1E3A8A; font-size: 12px;">Recorded and Proved By</td></tr>
+                    <tr><td colspan="2"></td><td colspan="2" style="text-align: center; font-weight: bold; color: #DC2626; font-size: 12px;">NAY LIN HTIKE</td></tr>
+                </tbody></table>`;
+
+                const tempSumDiv = document.createElement('div');
+                tempSumDiv.innerHTML = summaryHtmlString;
+                const wsSummary = XLSX.utils.table_to_sheet(tempSumDiv.querySelector('table'));
+                wsSummary['!cols'] = [ { wch: 10 }, { wch: 45 }, { wch: 15 }, { wch: 18 } ];
+
+                if (wsSummary['!ref']) {
+                    const rangeSum = XLSX.utils.decode_range(wsSummary['!ref']);
+                    let wsSumRows = [];
+                    for (let R = rangeSum.s.r; R <= rangeSum.e.r; ++R) {
+                        wsSumRows.push({hpt: 25});
+                        
+                        let isTitleRow = false;
+                        let isHeaderRow = false;
+                        let isSignatureRow = false;
+                        let isTotalRow = false;
+
+                        for (let c = rangeSum.s.c; c <= rangeSum.e.c; ++c) {
+                            let cellRef = XLSX.utils.encode_cell({c: c, r: R});
+                            let val = wsSummary[cellRef] ? String(wsSummary[cellRef].v).trim() : "";
+                            if (val === summaryTitleText) isTitleRow = true;
+                            if (val === "No.") isHeaderRow = true;
+                            if (val.includes("Recorded and Proved By") || val.includes("NAY LIN HTIKE")) isSignatureRow = true;
+                            if (val.includes("Grand Total:")) isTotalRow = true;
+                        }
+
+                        for (let C = rangeSum.s.c; C <= rangeSum.e.c; ++C) {
+                            let cellRef = XLSX.utils.encode_cell({c: C, r: R});
+                            if(!wsSummary[cellRef]) wsSummary[cellRef] = {v:"",t:"s"};
+                            if(!wsSummary[cellRef].s) wsSummary[cellRef].s = {};
+                            
+                            let cellVal = String(wsSummary[cellRef].v || "");
+                            wsSummary[cellRef].s.alignment = { vertical: "center" };
+
+                            // Title Styling & Borders Fix
+                            if (isTitleRow) {
+                                if (wsSummary[cellRef].v === summaryTitleText) {
+                                    wsSummary[cellRef].s.font = { bold: true, sz: 14, color: { rgb: "1E40AF" } };
+                                    wsSummary[cellRef].s.alignment.horizontal = "center";
+                                }
+                            } 
+                            // Header Styling & Borders Fix
+                            else if (isHeaderRow) {
+                                wsSummary[cellRef].s.fill = { fgColor: { rgb: "172554" } }; 
+                                wsSummary[cellRef].s.font = { bold: true, color: { rgb: "FFFFFF" } };
+                                wsSummary[cellRef].s.alignment.horizontal = "center";
+                                wsSummary[cellRef].s.border = {
+                                    top: { style: "thin", color: { rgb: "000000" } }, bottom: { style: "thin", color: { rgb: "000000" } },
+                                    left: { style: "thin", color: { rgb: "000000" } }, right: { style: "thin", color: { rgb: "000000" } }
+                                };
+                            } 
+                            // Signature Distortion Fix
+                            else if (isSignatureRow) {
+                                if (cellVal.includes("Recorded and")) wsSummary[cellRef].s.font = { bold: true, color: { rgb: "1E3A8A" }, sz: 12 };
+                                if (cellVal.includes("NAY LIN HTIKE")) wsSummary[cellRef].s.font = { bold: true, color: { rgb: "DC2626" }, sz: 12 };
+                                wsSummary[cellRef].s.alignment.horizontal = "center";
+                            } 
+                            // Data Rows & Grand Total Fix
+                            else {
+                                if (R > 1 && cellVal !== "") {
+                                    if (C === 0) wsSummary[cellRef].s.alignment.horizontal = "center";
+                                    if (C >= 2) wsSummary[cellRef].s.alignment.horizontal = "right";
+                                    
+                                    if (isTotalRow) {
+                                        wsSummary[cellRef].s.font = { bold: true };
+                                        if (C === 2 || C === 3) {
+                                            wsSummary[cellRef].s.border = {
+                                                top: { style: "thin", color: { rgb: "000000" } }, bottom: { style: "thin", color: { rgb: "000000" } },
+                                                left: { style: "thin", color: { rgb: "000000" } }, right: { style: "thin", color: { rgb: "000000" } }
+                                            };
+                                        }
+                                    } else {
+                                        wsSummary[cellRef].s.border = {
+                                            top: { style: "thin", color: { rgb: "000000" } }, bottom: { style: "thin", color: { rgb: "000000" } },
+                                            left: { style: "thin", color: { rgb: "000000" } }, right: { style: "thin", color: { rgb: "000000" } }
+                                        };
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    wsSummary['!rows'] = wsSumRows;
+                }
+
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, wsMain, "Fuel_Report"); 
+                XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");  
+
+                const fileName = `Fuel_Report_${dateStr.replace(/[^a-zA-Z0-9 -]/g, '_').trim()}.xlsx`;
+                XLSX.writeFile(wb, fileName);
+            } catch (error) {
+                console.error(error);
+                alert("Excel ထုတ်ရာတွင် အမှားအယွင်းဖြစ်နေပါသည်။ Error: " + error.message);
+            }
+        }
+
+        /* =========================================
+           6. YEARLY DETAIL REPORT Specific Format
+           ========================================= */
+        function exportYearlyDetailToExcel() {
+            let year = document.getElementById('filterYear').value;
+            let dateStr = "Year " + year;
+            let wsData = [];
+            let merges = [];
+            let currentRow = 0;
+            let adjDept = document.getElementById('adjustDept').value;
+            let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
+
+            let headerRowIndices = [];
+            let dataRowIndices = [];
+            let subtotalRowIndices = [];
+
+            if(Object.keys(REPORT_GROUPS_DATA).length === 0) {
+                alert("Excel ထုတ်ရန် ဒေတာမရှိပါ။"); return;
+            }
+
+            for(let dept in REPORT_GROUPS_DATA) {
+                if(currentRow > 0) {
+                    wsData.push(["","","","","","","","","","",""]);
+                    wsData.push(["","","","","","","","","","",""]);
+                    currentRow += 2;
+                }
+                
+                let titleText = `My Mergui Speed Boat's Fuel Issued Record For ${dateStr} - ${dept}`;
+                wsData.push([titleText,"","","","","","","","","",""]);
+                merges.push({s:{r:currentRow, c:0}, e:{r:currentRow, c:10}});
+                currentRow++;
+                wsData.push(["","","","","","","","","","",""]); currentRow++;
+
+                headerRowIndices.push(currentRow);
+                wsData.push(["ID", "Filled Date", "Itineraries", "Issued Date", "Boat ID", "Department", "Liter", "Price/Drum", "Price(1L)", "Total Amount", "Marks"]);
+                currentRow++;
+
+                let dTotalL = 0, dTotalA = 0;
+                REPORT_GROUPS_DATA[dept].forEach(row => {
+                    let literNum = Math.round(parseFloat(row.liter) || 0);
+                    let amountNum = Math.round(parseFloat(row.totalAmount) || 0);
+                    let priceDrumNum = Math.round(parseFloat(row.pricePerDrum) || 0);
+                    let priceLtrNum = Math.round(parseFloat(row.price) || 0);
+                    dTotalL += literNum; dTotalA += amountNum;
+
+                    dataRowIndices.push(currentRow);
+                    wsData.push([
+                        row.id || "", formatToDDMMYYYY(row.filledDate), row.itineraries || "", formatToDDMMYYYY(row.issuedDate),
+                        row.boatId || "", row.issuedDept || "", literNum, priceDrumNum, priceLtrNum, amountNum, row.marks || ""
+                    ]);
+                    currentRow++;
+                });
+
+                if(adjDept === dept) dTotalA += adjInput;
+
+                subtotalRowIndices.push(currentRow);
+                wsData.push(["", "", "", "", "", `${dept} Sub-total:`, dTotalL, "", "", dTotalA, ""]);
+                currentRow++;
+
+                wsData.push(["","","","","","","","","","",""]); wsData.push(["","","","","","","","","","",""]);
+                wsData.push(["","","","","","","","","","",""]); wsData.push(["","","","","","","","","","",""]);
+                wsData.push(["","","","","","","","","Recorded and Proved By","",""]);
+                wsData.push(["","","","","","","","","NAY LIN HTIKE","",""]);
+                merges.push({s:{r:currentRow+4, c:8}, e:{r:currentRow+4, c:10}});
+                merges.push({s:{r:currentRow+5, c:8}, e:{r:currentRow+5, c:10}});
+                currentRow += 6;
+            }
+
+            let ws = XLSX.utils.aoa_to_sheet(wsData);
+            ws['!merges'] = merges;
+            ws['!cols'] = [ { wch: 20 }, { wch: 11 }, { wch: 55}, { wch: 11 }, { wch: 12 }, { wch: 20 }, { wch: 10 }, { wch: 11 }, { wch: 9 }, { wch: 18 }, { wch: 25 } ];
+
+            let wsRows = [];
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            for (let R = range.s.r; R <= range.e.r; ++R) {
+                wsRows.push({hpt: 25});
+                for (let C = range.s.c; C <= range.e.c; ++C) {
+                    let cellRef = XLSX.utils.encode_cell({c: C, r: R});
+                    if(!ws[cellRef]) ws[cellRef] = {v:"",t:"s"};
+                    if(!ws[cellRef].s) ws[cellRef].s = {};
+                    let val = String(ws[cellRef].v);
+                    ws[cellRef].s.alignment = { vertical: "center" };
+                    if(C===2) ws[cellRef].s.alignment.wrapText = true;
+
+                    if(val.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+                        ws[cellRef].t = 's'; ws[cellRef].v = val;
+                    }
+
+                    if(val.includes("My Mergui Speed Boat")) {
+                        ws[cellRef].s.font = { bold: true, sz: 14, color: { rgb: "1E40AF" } };
+                        ws[cellRef].s.alignment.horizontal = "center";
+                    } else if(headerRowIndices.includes(R)) {
+                        ws[cellRef].s.fill = { fgColor: { rgb: "172554" } };
+                        ws[cellRef].s.font = { bold: true, color: { rgb: "FFFFFF" } };
+                        ws[cellRef].s.alignment.horizontal = "center";
+                        ws[cellRef].s.border = {
+                            top: {style:"thin",color:{rgb:"000000"}}, bottom: {style:"thin",color:{rgb:"000000"}},
+                            left: {style:"thin",color:{rgb:"000000"}}, right: {style:"thin",color:{rgb:"000000"}}
+                        };
+                    } else if(dataRowIndices.includes(R)) {
+                        ws[cellRef].s.border = {
+                            top: {style:"thin",color:{rgb:"000000"}}, bottom: {style:"thin",color:{rgb:"000000"}},
+                            left: {style:"thin",color:{rgb:"000000"}}, right: {style:"thin",color:{rgb:"000000"}}
+                        };
+                        if(C>=6 && val!=="") ws[cellRef].s.alignment.horizontal = "right";
+                    } else if(subtotalRowIndices.includes(R)) {
+                        ws[cellRef].s.font = { bold: true };
+                        if(C>=6) ws[cellRef].s.alignment.horizontal = "right";
+                        if(C===6 || C===9) {
+                            ws[cellRef].s.border = {
+                                top: {style:"thin",color:{rgb:"000000"}}, bottom: {style:"thin",color:{rgb:"000000"}},
+                                left: {style:"thin",color:{rgb:"000000"}}, right: {style:"thin",color:{rgb:"000000"}}
+                            };
+                        }
+                    } else if(val.includes("Recorded") || val.includes("NAY LIN HTIKE")) {
+                        if(val.includes("Recorded")) ws[cellRef].s.font = { bold: true, color: { rgb: "1E3A8A" } };
+                        if(val.includes("NAY LIN HTIKE")) ws[cellRef].s.font = { bold: true, color: { rgb: "DC2626" } };
+                        ws[cellRef].s.alignment.horizontal = "center";
+                    }
+                }
+            }
+            ws['!rows'] = wsRows;
+            let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Yearly_Detail");
+            XLSX.writeFile(wb, `Yearly_Detail_Report_${year}.xlsx`);
+        }
+
+        /* =========================================
+           7. YEARLY SUMMARY REPORT Specific Format
+           ========================================= */
+        function exportYearlySummaryToExcel() {
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            let rows = document.querySelectorAll('#reportTableBody tr.data-row:not(.year-header)');
+            let yearlyData = {}; 
+            
+            rows.forEach(row => {
+                let monthYearStr = row.cells[0].innerText.trim(); 
+                let parts = monthYearStr.split(',');
+                if(parts.length === 2) {
+                    let m = parts[0].trim();
+                    let y = parts[1].trim();
+                    
+                    let liter = parseFloat(row.cells[2].innerText.replace(/,/g, '')) || 0;
+                    let amtCell = row.querySelector('.row-amt');
+                    let amount = amtCell ? (parseFloat(amtCell.innerText.replace(/,/g, '')) || 0) : 0;
+                    
+                    if(!yearlyData[y]) {
+                        yearlyData[y] = {};
+                        monthNames.forEach(mn => yearlyData[y][mn] = { l: 0, a: 0 });
+                    }
+                    if(yearlyData[y][m]) {
+                        yearlyData[y][m].l += liter;
+                        yearlyData[y][m].a += amount;
+                    }
+                }
+            });
+
+            if(Object.keys(yearlyData).length === 0) {
+                alert("Excel ထုတ်ယူရန် လုံလောက်သောဒေတာမရှိပါ။");
+                return;
+            }
+
+            let wsData = []; let merges = []; let currentRow = 0;
+            let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
+            let years = Object.keys(yearlyData).sort();
+
+            let titleRowIndices = []; let headerRowIndices = []; let yearRowIndices = []; let dataRowIndices = [];
+
+            years.forEach((y, yIndex) => {
+                if (yIndex > 0) {
+                    wsData.push(["", "", "", "", ""]); wsData.push(["", "", "", "", ""]);
+                    currentRow += 2;
+                }
+
+                titleRowIndices.push(currentRow);
+                wsData.push(["My Mergui Fuel Issued Recorded Summary For Yearly", "", "", "", ""]);
+                merges.push({ s: {r: currentRow, c: 0}, e: {r: currentRow, c: 4} }); currentRow++;
+                wsData.push(["", "", "", "", ""]); currentRow++;
+
+                headerRowIndices.push(currentRow);
+                wsData.push(["No.", "Month", "Total Litter", "Total Amount", "Marks"]); currentRow++;
+
+                yearRowIndices.push(currentRow);
+                wsData.push([`Year : ${y}`, "", "", "", ""]);
+                merges.push({ s: {r: currentRow, c: 0}, e: {r: currentRow, c: 4} }); currentRow++;
+
+                let no = 1; let yTotalL = 0; let yTotalA = 0;
+                monthNames.forEach(m => {
+                    let l = yearlyData[y][m].l; let a = yearlyData[y][m].a;
+                    if (l > 0 || a > 0) {
+                        dataRowIndices.push(currentRow);
+                        wsData.push([no++, m, l, a, ""]);
+                        yTotalL += l; yTotalA += a; currentRow++;
+                    }
+                });
+                
+                if (yIndex === years.length - 1 && adjInput !== 0) {
+                    yTotalA += adjInput; dataRowIndices.push(currentRow);
+                    wsData.push(["", "Adjust Amount", "", adjInput, ""]); currentRow++;
+                }
+
+                dataRowIndices.push(currentRow);
+                wsData.push(["", "Total", yTotalL, yTotalA, ""]); currentRow++;
+
+                wsData.push(["", "", "", "", ""]); wsData.push(["", "", "", "", ""]);
+                wsData.push(["", "", "", "", ""]); wsData.push(["", "", "", "", ""]);
+                wsData.push(["", "", "", "Recorded and Proved By", ""]);
+                wsData.push(["", "", "", "NAY LIN HTIKE", ""]); currentRow += 6;
+            });
+
+            let ws = XLSX.utils.aoa_to_sheet(wsData);
+            ws['!merges'] = merges;
+            ws['!cols'] = [ { wch: 10 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 25 } ];
+
+            function addBorder(cell) {
+                cell.s.border = {
+                    top: { style: "thin", color: { rgb: "000000" } }, bottom: { style: "thin", color: { rgb: "000000" } },
+                    left: { style: "thin", color: { rgb: "000000" } }, right: { style: "thin", color: { rgb: "000000" } }
+                };
+            }
+
+            let wsRows = [];
+            const range = XLSX.utils.decode_range(ws['!ref']);
+            for (let R = range.s.r; R <= range.e.r; ++R) {
+                wsRows.push({hpt: 25});
+                for (let C = range.s.c; C <= range.e.c; ++C) {
+                    let cellRef = XLSX.utils.encode_cell({c: C, r: R});
+                    if (!ws[cellRef]) ws[cellRef] = { v: "", t: "s" };
+                    if (!ws[cellRef].s) ws[cellRef].s = {};
+                    
+                    let val = String(ws[cellRef].v);
+                    ws[cellRef].s.alignment = { vertical: "center" };
+                    
+                    if (titleRowIndices.includes(R)) {
+                        ws[cellRef].s.font = { bold: true, sz: 14, color: { rgb: "1E40AF" } };
+                        ws[cellRef].s.alignment.horizontal = "center";
+                    } else if (headerRowIndices.includes(R)) {
+                        ws[cellRef].s.fill = { fgColor: { rgb: "172554" } };
+                        ws[cellRef].s.font = { bold: true, color: { rgb: "FFFFFF" } };
+                        ws[cellRef].s.alignment.horizontal = "center";
+                        addBorder(ws[cellRef]);
+                    } else if (yearRowIndices.includes(R)) {
+                        ws[cellRef].s.font = { bold: true };
+                        ws[cellRef].s.alignment.horizontal = "left";
+                        ws[cellRef].s.fill = { fgColor: { rgb: "F1F5F9" } };
+                        addBorder(ws[cellRef]);
+                    } else if (dataRowIndices.includes(R)) {
+                        addBorder(ws[cellRef]);
+                        if (C >= 2) ws[cellRef].s.alignment.horizontal = "right";
+                        if (C === 0) ws[cellRef].s.alignment.horizontal = "center";
+                        if (C === 1 && (val === "Total" || val === "Adjust Amount")) ws[cellRef].s.font = { bold: true };
+                    } else if (val.includes("Recorded") || val.includes("NAY LIN HTIKE")) {
+                        if (val.includes("Recorded")) ws[cellRef].s.font = { bold: true, color: { rgb: "1E3A8A" } };
+                        if (val.includes("NAY LIN HTIKE")) ws[cellRef].s.font = { bold: true, color: { rgb: "DC2626" } };
+                        ws[cellRef].s.alignment.horizontal = "center";
+                    }
+                }
+            }
+            ws['!rows'] = wsRows;
+            let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Yearly_Summary");
+            
+            let sYear = document.getElementById('filterStartYear').value || "Start";
+            let eYear = document.getElementById('filterEndYear').value || "End";
+            XLSX.writeFile(wb, `Yearly_Summary_${sYear}_to_${eYear}.xlsx`);
+        }
+
+    </script>
+</body>
+</html>anmar Text', 'Padauk', sans-serif; 
             background-color: #f8fafc;
         }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
