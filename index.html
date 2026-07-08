@@ -6,9 +6,10 @@
     <title>Fuel Management Pro System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="xlsx.js"></script>
+    <!-- ExcelJS & FileSaver Libraries for Real Image Embedding & Perfect Formatting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
-        /* သေချာသော မြန်မာဖောင့်များကို ဦးစားပေးစီစဉ်ထားခြင်း */
         @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
         body { 
             font-family: 'Pyidaungsu', 'Myanmar Text', 'Padauk', sans-serif; 
@@ -19,7 +20,6 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* Form Inputs */
         .form-input {
             width: 100%; padding: 0.75rem 1rem; background-color: #f8fafc; border: 1px solid #e2e8f0; 
             border-radius: 0.5rem; font-size: 0.875rem; transition: all 0.2s ease; outline: none;
@@ -28,11 +28,9 @@
         .form-input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15); background-color: #ffffff; }
         .form-label { display: block; font-size: 0.75rem; font-weight: 700; color: #475569;   }
         
-        /* Table Styles (Auto Width for Content) */
         .th-style { padding: 12px 16px; font-size: 0.75rem; font-weight: 700;  }
         .td-style { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
         
-        /* Gradient Backgrounds */
         .bg-gradient-header { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
     </style>
 </head>
@@ -80,7 +78,6 @@
     </div>
 
     <div class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-100 relative z-10">
-        
         <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0 shadow-sm z-10">
             <div class="flex items-center space-x-3">
                 <span class="text-sm font-bold text-slate-800" id="activeTabTitle">ဆီထုတ်ပေးမှု မှတ်တမ်းအသစ်သွင်းရန်</span>
@@ -92,7 +89,6 @@
         </header>
 
         <main class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8">
-            
             <!-- 1. FORM TAB -->
             <div id="form-tab" class="tab-content max-w-7xl mx-auto space-y-6">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -398,6 +394,30 @@
                     </div>
                 </div>
 
+                <!-- SIGNATURE UPLOAD SECTION -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="border-b border-slate-100 pb-3 mb-5">
+                        <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+                            <i class="fa-solid fa-signature text-pink-600"></i>
+                            <span>လက်မှတ်ပုံထည့်ရန် (Upload Signature)</span>
+                        </h2>
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-4 items-end">
+                        <div class="flex-1">
+                            <label class="form-label text-slate-600 mb-2">ပုံရွေးချယ်ပါ (Image File)</label>
+                            <input type="file" id="signatureUpload" accept="image/*" class="form-input border-pink-200 bg-pink-50/20 text-sm">
+                        </div>
+                        <button onclick="saveSignature()" class="px-6 py-2.5 h-[42px] bg-pink-600 text-white text-sm font-bold rounded-xl hover:bg-pink-700 transition shadow-md shrink-0 flex items-center space-x-2">
+                            <i class="fa-solid fa-upload"></i>
+                            <span>Save Signature</span>
+                        </button>
+                    </div>
+                    <div class="mt-4 border border-dashed border-slate-300 p-4 flex flex-col justify-center items-center bg-slate-50 rounded-xl min-h-[120px]">
+                        <img id="signaturePreview" src="" alt="Signature Preview" class="max-h-[80px] hidden object-contain">
+                        <span id="noSignatureText" class="text-sm text-slate-400"><i class="fa-solid fa-image text-2xl block text-center mb-2 text-slate-300"></i>No signature saved yet.</span>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col h-[400px]">
                         <div class="border-b border-slate-100 pb-3 mb-4 shrink-0 flex justify-between items-center">
@@ -432,15 +452,12 @@
                     </div>
                 </div>
             </div>
-
         </main>
     </div>
 
     <script>
-        /* =========================================
-           1. INITIALIZATION & STATE
-           ========================================= */
         let WEB_APP_URL = localStorage.getItem('v5_google_web_app_url') || "";
+        let savedSignatureBase64 = localStorage.getItem('v5_signature_base64') || "";
         let DRAFT_DATA = [];
         let REPORT_GROUPS_DATA = {}; 
         let isReportGenerated = false;
@@ -509,7 +526,7 @@
                     let nextNum = Math.max(sheetMax, draftMax) + 1;
                     document.getElementById('inp_id').value = generateIdString(nextNum);
                 })
-                .catch(err => {
+                .catch(() => {
                     document.getElementById('inp_id').value = generateIdString(draftMax + 1);
                 });
         }
@@ -524,6 +541,7 @@
 
         window.onload = function() {
             initStorage();
+            loadSignaturePreview();
             const today = new Date();
             document.getElementById('currentDateDisplay').innerText = formatToDDMMYYYY(today.toISOString().split('T')[0]);
             document.getElementById('inp_filledDate').valueAsDate = today;
@@ -586,9 +604,6 @@
             }
         }
 
-        /* =========================================
-           2. SETTINGS & SYNC LOGIC
-           ========================================= */
         function saveWebAppUrl() {
             const urlVal = document.getElementById('webAppUrlInput').value.trim();
             if(!urlVal) return alert("URL ထည့်ပါ။");
@@ -598,6 +613,36 @@
             alert("API URL သိမ်းဆည်းပြီးပါပြီ။");
             fetchSettingsFromSheet();
             fetchNextID();
+        }
+
+        function loadSignaturePreview() {
+            const img = document.getElementById('signaturePreview');
+            const txt = document.getElementById('noSignatureText');
+            if (savedSignatureBase64) {
+                img.src = savedSignatureBase64;
+                img.classList.remove('hidden');
+                txt.classList.add('hidden');
+            } else {
+                img.classList.add('hidden');
+                txt.classList.remove('hidden');
+            }
+        }
+
+        function saveSignature() {
+            const fileInput = document.getElementById('signatureUpload');
+            if (fileInput.files.length === 0) return alert("ကျေးဇူးပြု၍ ပုံရွေးချယ်ပါ။");
+            
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64String = e.target.result;
+                localStorage.setItem('v5_signature_base64', base64String);
+                savedSignatureBase64 = base64String;
+                loadSignaturePreview();
+                alert("လက်မှတ်ပုံ (Signature) အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
+                fileInput.value = ""; 
+            };
+            reader.readAsDataURL(file);
         }
 
         async function fetchSettingsFromSheet() {
@@ -614,6 +659,7 @@
                 console.log("Settings fetch error:", e);
             }
         }
+
         async function saveSettingsToSheet() {
             if(!WEB_APP_URL) return;
             const boats = JSON.parse(localStorage.getItem('v5_boat_ids') || '[]');
@@ -626,7 +672,6 @@
                     body: JSON.stringify({ action: "saveSettings", boats: boats, depts: depts })
                 });
             } catch(e) {
-                console.log("Settings save error:", e);
                 alert("စနစ်ချိတ်ဆက်မှု အမှားအယွင်းဖြစ်နေပါသည်။");
             }
         }
@@ -693,9 +738,6 @@
             refreshUI();
         }
 
-        /* =========================================
-           3. FORM, DRAFT & FETCH FOR EDIT LOGIC
-           ========================================= */
         function calcPrice() {
             const l = Math.round(parseFloat(document.getElementById('inp_liter').value)) || 0;
             const pDrum = Math.round(parseFloat(document.getElementById('inp_priceDrum').value)) || 0;
@@ -762,7 +804,7 @@
                 btn.innerHTML = oriTxt;
                 btn.disabled = false;
             })
-            .catch(err => {
+            .catch(() => {
                 btn.innerHTML = oriTxt;
                 btn.disabled = false;
                 alert("ဒေတာဆွဲယူရာတွင် Error ဖြစ်နေပါသည်။");
@@ -951,9 +993,6 @@
             renderDraftTable();
         }
 
-        /* =========================================
-           4. REPORT GENERATION & HTML RENDERING
-           ========================================= */
         function toggleFilterView() {
             const rType = document.getElementById('reportType').value;
             
@@ -1227,7 +1266,7 @@
                     <tr>
                         <td colspan="11" class="p-10 text-center text-red-500 font-normal">
                             <i class="fa-solid fa-triangle-exclamation block text-xl mb-2"></i>
-                            ဒေတာဆွဲယူမှု မအောင်မြင်ပါ (ကွန်ရက် သို့မဟုတ် API ချိတ်ဆက်မှု မှားနေနိုင်ပါသည်)။ Error: ${err}
+                            ဒေတာဆွဲယူမှု မအောင်မြင်ပါ Error: ${err}
                         </td>
                     </tr>`;
                 document.getElementById('reportTotalSum').innerText = "0";
@@ -1235,17 +1274,13 @@
             });
         }
         
-        /* =========================================
-           5. EXCEL EXPORT LOGIC
-           ========================================= */
-        function exportToExcel() {
+        /* =========================================================
+           ADVANCED EXCEL EXPORT USING EXCELJS (100% PERFECT FORMAT)
+           ========================================================= */
+        async function exportToExcel() {
             try {
                 if (!isReportGenerated) {
                     alert("ကျေးဇူးပြု၍ 'ရှာဖွေမည်' ခလုတ်ကို အရင်နှိပ်ပြီး Report ထုတ်ပါ။");
-                    return;
-                }
-                if (typeof XLSX === 'undefined') {
-                    alert("Excel Library ချိတ်ဆက်မှု မအောင်မြင်ပါ။");
                     return;
                 }
 
@@ -1268,340 +1303,253 @@
                     if(sDate && eDate) dateStr = `${formatToDDMMYYYY(sDate)} to ${formatToDDMMYYYY(eDate)}`;
                     else dateStr = "Custom Date Range";
                 }
-                
-                let titleText = `My Mergui Speed Boat's Fuel Issued Record For ${dateStr}`;
 
-                function getMainTitleBlock() {
-                    return `
-                        <tr><td colspan="11" style="text-align: center; font-size: 16px; font-weight: bold; color: #1E40AF;">${titleText}</td></tr>
-                        <tr><td colspan="11"></td></tr>
-                    `;
+                const workbook = new ExcelJS.Workbook();
+                const wsMain = workbook.addWorksheet('Fuel_Report');
+                const wsSummary = workbook.addWorksheet('Summary');
+
+                // Column Setup
+                wsMain.columns = [
+                    { key: 'id', width: 22 },
+                    { key: 'filledDate', width: 14 },
+                    { key: 'itineraries', width: 45 },
+                    { key: 'issuedDate', width: 14 },
+                    { key: 'boatId', width: 15 },
+                    { key: 'dept', width: 20 },
+                    { key: 'liter', width: 12 },
+                    { key: 'priceDrum', width: 14 },
+                    { key: 'priceLtr', width: 12 },
+                    { key: 'totalAmount', width: 18 },
+                    { key: 'marks', width: 25 }
+                ];
+
+                let imageId = null;
+                if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
+                    imageId = workbook.addImage({
+                        base64: savedSignatureBase64,
+                        extension: 'png',
+                    });
                 }
 
-                function getSignatureBlock() {
-                    return `
-                        <tr><td colspan="11"></td></tr><tr><td colspan="11"></td></tr>
-                        <tr><td colspan="11"></td></tr><tr><td colspan="11"></td></tr>
-                        <tr>
-                            <td colspan="8"></td>
-                            <td colspan="3" style="text-align: center; font-weight: bold; color: #1E3A8A; font-size: 12px;">Recorded and Proved By</td>
-                        </tr>
-                        <tr>
-                            <td colspan="8"></td>
-                            <td colspan="3" style="text-align: center; font-weight: bold; color: #DC2626; font-size: 12px;">NAY LIN HTIKE</td>
-                        </tr>
-                    `;
-                }
-
-                const originalTable = document.getElementById('excelReportTable');
-                const headerHTML = originalTable.querySelector('thead').innerHTML;
-                const originalTbodyRows = originalTable.querySelectorAll('tbody tr');
-                
                 let summaryData = [];
-                let htmlString = `<table><tbody>`;
-                let isFirstDepartment = true;
-                let currentDeptName = "Unknown Department"; 
-
-                originalTbodyRows.forEach((row, index) => {
-                    const rowText = row.innerText || row.textContent;
-                    
-                    if (rowText.includes("ဌာနအမည်")) {
-                        let extractedName = rowText.replace(/ဌာနအမည်/g, "").replace(/[:\-]/g, "").trim();
-                        if (extractedName !== "") currentDeptName = extractedName;
-
-                        if (!isFirstDepartment) {
-                            htmlString += getSignatureBlock();
-                            htmlString += `<tr><td colspan="11"></td></tr>`; 
-                        }
-                        isFirstDepartment = false;
-                        
-                        htmlString += getMainTitleBlock();
-                        htmlString += headerHTML; 
-                    }
-
-                    if (rowText.toLowerCase().includes("sub-total") || rowText.toLowerCase().includes("sub total")) {
-                        let cells = Array.from(row.querySelectorAll('td, th'));
-                        let numberValues = [];
-
-                        cells.forEach(cell => {
-                            let rawText = (cell.innerText || cell.textContent).trim();
-                            if (!rawText.toLowerCase().includes("total") && !rawText.toLowerCase().includes("sub")) {
-                                let cleanNumStr = rawText.replace(/,/g, '').trim();
-                                if (cleanNumStr !== "" && !isNaN(cleanNumStr)) numberValues.push(parseFloat(cleanNumStr));
-                            }
-                        });
-                        let liters = 0, amount = 0;
-                        if (numberValues.length > 0) {
-                            liters = numberValues[0]; 
-                            amount = numberValues[numberValues.length - 1]; 
-                        }
-                        if (liters > 0 || amount > 0) {
-                            summaryData.push({ name: currentDeptName, liters: liters, amount: amount });
-                        }
-                    }
-                    htmlString += row.outerHTML;
-                });
-
-                if (!isFirstDepartment) htmlString += getSignatureBlock();
-                
-                const tfootHTML = originalTable.querySelector('tfoot').innerHTML;
-                htmlString += tfootHTML;
-                htmlString += `</tbody></table>`; 
-
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = htmlString;
-                const tempTable = tempDiv.querySelector('table');
-                const wsMain = XLSX.utils.table_to_sheet(tempTable);
-                wsMain['!cols'] = [ { wch: 20 }, { wch: 11 }, { wch: 55}, { wch: 11 }, { wch: 12 }, { wch: 20 }, { wch: 10 }, { wch: 11 }, { wch: 9 }, { wch: 18 }, { wch: 25 } ];
-
-                const rangeMain = XLSX.utils.decode_range(wsMain['!ref']);
-                let wsRows = [];
-                for (let R = rangeMain.s.r; R <= rangeMain.e.r; ++R) {
-                    wsRows.push({hpt: 25}); 
-                    let isHeaderRow = false, isMainTitleRow = false, isSignatureRow = false, isFooterRow = false, isEmptyRow = true, isSubTotal = false;
-
-                    for (let c = rangeMain.s.c; c <= rangeMain.e.c; ++c) {
-                        let cellRef = XLSX.utils.encode_cell({c: c, r: R});
-                        let val = wsMain[cellRef] ? String(wsMain[cellRef].v).trim() : "";
-                        if (val !== "") isEmptyRow = false;
-                        if (val === titleText) isMainTitleRow = true;
-                        if (val === "ID") isHeaderRow = true;
-                        if (val.includes("Recorded and Proved By") || val.includes("NAY LIN HTIKE")) isSignatureRow = true;
-                        if (val.includes("Grand Total")) isFooterRow = true;
-                        if (val.includes("Sub-total") || val.includes("Sub total")) isSubTotal = true;
-                    }
-
-                    let isDataRow = !isEmptyRow && !isMainTitleRow && !isSignatureRow && !isHeaderRow;
-
-                    for (let C = rangeMain.s.c; C <= rangeMain.e.c; ++C) {
-                        const cellRef = XLSX.utils.encode_cell({c: C, r: R});
-                        if (!wsMain[cellRef]) wsMain[cellRef] = { v: "", t: "s" }; 
-                        if (!wsMain[cellRef].s) wsMain[cellRef].s = {}; 
-
-                        const cellVal = String(wsMain[cellRef].v || "");
-                        wsMain[cellRef].s.alignment = { vertical: "center" };
-                        if (C === 2) wsMain[cellRef].s.alignment.wrapText = true;
-
-                        if (cellVal.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-                            wsMain[cellRef].t = "s";
-                            wsMain[cellRef].v = cellVal;
-                        }
-
-                        if (isHeaderRow || (isDataRow && !isSubTotal)) {
-                            wsMain[cellRef].s.border = {
-                                top: { style: "thin", color: { rgb: "000000" } },
-                                bottom: { style: "thin", color: { rgb: "000000" } },
-                                left: { style: "thin", color: { rgb: "000000" } },
-                                right: { style: "thin", color: { rgb: "000000" } }
-                            };
-                        }
-
-                        if (isSubTotal || isFooterRow) {
-                            wsMain[cellRef].s.border = {}; 
-                            if (C === 6 || C === 9) {
-                                wsMain[cellRef].s.border = {
-                                    top: { style: "thin", color: { rgb: "000000" } },
-                                    bottom: { style: "thin", color: { rgb: "000000" } },
-                                    left: { style: "thin", color: { rgb: "000000" } },
-                                    right: { style: "thin", color: { rgb: "000000" } }
-                                };
-                            }
-                        }
-
-                        if (isMainTitleRow) {
-                            if (wsMain[cellRef].v === titleText) {
-                                wsMain[cellRef].s.font = { bold: true, sz: 14, color: { rgb: "1E40AF" } };
-                                wsMain[cellRef].s.alignment.horizontal = "center";
-                                wsMain[cellRef].s.border = {}; 
-                            }
-                        } 
-                        else if (isHeaderRow) {
-                            wsMain[cellRef].s.fill = { fgColor: { rgb: "172554" } }; 
-                            wsMain[cellRef].s.font = { bold: true, color: { rgb: "FFFFFF" } };
-                            wsMain[cellRef].s.alignment.horizontal = "center";
-                        } 
-                        else if (isSignatureRow) {
-                            if (cellVal.includes("Recorded and")) wsMain[cellRef].s.font = { bold: true, color: { rgb: "1E3A8A" } };
-                            if (cellVal.includes("NAY LIN HTIKE")) wsMain[cellRef].s.font = { bold: true, color: { rgb: "DC2626" } };
-                            wsMain[cellRef].s.alignment.horizontal = "center";
-                            wsMain[cellRef].s.border = {}; 
-                        } 
-                        else if (isDataRow || isFooterRow) {
-                            if (C >= 6 && (typeof wsMain[cellRef].v === 'number' || /^[\d,]+(\.\d+)?$/.test(cellVal))) {
-                                wsMain[cellRef].s.alignment.horizontal = "right";
-                            }
-                            if (C === 0 && parseInt(cellVal) > 0 && !cellVal.includes("MMFA")) {
-                                 wsMain[cellRef].s.alignment.horizontal = "center";
-                            }
-                            if (cellVal.includes("ဌာနအမည်") || isSubTotal || isFooterRow) {
-                                wsMain[cellRef].s.font = { bold: true };
-                            }
-                        }
-                    }
-                }
-                wsMain['!rows'] = wsRows;
-
-                // ==========================================
-                // SUMMARY SHEET GENERATION & FIXED STYLING
-                // ==========================================
-                let summaryTitleText = `My Mergui Speed Boat's Fuel Issued Record Summary For ${dateStr}`;
-                let summaryHtmlString = `
-                    <table><thead>
-                        <tr><th colspan="4" style="text-align: center; font-size: 16px; font-weight: bold; color: #1E40AF;">${summaryTitleText}</th></tr>
-                        <tr><td colspan="4"></td></tr>
-                        <tr><th>No.</th><th>Department Description</th><th>Total Liters</th><th>Amount</th></tr>
-                    </thead><tbody>
-                `;
-                let grandTotalLiters = 0, grandTotalAmount = 0;
                 let adjDept = document.getElementById('adjustDept').value;
                 let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
 
-                if (summaryData.length > 0) {
-                    summaryData.forEach((item, i) => {
-                        grandTotalLiters += item.liters;
-                        grandTotalAmount += item.amount;
-                        summaryHtmlString += `<tr><td>${i + 1}</td><td>${item.name}</td><td>${item.liters}</td><td>${item.amount}</td></tr>`;
+                for (let dept in REPORT_GROUPS_DATA) {
+                    // Title
+                    const titleText = `My Mergui Speed Boat's Fuel Issued Record For ${dateStr}`;
+                    const titleRow = wsMain.addRow([titleText]);
+                    wsMain.mergeCells(`A${titleRow.number}:K${titleRow.number}`);
+                    titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1E40AF' } };
+                    titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+                    titleRow.height = 28;
+
+                    // Header
+                    const headerRow = wsMain.addRow(['ID', 'Filled Date', 'Itineraries', 'Issued Date', 'Boat ID', 'Department', 'Liter', 'Price/Drum', 'Price(1L)', 'Total Amount', 'Marks']);
+                    headerRow.height = 24;
+                    headerRow.eachCell((cell) => {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
+                        cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
                     });
-                    if (adjDept === 'Grand') grandTotalAmount += adjInput;
-                    summaryHtmlString += `<tr><td colspan="2">Grand Total:</td><td>${grandTotalLiters}</td><td>${grandTotalAmount}</td></tr>`;
-                }
-                summaryHtmlString += `
-                    <tr><td colspan="4"></td></tr><tr><td colspan="4"></td></tr><tr><td colspan="4"></td></tr><tr><td colspan="4"></td></tr>
-                    <tr><td colspan="2"></td><td colspan="2" style="text-align: center; font-weight: bold; color: #1E3A8A; font-size: 12px;">Recorded and Proved By</td></tr>
-                    <tr><td colspan="2"></td><td colspan="2" style="text-align: center; font-weight: bold; color: #DC2626; font-size: 12px;">NAY LIN HTIKE</td></tr>
-                </tbody></table>`;
 
-                const tempSumDiv = document.createElement('div');
-                tempSumDiv.innerHTML = summaryHtmlString;
-                const wsSummary = XLSX.utils.table_to_sheet(tempSumDiv.querySelector('table'));
-                wsSummary['!cols'] = [ { wch: 10 }, { wch: 45 }, { wch: 15 }, { wch: 18 } ];
+                    let dTotalL = 0, dTotalA = 0;
+                    REPORT_GROUPS_DATA[dept].forEach(row => {
+                        let literNum = Math.round(parseFloat(row.liter) || 0);
+                        let amountNum = Math.round(parseFloat(row.totalAmount) || 0);
+                        let priceDrumNum = Math.round(parseFloat(row.pricePerDrum) || 0);
+                        let priceLtrNum = Math.round(parseFloat(row.price) || 0);
+                        dTotalL += literNum; dTotalA += amountNum;
 
-                if (wsSummary['!ref']) {
-                    const rangeSum = XLSX.utils.decode_range(wsSummary['!ref']);
-                    let wsSumRows = [];
-                    for (let R = rangeSum.s.r; R <= rangeSum.e.r; ++R) {
-                        wsSumRows.push({hpt: 25});
-                        
-                        let isTitleRow = false;
-                        let isHeaderRow = false;
-                        let isSignatureRow = false;
-                        let isTotalRow = false;
+                        const dataRow = wsMain.addRow([
+                            row.id || "",
+                            formatToDDMMYYYY(row.filledDate),
+                            row.itineraries || "",
+                            formatToDDMMYYYY(row.issuedDate),
+                            row.boatId || "",
+                            row.issuedDept || "",
+                            literNum,
+                            priceDrumNum,
+                            priceLtrNum,
+                            amountNum,
+                            row.marks || ""
+                        ]);
+                        dataRow.height = 20;
+                        dataRow.eachCell((cell, colIdx) => {
+                            cell.font = { size: 10 };
+                            cell.alignment = { vertical: 'middle', horizontal: colIdx >= 7 && colIdx <= 10 ? 'right' : 'left' };
+                            if (colIdx === 1 || colIdx === 2 || colIdx === 4) cell.alignment.horizontal = 'center';
+                            cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                        });
+                    });
 
-                        for (let c = rangeSum.s.c; c <= rangeSum.e.c; ++c) {
-                            let cellRef = XLSX.utils.encode_cell({c: c, r: R});
-                            let val = wsSummary[cellRef] ? String(wsSummary[cellRef].v).trim() : "";
-                            if (val === summaryTitleText) isTitleRow = true;
-                            if (val === "No.") isHeaderRow = true;
-                            if (val.includes("Recorded and Proved By") || val.includes("NAY LIN HTIKE")) isSignatureRow = true;
-                            if (val.includes("Grand Total:")) isTotalRow = true;
+                    if (adjDept === dept) dTotalA += adjInput;
+                    summaryData.push({ name: dept, liters: dTotalL, amount: dTotalA });
+
+                    // Subtotal
+                    const subtotalRow = wsMain.addRow(['', '', '', '', '', `${dept} Sub-total:`, dTotalL, '', '', dTotalA, '']);
+                    subtotalRow.height = 22;
+                    subtotalRow.eachCell((cell, colIdx) => {
+                        cell.font = { bold: true, size: 10 };
+                        cell.alignment = { vertical: 'middle' };
+                        if (colIdx === 7 || colIdx === 10) {
+                            cell.alignment.horizontal = 'right';
+                            cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
                         }
+                    });
 
-                        for (let C = rangeSum.s.c; C <= rangeSum.e.c; ++C) {
-                            let cellRef = XLSX.utils.encode_cell({c: C, r: R});
-                            if(!wsSummary[cellRef]) wsSummary[cellRef] = {v:"",t:"s"};
-                            if(!wsSummary[cellRef].s) wsSummary[cellRef].s = {};
-                            
-                            let cellVal = String(wsSummary[cellRef].v || "");
-                            wsSummary[cellRef].s.alignment = { vertical: "center" };
+                    // Remark
+                    const noteRow = wsMain.addRow(['မှတ်ချက် - (အစွန်းထွက်) ဆီကုမ္ပဏီမှ အစွန်း တွေဖြတ်ပေးထားသော တန်ဖိုးများကိုခွဲပြထားပါသည်။']);
+                    wsMain.mergeCells(`A${noteRow.number}:K${noteRow.number}`);
+                    noteRow.getCell(1).font = { italic: true, size: 9, color: { argb: 'FF475569' } };
+                    noteRow.height = 18;
 
-                            // Title Styling & Borders Fix
-                            if (isTitleRow) {
-                                if (wsSummary[cellRef].v === summaryTitleText) {
-                                    wsSummary[cellRef].s.font = { bold: true, sz: 14, color: { rgb: "1E40AF" } };
-                                    wsSummary[cellRef].s.alignment.horizontal = "center";
-                                }
-                            } 
-                            // Header Styling & Borders Fix
-                            else if (isHeaderRow) {
-                                wsSummary[cellRef].s.fill = { fgColor: { rgb: "172554" } }; 
-                                wsSummary[cellRef].s.font = { bold: true, color: { rgb: "FFFFFF" } };
-                                wsSummary[cellRef].s.alignment.horizontal = "center";
-                                wsSummary[cellRef].s.border = {
-                                    top: { style: "thin", color: { rgb: "000000" } }, bottom: { style: "thin", color: { rgb: "000000" } },
-                                    left: { style: "thin", color: { rgb: "000000" } }, right: { style: "thin", color: { rgb: "000000" } }
-                                };
-                            } 
-                            // Signature Distortion Fix
-                            else if (isSignatureRow) {
-                                if (cellVal.includes("Recorded and")) wsSummary[cellRef].s.font = { bold: true, color: { rgb: "1E3A8A" }, sz: 12 };
-                                if (cellVal.includes("NAY LIN HTIKE")) wsSummary[cellRef].s.font = { bold: true, color: { rgb: "DC2626" }, sz: 12 };
-                                wsSummary[cellRef].s.alignment.horizontal = "center";
-                            } 
-                            // Data Rows & Grand Total Fix
-                            else {
-                                if (R > 1 && cellVal !== "") {
-                                    if (C === 0) wsSummary[cellRef].s.alignment.horizontal = "center";
-                                    if (C >= 2) wsSummary[cellRef].s.alignment.horizontal = "right";
-                                    
-                                    if (isTotalRow) {
-                                        wsSummary[cellRef].s.font = { bold: true };
-                                        if (C === 2 || C === 3) {
-                                            wsSummary[cellRef].s.border = {
-                                                top: { style: "thin", color: { rgb: "000000" } }, bottom: { style: "thin", color: { rgb: "000000" } },
-                                                left: { style: "thin", color: { rgb: "000000" } }, right: { style: "thin", color: { rgb: "000000" } }
-                                            };
-                                        }
-                                    } else {
-                                        wsSummary[cellRef].s.border = {
-                                            top: { style: "thin", color: { rgb: "000000" } }, bottom: { style: "thin", color: { rgb: "000000" } },
-                                            left: { style: "thin", color: { rgb: "000000" } }, right: { style: "thin", color: { rgb: "000000" } }
-                                        };
-                                    }
-                                }
-                            }
-                        }
+                    // Signature
+                    const sigSpaceRow = wsMain.addRow([]);
+                    // UPDATED: အမြင့်ကို 75 အထိ မြှင့်ပေးထားသည် (စိုက်မမှန်တာ ဖြေရှင်းရန်)
+                    sigSpaceRow.height = 55; 
+
+                    if (imageId !== null) {
+                        wsMain.addImage(imageId, {
+                            // Center over I, J, K (cols 8, 9, 10)
+                            tl: { col: 9.9, row: sigSpaceRow.number -1 },
+                            br: { col: 10.2, row: sigSpaceRow.number },
+                            editMode: 'oneCell'
+                        });
                     }
-                    wsSummary['!rows'] = wsSumRows;
+
+                    const recRow = wsMain.addRow(['', '', '', '', '', '', '', '', 'Recorded and Proved By', '', '']);
+                    wsMain.mergeCells(`I${recRow.number}:K${recRow.number}`);
+                    recRow.getCell(9).font = { bold: true, size: 10, color: { argb: 'FF1E3A8A' } };
+                    recRow.getCell(9).alignment = { horizontal: 'center' };
+
+                    const nameRow = wsMain.addRow(['', '', '', '', '', '', '', '', 'NAY LIN HTIKE', '', '']);
+                    wsMain.mergeCells(`I${nameRow.number}:K${nameRow.number}`);
+                    nameRow.getCell(9).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
+                    nameRow.getCell(9).alignment = { horizontal: 'center' };
+
+                    wsMain.addRow([]); // Single Clean Gap Between Departments
                 }
 
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, wsMain, "Fuel_Report"); 
-                XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");  
+                // Summary Sheet Setup
+                wsSummary.columns = [
+                    { key: 'no', width: 8 },
+                    { key: 'dept', width: 35 },
+                    { key: 'liters', width: 16 },
+                    { key: 'amount', width: 20 }
+                ];
 
-                const fileName = `Fuel_Report_${dateStr.replace(/[^a-zA-Z0-9 -]/g, '_').trim()}.xlsx`;
-                XLSX.writeFile(wb, fileName);
+                const sumTitleText = `My Mergui Speed Boat's Fuel Issued Record Summary For ${dateStr}`;
+                const sumTitleRow = wsSummary.addRow([sumTitleText]);
+                wsSummary.mergeCells(`A${sumTitleRow.number}:D${sumTitleRow.number}`);
+                sumTitleRow.getCell(1).font = { bold: true, size: 13, color: { argb: 'FF1E40AF' } };
+                sumTitleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+                sumTitleRow.height = 28;
+
+                const sumHeaderRow = wsSummary.addRow(['No.', 'Department Description', 'Total Liters', 'Amount']);
+                sumHeaderRow.height = 24;
+                sumHeaderRow.eachCell((cell) => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
+                    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                });
+
+                let gLiters = 0, gAmount = 0;
+                summaryData.forEach((item, idx) => {
+                    gLiters += item.liters;
+                    gAmount += item.amount;
+                    const sRow = wsSummary.addRow([idx + 1, item.name, item.liters, item.amount]);
+                    sRow.height = 20;
+                    sRow.eachCell((cell, colIdx) => {
+                        cell.font = { size: 10 };
+                        cell.alignment = { vertical: 'middle', horizontal: colIdx >= 3 ? 'right' : (colIdx === 1 ? 'center' : 'left') };
+                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                    });
+                });
+
+                if (adjDept === 'Grand' && adjInput !== 0) gAmount += adjInput;
+
+                const gTotalRow = wsSummary.addRow(['', 'Grand Total:', gLiters, gAmount]);
+                gTotalRow.height = 22;
+                gTotalRow.eachCell((cell, colIdx) => {
+                    cell.font = { bold: true, size: 10 };
+                    cell.alignment = { vertical: 'middle', horizontal: colIdx >= 3 ? 'right' : 'left' };
+                    if (colIdx >= 3) {
+                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                    }
+                });
+
+                // Summary Signature
+                const sumSigSpace = wsSummary.addRow([]);
+                // UPDATED
+                sumSigSpace.height = 55;
+                if (imageId !== null) {
+                    wsSummary.addImage(imageId, {
+                        // Center over C, D (cols 2, 3)
+                        tl: { col: 2.9, row: sumSigSpace.number - 1 },
+                        br: { col: 3.3, row: sumSigSpace.number },
+                        editMode: 'oneCell'
+                    });
+                }
+
+                const sumRec = wsSummary.addRow(['', '', 'Recorded and Proved By', '']);
+                wsSummary.mergeCells(`C${sumRec.number}:D${sumRec.number}`);
+                sumRec.getCell(3).font = { bold: true, size: 10, color: { argb: 'FF1E3A8A' } };
+                sumRec.getCell(3).alignment = { horizontal: 'center' };
+
+                const sumName = wsSummary.addRow(['', '', 'NAY LIN HTIKE', '']);
+                wsSummary.mergeCells(`C${sumName.number}:D${sumName.number}`);
+                sumName.getCell(3).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
+                sumName.getCell(3).alignment = { horizontal: 'center' };
+
+                // Download File
+                const buffer = await workbook.xlsx.writeBuffer();
+                saveAs(new Blob([buffer]), `Fuel_Report_${dateStr.replace(/[^a-zA-Z0-9 -]/g, '_').trim()}.xlsx`);
             } catch (error) {
-                console.error(error);
                 alert("Excel ထုတ်ရာတွင် အမှားအယွင်းဖြစ်နေပါသည်။ Error: " + error.message);
             }
         }
 
-        /* =========================================
-           6. YEARLY DETAIL REPORT Specific Format
-           ========================================= */
-        function exportYearlyDetailToExcel() {
+        async function exportYearlyDetailToExcel() {
             let year = document.getElementById('filterYear').value;
             let dateStr = "Year " + year;
-            let wsData = [];
-            let merges = [];
-            let currentRow = 0;
+
+            const workbook = new ExcelJS.Workbook();
+            const ws = workbook.addWorksheet('Yearly_Detail');
+
+            ws.columns = [
+                { key: 'id', width: 22 }, { key: 'filledDate', width: 14 }, { key: 'itineraries', width: 45 },
+                { key: 'issuedDate', width: 14 }, { key: 'boatId', width: 15 }, { key: 'dept', width: 20 },
+                { key: 'liter', width: 12 }, { key: 'priceDrum', width: 14 }, { key: 'priceLtr', width: 12 },
+                { key: 'totalAmount', width: 18 }, { key: 'marks', width: 25 }
+            ];
+
+            let imageId = null;
+            if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
+                imageId = workbook.addImage({ base64: savedSignatureBase64, extension: 'png' });
+            }
+
             let adjDept = document.getElementById('adjustDept').value;
             let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
 
-            let headerRowIndices = [];
-            let dataRowIndices = [];
-            let subtotalRowIndices = [];
+            for (let dept in REPORT_GROUPS_DATA) {
+                const titleText = `My Mergui Speed Boat's Fuel Issued Record For ${dateStr} - ${dept}`;
+                const titleRow = ws.addRow([titleText]);
+                ws.mergeCells(`A${titleRow.number}:K${titleRow.number}`);
+                titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1E40AF' } };
+                titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+                titleRow.height = 28;
 
-            if(Object.keys(REPORT_GROUPS_DATA).length === 0) {
-                alert("Excel ထုတ်ရန် ဒေတာမရှိပါ။"); return;
-            }
-
-            for(let dept in REPORT_GROUPS_DATA) {
-                if(currentRow > 0) {
-                    wsData.push(["","","","","","","","","","",""]);
-                    wsData.push(["","","","","","","","","","",""]);
-                    currentRow += 2;
-                }
-                
-                let titleText = `My Mergui Speed Boat's Fuel Issued Record For ${dateStr} - ${dept}`;
-                wsData.push([titleText,"","","","","","","","","",""]);
-                merges.push({s:{r:currentRow, c:0}, e:{r:currentRow, c:10}});
-                currentRow++;
-                wsData.push(["","","","","","","","","","",""]); currentRow++;
-
-                headerRowIndices.push(currentRow);
-                wsData.push(["ID", "Filled Date", "Itineraries", "Issued Date", "Boat ID", "Department", "Liter", "Price/Drum", "Price(1L)", "Total Amount", "Marks"]);
-                currentRow++;
+                const headerRow = ws.addRow(['ID', 'Filled Date', 'Itineraries', 'Issued Date', 'Boat ID', 'Department', 'Liter', 'Price/Drum', 'Price(1L)', 'Total Amount', 'Marks']);
+                headerRow.height = 24;
+                headerRow.eachCell((cell) => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
+                    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                });
 
                 let dTotalL = 0, dTotalA = 0;
                 REPORT_GROUPS_DATA[dept].forEach(row => {
@@ -1611,92 +1559,67 @@
                     let priceLtrNum = Math.round(parseFloat(row.price) || 0);
                     dTotalL += literNum; dTotalA += amountNum;
 
-                    dataRowIndices.push(currentRow);
-                    wsData.push([
-                        row.id || "", formatToDDMMYYYY(row.filledDate), row.itineraries || "", formatToDDMMYYYY(row.issuedDate),
-                        row.boatId || "", row.issuedDept || "", literNum, priceDrumNum, priceLtrNum, amountNum, row.marks || ""
+                    const dataRow = ws.addRow([
+                        row.id || "", formatToDDMMYYYY(row.filledDate), row.itineraries || "",
+                        formatToDDMMYYYY(row.issuedDate), row.boatId || "", row.issuedDept || "",
+                        literNum, priceDrumNum, priceLtrNum, amountNum, row.marks || ""
                     ]);
-                    currentRow++;
+                    dataRow.height = 20;
+                    dataRow.eachCell((cell, colIdx) => {
+                        cell.font = { size: 10 };
+                        cell.alignment = { vertical: 'middle', horizontal: colIdx >= 7 && colIdx <= 10 ? 'right' : 'left' };
+                        if (colIdx === 1 || colIdx === 2 || colIdx === 4) cell.alignment.horizontal = 'center';
+                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                    });
                 });
 
-                if(adjDept === dept) dTotalA += adjInput;
+                if (adjDept === dept) dTotalA += adjInput;
 
-                subtotalRowIndices.push(currentRow);
-                wsData.push(["", "", "", "", "", `${dept} Sub-total:`, dTotalL, "", "", dTotalA, ""]);
-                currentRow++;
-
-                wsData.push(["","","","","","","","","","",""]); wsData.push(["","","","","","","","","","",""]);
-                wsData.push(["","","","","","","","","","",""]); wsData.push(["","","","","","","","","","",""]);
-                wsData.push(["","","","","","","","","Recorded and Proved By","",""]);
-                wsData.push(["","","","","","","","","NAY LIN HTIKE","",""]);
-                merges.push({s:{r:currentRow+4, c:8}, e:{r:currentRow+4, c:10}});
-                merges.push({s:{r:currentRow+5, c:8}, e:{r:currentRow+5, c:10}});
-                currentRow += 6;
-            }
-
-            let ws = XLSX.utils.aoa_to_sheet(wsData);
-            ws['!merges'] = merges;
-            ws['!cols'] = [ { wch: 20 }, { wch: 11 }, { wch: 55}, { wch: 11 }, { wch: 12 }, { wch: 20 }, { wch: 10 }, { wch: 11 }, { wch: 9 }, { wch: 18 }, { wch: 25 } ];
-
-            let wsRows = [];
-            const range = XLSX.utils.decode_range(ws['!ref']);
-            for (let R = range.s.r; R <= range.e.r; ++R) {
-                wsRows.push({hpt: 25});
-                for (let C = range.s.c; C <= range.e.c; ++C) {
-                    let cellRef = XLSX.utils.encode_cell({c: C, r: R});
-                    if(!ws[cellRef]) ws[cellRef] = {v:"",t:"s"};
-                    if(!ws[cellRef].s) ws[cellRef].s = {};
-                    let val = String(ws[cellRef].v);
-                    ws[cellRef].s.alignment = { vertical: "center" };
-                    if(C===2) ws[cellRef].s.alignment.wrapText = true;
-
-                    if(val.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
-                        ws[cellRef].t = 's'; ws[cellRef].v = val;
+                const subtotalRow = ws.addRow(['', '', '', '', '', `${dept} Sub-total:`, dTotalL, '', '', dTotalA, '']);
+                subtotalRow.height = 22;
+                subtotalRow.eachCell((cell, colIdx) => {
+                    cell.font = { bold: true, size: 10 };
+                    cell.alignment = { vertical: 'middle' };
+                    if (colIdx === 7 || colIdx === 10) {
+                        cell.alignment.horizontal = 'right';
+                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
                     }
+                });
 
-                    if(val.includes("My Mergui Speed Boat")) {
-                        ws[cellRef].s.font = { bold: true, sz: 14, color: { rgb: "1E40AF" } };
-                        ws[cellRef].s.alignment.horizontal = "center";
-                    } else if(headerRowIndices.includes(R)) {
-                        ws[cellRef].s.fill = { fgColor: { rgb: "172554" } };
-                        ws[cellRef].s.font = { bold: true, color: { rgb: "FFFFFF" } };
-                        ws[cellRef].s.alignment.horizontal = "center";
-                        ws[cellRef].s.border = {
-                            top: {style:"thin",color:{rgb:"000000"}}, bottom: {style:"thin",color:{rgb:"000000"}},
-                            left: {style:"thin",color:{rgb:"000000"}}, right: {style:"thin",color:{rgb:"000000"}}
-                        };
-                    } else if(dataRowIndices.includes(R)) {
-                        ws[cellRef].s.border = {
-                            top: {style:"thin",color:{rgb:"000000"}}, bottom: {style:"thin",color:{rgb:"000000"}},
-                            left: {style:"thin",color:{rgb:"000000"}}, right: {style:"thin",color:{rgb:"000000"}}
-                        };
-                        if(C>=6 && val!=="") ws[cellRef].s.alignment.horizontal = "right";
-                    } else if(subtotalRowIndices.includes(R)) {
-                        ws[cellRef].s.font = { bold: true };
-                        if(C>=6) ws[cellRef].s.alignment.horizontal = "right";
-                        if(C===6 || C===9) {
-                            ws[cellRef].s.border = {
-                                top: {style:"thin",color:{rgb:"000000"}}, bottom: {style:"thin",color:{rgb:"000000"}},
-                                left: {style:"thin",color:{rgb:"000000"}}, right: {style:"thin",color:{rgb:"000000"}}
-                            };
-                        }
-                    } else if(val.includes("Recorded") || val.includes("NAY LIN HTIKE")) {
-                        if(val.includes("Recorded")) ws[cellRef].s.font = { bold: true, color: { rgb: "1E3A8A" } };
-                        if(val.includes("NAY LIN HTIKE")) ws[cellRef].s.font = { bold: true, color: { rgb: "DC2626" } };
-                        ws[cellRef].s.alignment.horizontal = "center";
-                    }
+                const noteRow = ws.addRow(['မှတ်ချက် - (အစွန်းထွက်) ဆီကုမ္ပဏီမှ အစွန်း တွေဖြတ်ပေးထားသော တန်ဖိုးများကိုခွဲပြထားပါသည်။']);
+                ws.mergeCells(`A${noteRow.number}:K${noteRow.number}`);
+                noteRow.getCell(1).font = { italic: true, size: 9, color: { argb: 'FF475569' } };
+
+                const sigSpaceRow = ws.addRow([]);
+                // UPDATED
+                sigSpaceRow.height = 75;
+                if (imageId !== null) {
+                    ws.addImage(imageId, {
+                        // Center over I, J, K (cols 8, 9, 10) - Fixed inverted br/tl
+                        tl: { col: 8.5, row: sigSpaceRow.number - 1 },
+                        br: { col: 10.5, row: sigSpaceRow.number },
+                        editMode: 'oneCell'
+                    });
                 }
+
+                const recRow = ws.addRow(['', '', '', '', '', '', '', '', 'Recorded and Proved By', '', '']);
+                ws.mergeCells(`I${recRow.number}:K${recRow.number}`);
+                recRow.getCell(9).font = { bold: true, size: 10, color: { argb: 'FF1E3A8A' } };
+                recRow.getCell(9).alignment = { horizontal: 'center' };
+
+                const nameRow = ws.addRow(['', '', '', '', '', '', '', '', 'NAY LIN HTIKE', '', '']);
+                ws.mergeCells(`I${nameRow.number}:K${nameRow.number}`);
+                nameRow.getCell(9).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
+                nameRow.getCell(9).alignment = { horizontal: 'center' };
+
+                ws.addRow([]);
             }
-            ws['!rows'] = wsRows;
-            let wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Yearly_Detail");
-            XLSX.writeFile(wb, `Yearly_Detail_Report_${year}.xlsx`);
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            saveAs(new Blob([buffer]), `Yearly_Detail_Report_${year}.xlsx`);
         }
 
-        /* =========================================
-           7. YEARLY SUMMARY REPORT Specific Format
-           ========================================= */
-        function exportYearlySummaryToExcel() {
+        async function exportYearlySummaryToExcel() {
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             let rows = document.querySelectorAll('#reportTableBody tr.data-row:not(.year-header)');
             let yearlyData = {}; 
@@ -1707,7 +1630,6 @@
                 if(parts.length === 2) {
                     let m = parts[0].trim();
                     let y = parts[1].trim();
-                    
                     let liter = parseFloat(row.cells[2].innerText.replace(/,/g, '')) || 0;
                     let amtCell = row.querySelector('.row-amt');
                     let amount = amtCell ? (parseFloat(amtCell.innerText.replace(/,/g, '')) || 0) : 0;
@@ -1723,116 +1645,85 @@
                 }
             });
 
-            if(Object.keys(yearlyData).length === 0) {
-                alert("Excel ထုတ်ယူရန် လုံလောက်သောဒေတာမရှိပါ။");
-                return;
+            const workbook = new ExcelJS.Workbook();
+            const ws = workbook.addWorksheet('Yearly_Summary');
+            ws.columns = [{ width: 8 }, { width: 20 }, { width: 16 }, { width: 20 }, { width: 25 }];
+
+            let imageId = null;
+            if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
+                imageId = workbook.addImage({ base64: savedSignatureBase64, extension: 'png' });
             }
 
-            let wsData = []; let merges = []; let currentRow = 0;
             let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
             let years = Object.keys(yearlyData).sort();
 
-            let titleRowIndices = []; let headerRowIndices = []; let yearRowIndices = []; let dataRowIndices = [];
-
             years.forEach((y, yIndex) => {
-                if (yIndex > 0) {
-                    wsData.push(["", "", "", "", ""]); wsData.push(["", "", "", "", ""]);
-                    currentRow += 2;
-                }
+                const titleRow = ws.addRow(["My Mergui Fuel Issued Recorded Summary For Yearly"]);
+                ws.mergeCells(`A${titleRow.number}:E${titleRow.number}`);
+                titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1E40AF' } };
+                titleRow.getCell(1).alignment = { horizontal: 'center' };
 
-                titleRowIndices.push(currentRow);
-                wsData.push(["My Mergui Fuel Issued Recorded Summary For Yearly", "", "", "", ""]);
-                merges.push({ s: {r: currentRow, c: 0}, e: {r: currentRow, c: 4} }); currentRow++;
-                wsData.push(["", "", "", "", ""]); currentRow++;
+                const headerRow = ws.addRow(["No.", "Month", "Total Litter", "Total Amount", "Marks"]);
+                headerRow.eachCell(cell => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
+                    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                    cell.alignment = { horizontal: 'center' };
+                });
 
-                headerRowIndices.push(currentRow);
-                wsData.push(["No.", "Month", "Total Litter", "Total Amount", "Marks"]); currentRow++;
+                const yearHeader = ws.addRow([`Year : ${y}`, "", "", "", ""]);
+                ws.mergeCells(`A${yearHeader.number}:E${yearHeader.number}`);
+                yearHeader.getCell(1).font = { bold: true };
 
-                yearRowIndices.push(currentRow);
-                wsData.push([`Year : ${y}`, "", "", "", ""]);
-                merges.push({ s: {r: currentRow, c: 0}, e: {r: currentRow, c: 4} }); currentRow++;
-
-                let no = 1; let yTotalL = 0; let yTotalA = 0;
+                let no = 1, yTotalL = 0, yTotalA = 0;
                 monthNames.forEach(m => {
-                    let l = yearlyData[y][m].l; let a = yearlyData[y][m].a;
+                    let l = yearlyData[y][m].l, a = yearlyData[y][m].a;
                     if (l > 0 || a > 0) {
-                        dataRowIndices.push(currentRow);
-                        wsData.push([no++, m, l, a, ""]);
-                        yTotalL += l; yTotalA += a; currentRow++;
+                        const dRow = ws.addRow([no++, m, l, a, ""]);
+                        dRow.eachCell((cell, cIdx) => {
+                            if (cIdx >= 3) cell.alignment = { horizontal: 'right' };
+                            cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                        });
+                        yTotalL += l; yTotalA += a;
                     }
                 });
-                
-                if (yIndex === years.length - 1 && adjInput !== 0) {
-                    yTotalA += adjInput; dataRowIndices.push(currentRow);
-                    wsData.push(["", "Adjust Amount", "", adjInput, ""]); currentRow++;
+
+                if (yIndex === years.length - 1 && adjInput !== 0) yTotalA += adjInput;
+
+                const totRow = ws.addRow(["", "Total", yTotalL, yTotalA, ""]);
+                totRow.eachCell((cell, cIdx) => {
+                    cell.font = { bold: true };
+                    if (cIdx >= 3) cell.alignment = { horizontal: 'right' };
+                    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                });
+
+                const sigSpaceRow = ws.addRow([]);
+                // UPDATED
+                sigSpaceRow.height = 75;
+                if (imageId !== null) {
+                    ws.addImage(imageId, {
+                        // Center over D (col 3)
+                        tl: { col: 2.7, row: sigSpaceRow.number - 1 },
+                        br: { col: 4.3, row: sigSpaceRow.number },
+                        editMode: 'oneCell'
+                    });
                 }
 
-                dataRowIndices.push(currentRow);
-                wsData.push(["", "Total", yTotalL, yTotalA, ""]); currentRow++;
+                const recRow = ws.addRow(["", "", "", "Recorded and Proved By", ""]);
+                recRow.getCell(4).font = { bold: true, color: { argb: 'FF1E3A8A' } };
+                recRow.getCell(4).alignment = { horizontal: 'center' };
 
-                wsData.push(["", "", "", "", ""]); wsData.push(["", "", "", "", ""]);
-                wsData.push(["", "", "", "", ""]); wsData.push(["", "", "", "", ""]);
-                wsData.push(["", "", "", "Recorded and Proved By", ""]);
-                wsData.push(["", "", "", "NAY LIN HTIKE", ""]); currentRow += 6;
+                const nameRow = ws.addRow(["", "", "", "NAY LIN HTIKE", ""]);
+                nameRow.getCell(4).font = { bold: true, color: { argb: 'FFDC2626' } };
+                nameRow.getCell(4).alignment = { horizontal: 'center' };
+
+                ws.addRow([]);
             });
 
-            let ws = XLSX.utils.aoa_to_sheet(wsData);
-            ws['!merges'] = merges;
-            ws['!cols'] = [ { wch: 10 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 25 } ];
-
-            function addBorder(cell) {
-                cell.s.border = {
-                    top: { style: "thin", color: { rgb: "000000" } }, bottom: { style: "thin", color: { rgb: "000000" } },
-                    left: { style: "thin", color: { rgb: "000000" } }, right: { style: "thin", color: { rgb: "000000" } }
-                };
-            }
-
-            let wsRows = [];
-            const range = XLSX.utils.decode_range(ws['!ref']);
-            for (let R = range.s.r; R <= range.e.r; ++R) {
-                wsRows.push({hpt: 25});
-                for (let C = range.s.c; C <= range.e.c; ++C) {
-                    let cellRef = XLSX.utils.encode_cell({c: C, r: R});
-                    if (!ws[cellRef]) ws[cellRef] = { v: "", t: "s" };
-                    if (!ws[cellRef].s) ws[cellRef].s = {};
-                    
-                    let val = String(ws[cellRef].v);
-                    ws[cellRef].s.alignment = { vertical: "center" };
-                    
-                    if (titleRowIndices.includes(R)) {
-                        ws[cellRef].s.font = { bold: true, sz: 14, color: { rgb: "1E40AF" } };
-                        ws[cellRef].s.alignment.horizontal = "center";
-                    } else if (headerRowIndices.includes(R)) {
-                        ws[cellRef].s.fill = { fgColor: { rgb: "172554" } };
-                        ws[cellRef].s.font = { bold: true, color: { rgb: "FFFFFF" } };
-                        ws[cellRef].s.alignment.horizontal = "center";
-                        addBorder(ws[cellRef]);
-                    } else if (yearRowIndices.includes(R)) {
-                        ws[cellRef].s.font = { bold: true };
-                        ws[cellRef].s.alignment.horizontal = "left";
-                        ws[cellRef].s.fill = { fgColor: { rgb: "F1F5F9" } };
-                        addBorder(ws[cellRef]);
-                    } else if (dataRowIndices.includes(R)) {
-                        addBorder(ws[cellRef]);
-                        if (C >= 2) ws[cellRef].s.alignment.horizontal = "right";
-                        if (C === 0) ws[cellRef].s.alignment.horizontal = "center";
-                        if (C === 1 && (val === "Total" || val === "Adjust Amount")) ws[cellRef].s.font = { bold: true };
-                    } else if (val.includes("Recorded") || val.includes("NAY LIN HTIKE")) {
-                        if (val.includes("Recorded")) ws[cellRef].s.font = { bold: true, color: { rgb: "1E3A8A" } };
-                        if (val.includes("NAY LIN HTIKE")) ws[cellRef].s.font = { bold: true, color: { rgb: "DC2626" } };
-                        ws[cellRef].s.alignment.horizontal = "center";
-                    }
-                }
-            }
-            ws['!rows'] = wsRows;
-            let wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Yearly_Summary");
-            
             let sYear = document.getElementById('filterStartYear').value || "Start";
             let eYear = document.getElementById('filterEndYear').value || "End";
-            XLSX.writeFile(wb, `Yearly_Summary_${sYear}_to_${eYear}.xlsx`);
+            const buffer = await workbook.xlsx.writeBuffer();
+            saveAs(new Blob([buffer]), `Yearly_Summary_${sYear}_to_${eYear}.xlsx`);
         }
-
     </script>
 </body>
 </html>
