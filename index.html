@@ -28,23 +28,33 @@
         .form-input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15); background-color: #ffffff; }
         .form-label { display: block; font-size: 0.75rem; font-weight: 700; color: #475569;   }
         
-        .th-style { padding: 12px 16px; font-size: 0.75rem; font-weight: 700;  }
-        .td-style { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
+        .th-style { padding: 12px 16px; font-size: 0.75rem; font-weight: 700; whitespace: nowrap; }
+        .td-style { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; whitespace: nowrap; }
         
         .bg-gradient-header { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
     </style>
 </head>
-<body class="min-h-screen text-slate-800 flex flex-col lg:flex-row overflow-hidden">
+<body class="min-h-screen text-slate-800 flex flex-col lg:flex-row overflow-hidden relative">
 
-    <div class="w-full lg:w-72 bg-gradient-header text-slate-200 flex flex-col shrink-0 h-screen shadow-2xl z-20">
-        <div class="p-6 border-b border-slate-700/50 flex items-center space-x-4">
-            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-900/50">
-                <i class="fa-solid fa-gas-pump text-white text-xl"></i>
+    <!-- Mobile Backdrop Overlay -->
+    <div id="sidebarOverlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/60 z-20 hidden lg:hidden transition-opacity duration-300"></div>
+
+    <!-- Sidebar Navigation -->
+    <div id="mainSidebar" class="fixed lg:static inset-y-0 left-0 z-30 w-72 bg-gradient-header text-slate-200 flex flex-col shrink-0 h-full shadow-2xl transition-transform duration-300 transform -translate-x-full lg:translate-x-0">
+        <div class="p-6 border-b border-slate-700/50 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-900/50">
+                    <i class="fa-solid fa-gas-pump text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-white text-lg leading-tight tracking-wide">Fuel Manager</h1>
+                    <p class="text-[11px] text-indigo-300 font-semibold tracking-wider uppercase mt-1">Enterprise System</p>
+                </div>
             </div>
-            <div>
-                <h1 class="font-bold text-white text-lg leading-tight tracking-wide">Fuel Manager</h1>
-                <p class="text-[11px] text-indigo-300 font-semibold tracking-wider uppercase mt-1">Enterprise System</p>
-            </div>
+            <!-- Close button for mobile -->
+            <button onclick="toggleSidebar(false)" class="lg:hidden text-slate-400 hover:text-white text-xl p-1">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
         
         <nav class="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
@@ -77,35 +87,39 @@
         </div>
     </div>
 
-    <div class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-100 relative z-10">
-        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0 shadow-sm z-10">
-            <div class="flex items-center space-x-3">
-                <span class="text-sm font-bold text-slate-800" id="activeTabTitle">ဆီထုတ်ပေးမှု မှတ်တမ်းအသစ်သွင်းရန်</span>
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-100 relative z-10 w-full">
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-8 shrink-0 shadow-sm z-10">
+            <div class="flex items-center space-x-3 overflow-hidden">
+                <button onclick="toggleSidebar(true)" class="lg:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+                <span class="text-xs sm:text-sm font-bold text-slate-800 truncate" id="activeTabTitle">ဆီထုတ်ပေးမှု မှတ်တမ်းအသစ်သွင်းရန်</span>
             </div>
-            <div class="text-sm text-indigo-700 font-bold flex items-center space-x-2 bg-indigo-50 px-4 py-2 rounded-lg border border-indigo-100">
+            <div class="text-xs sm:text-sm text-indigo-700 font-bold flex items-center space-x-1.5 sm:space-x-2 bg-indigo-50 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-indigo-100 shrink-0">
                 <i class="fa-regular fa-calendar-check"></i>
                 <span id="currentDateDisplay"></span>
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8">
+        <main class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-8">
             <!-- 1. FORM TAB -->
             <div id="form-tab" class="tab-content max-w-7xl mx-auto space-y-6">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-6 py-4 flex justify-between items-center">
-                        <h2 class="text-base font-bold text-white flex items-center space-x-2">
+                    <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <h2 class="text-sm sm:text-base font-bold text-white flex items-center space-x-2">
                             <i class="fa-solid fa-pen-to-square text-indigo-400"></i>
                             <span>အချက်အလက်ဖြည့်စွက်ရန်</span>
                         </h2>
-                        <button onclick="switchTab('draft-tab')" class="text-sm text-slate-200 hover:text-white flex items-center font-semibold">
+                        <button onclick="switchTab('draft-tab')" class="text-xs sm:text-sm text-slate-200 hover:text-white flex items-center font-semibold">
                             စစ်ဆေးရန် Draft သို့သွားမည် <i class="fa-solid fa-arrow-right ml-2"></i>
                         </button>
                     </div>
 
-                    <form id="entryForm" class="p-6 md:p-8" onsubmit="addToDraft(event)">
-                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 mb-6">
+                    <form id="entryForm" class="p-4 sm:p-6 md:p-8" onsubmit="addToDraft(event)">
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 sm:p-5 mb-6">
                             <h3 class="text-xs font-bold text-slate-500 mb-4 border-b border-slate-200 pb-2">အခြေခံအချက်အလက်များ</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
                                 <div>
                                     <label class="form-label text-slate-700">ID / အမှတ်စဉ်</label>
                                     <input type="text" id="inp_id" required placeholder="ခေါ်ယူနေပါသည်..." class="form-input bg-white border-slate-300">
@@ -131,15 +145,15 @@
 
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                             <div class="lg:col-span-2 space-y-5">
-                                <div class="bg-indigo-50/50 border border-indigo-100 rounded-xl p-5 h-full">
+                                <div class="bg-indigo-50/50 border border-indigo-100 rounded-xl p-4 sm:p-5 h-full">
                                     <h3 class="text-xs font-bold text-indigo-600 mb-4 border-b border-indigo-100 pb-2">ခရီးစဉ်အသေးစိတ်</h3>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 mb-4">
                                         <div class="md:col-span-2">
                                             <label class="form-label text-indigo-900">Itineraries (ခရီးစဉ်)</label>
                                             <input type="text" id="inp_itineraries" required placeholder="သွားရောက်မည့် ခရီးစဉ်ရေးရန်" class="form-input border-indigo-200">
                                         </div>
                                     </div>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                                         <div>
                                             <label class="form-label text-emerald-700">Issued Date</label>
                                             <input type="date" id="inp_issuedDate" required class="form-input border-emerald-300 bg-emerald-50/50 text-emerald-800">
@@ -153,7 +167,7 @@
                             </div>
 
                             <div class="lg:col-span-1">
-                                <div class="bg-amber-50/50 border border-amber-200 rounded-xl p-5 h-full">
+                                <div class="bg-amber-50/50 border border-amber-200 rounded-xl p-4 sm:p-5 h-full">
                                     <h3 class="text-xs font-bold text-amber-700 mb-4 border-b border-amber-200 pb-2 flex items-center"><i class="fa-solid fa-calculator mr-2"></i> တွက်ချက်မှု</h3>
                                     <div class="space-y-4">
                                         <div>
@@ -186,7 +200,7 @@
                         </div>
 
                         <div class="flex justify-end pt-2">
-                            <button type="submit" id="btnSubmitDraft" class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/30 transition duration-200 flex items-center space-x-2">
+                            <button type="submit" id="btnSubmitDraft" class="w-full sm:w-auto px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/30 transition duration-200 flex items-center justify-center space-x-2">
                                 <i class="fa-solid fa-arrow-down"></i>
                                 <span>Draft စာရင်းသို့ ထည့်မည်</span>
                             </button>
@@ -197,13 +211,13 @@
 
             <!-- 2. DRAFT TAB -->
             <div id="draft-tab" class="tab-content hidden max-w-7xl mx-auto space-y-6">
-                <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm">
+                <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-sm">
                     <div>
                         <h4 class="text-sm font-bold text-indigo-800"><i class="fa-solid fa-rotate-left mr-2"></i>အမှားပြင်ဆင်ရန် ဒေတာပြန်ခေါ်မည် (Edit Data)</h4>
                         <p class="text-xs text-indigo-600 mt-1">ပို့ပြီးသားစာရင်းများကို လအလိုက် ပြန်ခေါ်၍ ပြင်ဆင်ပြီး Sheet သို့ ပြန်သိမ်းနိုင်ပါသည်။</p>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <input type="month" id="fetchEditMonth" class="form-input py-2 bg-white border-indigo-300 font-bold text-sm">
+                    <div class="flex items-center space-x-2 w-full md:w-auto">
+                        <input type="month" id="fetchEditMonth" class="form-input py-2 bg-white border-indigo-300 font-bold text-sm flex-1 md:w-auto">
                         <button onclick="fetchDataForEdit()" id="btnFetchEdit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-lg shadow-md transition whitespace-nowrap">
                             ဆွဲယူမည်
                         </button>
@@ -211,27 +225,27 @@
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
-                    <div class="bg-slate-50 border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div class="bg-slate-50 border-b border-slate-200 px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
-                            <h3 class="text-base font-bold text-slate-800 flex items-center space-x-2">
+                            <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center space-x-2">
                                 <i class="fa-solid fa-list-check text-indigo-600"></i>
                                 <span>စစ်ဆေးရန် ယာယီစာရင်းများ (Draft & Edit)</span>
                             </h3>
                         </div>
-                        <div class="flex flex-wrap items-center space-x-3">
-                            <button onclick="startNewForm()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-md transition duration-200 flex items-center space-x-2">
+                        <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                            <button onclick="startNewForm()" class="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-md transition duration-200 flex items-center justify-center space-x-2">
                                 <i class="fa-solid fa-plus"></i>
                                 <span>အသစ်ထပ်သွင်းမည် (New)</span>
                             </button>
-                            <button onclick="submitDraftToSheet()" id="btnSubmitToSheet" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition duration-200 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <button onclick="submitDraftToSheet()" id="btnSubmitToSheet" class="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
                                 <i class="fa-solid fa-cloud-arrow-up"></i>
                                 <span>Sheet သို့ သိမ်းမည်</span>
                             </button>
                         </div>
                     </div>
                     
-                    <div class="overflow-x-auto custom-scrollbar">
-                        <table class="w-full text-left border-collapse">
+                    <div class="overflow-x-auto custom-scrollbar w-full">
+                        <table class="w-full text-left border-collapse min-w-[800px]">
                             <thead>
                                 <tr class="bg-slate-800">
                                     <th class="th-style text-slate-200 pl-6 border-b-0">ID</th>
@@ -261,9 +275,9 @@
 
             <!-- 3. REPORT TAB -->
             <div id="report-tab" class="tab-content hidden max-w-7xl mx-auto space-y-6">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
                     <div class="border-b border-slate-100 pb-4 mb-5">
-                        <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+                        <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center space-x-2">
                             <i class="fa-solid fa-chart-line text-emerald-600"></i>
                             <span>လချုပ် / နှစ်ချုပ် / စိတ်ကြိုက် Report ထုတ်ရန်</span>
                         </h2>
@@ -329,17 +343,19 @@
                             </button>
                         </div>
                         
-                        <div class="col-span-1 md:col-span-2 lg:col-span-6 flex items-center space-x-3 bg-amber-50 p-3 rounded-lg border border-amber-200 mt-2">
-                            <span class="text-amber-700 font-bold text-sm"><i class="fa-solid fa-scale-balanced mr-2"></i>အတိုး/အလျော့ (Adjust +/-) ပြုလုပ်မည့် ဌာန:</span>
-                            <select id="adjustDept" onchange="calculateNetTotal()" class="w-auto px-3 py-1.5 text-slate-900 font-bold rounded-md outline-none border border-amber-300 bg-white">
-                                <option value="Grand">Grand Total (အားလုံးစုစုပေါင်း)</option>
-                            </select>
-                            <input type="number" step="1" id="adjustAmount" oninput="calculateNetTotal()" class="w-40 px-3 py-1.5 text-right text-slate-900 font-mono font-bold rounded-md outline-none border border-amber-300 focus:border-amber-500 transition" placeholder="Amount (0)">
+                        <div class="col-span-1 md:col-span-2 lg:col-span-6 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3 bg-amber-50 p-3 rounded-lg border border-amber-200 mt-2">
+                            <span class="text-amber-700 font-bold text-xs sm:text-sm whitespace-nowrap"><i class="fa-solid fa-scale-balanced mr-2"></i>အတိုး/အလျော့ (Adjust +/-) ပြုလုပ်မည့် ဌာန:</span>
+                            <div class="flex items-center space-x-2 w-full sm:w-auto">
+                                <select id="adjustDept" onchange="calculateNetTotal()" class="w-full sm:w-auto px-3 py-1.5 text-slate-900 font-bold rounded-md outline-none border border-amber-300 bg-white text-xs sm:text-sm">
+                                    <option value="Grand">Grand Total (အားလုံးစုစုပေါင်း)</option>
+                                </select>
+                                <input type="number" step="1" id="adjustAmount" oninput="calculateNetTotal()" class="w-32 sm:w-40 px-3 py-1.5 text-right text-slate-900 font-mono font-bold rounded-md outline-none border border-amber-300 focus:border-amber-500 transition text-xs sm:text-sm" placeholder="Amount (0)">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto border border-slate-300 rounded-xl custom-scrollbar max-h-[600px] shadow-sm">
-                        <table id="excelReportTable" class="w-full text-left border-collapse bg-white">
+                    <div class="overflow-x-auto border border-slate-300 rounded-xl custom-scrollbar max-h-[600px] shadow-sm w-full">
+                        <table id="excelReportTable" class="w-full text-left border-collapse bg-white min-w-[900px]">
                             <thead class="sticky top-0 z-10 shadow-sm">
                                 <tr class="bg-slate-800" id="reportTableHeader">
                                     <th class="th-style pl-6 text-slate-200 border-b-0">ID</th>
@@ -379,7 +395,7 @@
 
             <!-- 4. SETTINGS TAB -->
             <div id="settings-tab" class="tab-content hidden max-w-5xl mx-auto space-y-6">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
                     <div class="border-b border-slate-100 pb-3 mb-5">
                         <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2">
                             <i class="fa-solid fa-link text-indigo-600"></i>
@@ -395,19 +411,19 @@
                 </div>
 
                 <!-- SIGNATURE UPLOAD SECTION -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
                     <div class="border-b border-slate-100 pb-3 mb-5">
                         <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2">
                             <i class="fa-solid fa-signature text-pink-600"></i>
                             <span>လက်မှတ်ပုံထည့်ရန် (Upload Signature)</span>
                         </h2>
                     </div>
-                    <div class="flex flex-col md:flex-row gap-4 items-end">
+                    <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
                         <div class="flex-1">
                             <label class="form-label text-slate-600 mb-2">ပုံရွေးချယ်ပါ (Image File)</label>
                             <input type="file" id="signatureUpload" accept="image/*" class="form-input border-pink-200 bg-pink-50/20 text-sm">
                         </div>
-                        <button onclick="saveSignature()" class="px-6 py-2.5 h-[42px] bg-pink-600 text-white text-sm font-bold rounded-xl hover:bg-pink-700 transition shadow-md shrink-0 flex items-center space-x-2">
+                        <button onclick="saveSignature()" class="px-6 py-2.5 h-[42px] bg-pink-600 text-white text-sm font-bold rounded-xl hover:bg-pink-700 transition shadow-md shrink-0 flex items-center justify-center space-x-2">
                             <i class="fa-solid fa-upload"></i>
                             <span>Save Signature</span>
                         </button>
@@ -419,7 +435,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col h-[400px]">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 flex flex-col h-[400px]">
                         <div class="border-b border-slate-100 pb-3 mb-4 shrink-0 flex justify-between items-center">
                             <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
                                 <i class="fa-solid fa-ship text-blue-500"></i>
@@ -435,7 +451,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col h-[400px]">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6 flex flex-col h-[400px]">
                         <div class="border-b border-slate-100 pb-3 mb-4 shrink-0 flex justify-between items-center">
                             <h3 class="font-bold text-slate-800 text-sm flex items-center space-x-2">
                                 <i class="fa-solid fa-building text-purple-500"></i>
@@ -464,6 +480,23 @@
         let currentEditIndex = -1;
         let globalGrandTotalAmount = 0;
         let globalGrandTotalLiter = 0;
+
+        function toggleSidebar(forceState) {
+            const sidebar = document.getElementById('mainSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (!sidebar || !overlay) return;
+
+            const isExpanded = !sidebar.classList.contains('-translate-x-full');
+            const shouldOpen = forceState !== undefined ? forceState : !isExpanded;
+
+            if (shouldOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
 
         function initStorage() {
             if (!localStorage.getItem('v5_boat_ids')) {
@@ -566,6 +599,7 @@
         }
 
         function switchTab(tabId) {
+            toggleSidebar(false); // Auto close sidebar on mobile when tab is clicked
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
             
@@ -1310,17 +1344,17 @@
 
                 // Column Setup
                 wsMain.columns = [
-                    { key: 'id', width: 22 },
-                    { key: 'filledDate', width: 14 },
-                    { key: 'itineraries', width: 45 },
-                    { key: 'issuedDate', width: 14 },
-                    { key: 'boatId', width: 15 },
-                    { key: 'dept', width: 20 },
-                    { key: 'liter', width: 12 },
-                    { key: 'priceDrum', width: 14 },
-                    { key: 'priceLtr', width: 12 },
-                    { key: 'totalAmount', width: 18 },
-                    { key: 'marks', width: 25 }
+                    { key: 'id', width: 20 },
+                    { key: 'filledDate', width: 11 },
+                    { key: 'itineraries', width: 50 },
+                    { key: 'issuedDate', width: 11 },
+                    { key: 'boatId', width: 10 },
+                    { key: 'dept', width: 26 },
+                    { key: 'liter', width: 9 },
+                    { key: 'priceDrum', width: 12 },
+                    { key: 'priceLtr', width: 9 },
+                    { key: 'totalAmount', width: 15 },
+                    { key: 'marks', width: 15 }
                 ];
 
                 let imageId = null;
@@ -1351,8 +1385,17 @@
                         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
                         cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
                         cell.alignment = { horizontal: 'center', vertical: 'middle' };
-                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                        cell.border = { top: {style:'thin', color: { argb: 'FFFFFFFF' }}, left: {style:'thin', color: { argb: 'FFFFFFFF' }}, bottom: {style:'thin', color: { argb: 'FFFFFFFF' }}, right: {style:'thin', color: { argb: 'FFFFFFFF' }} };
                     });
+
+                    // Department Name Sub-Header (Newly Added)
+                    const deptHeaderRow = wsMain.addRow([`အသုံးပြုသည့်ဌာန(သို့)စာရင်းအမျိုးအစား : ${dept}`]);
+                    wsMain.mergeCells(`A${deptHeaderRow.number}:K${deptHeaderRow.number}`);
+                    deptHeaderRow.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1E3A8A' } };
+                    deptHeaderRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E7FF' } };
+                    deptHeaderRow.getCell(1).alignment = { vertical: 'middle', horizontal: 'left' };
+                    deptHeaderRow.getCell(1).border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                    deptHeaderRow.height = 23;
 
                     let dTotalL = 0, dTotalA = 0;
                     REPORT_GROUPS_DATA[dept].forEach(row => {
@@ -1375,13 +1418,36 @@
                             amountNum,
                             row.marks || ""
                         ]);
-                        dataRow.height = 20;
-                        dataRow.eachCell((cell, colIdx) => {
-                            cell.font = { size: 10 };
-                            cell.alignment = { vertical: 'middle', horizontal: colIdx >= 7 && colIdx <= 10 ? 'right' : 'left' };
-                            if (colIdx === 1 || colIdx === 2 || colIdx === 4) cell.alignment.horizontal = 'center';
-                            cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                        });
+                        
+                        // စာသားအရှည်ပေါ်မူတည်ပြီး Row Height ကို Dynamic တွက်ချက်ခြင်း
+if (!row.itineraries || row.itineraries.length <= 40) {
+    dataRow.height = 20;
+} else {
+    // စာလုံးရေ ၄၀ လျှင် တစ်ကြောင်း (1 line) အဖြစ် ယူဆ၍ တွက်ချက်ခြင်း
+    let lineCount = Math.ceil(row.itineraries.length / 40);
+    
+    // တစ်ကြောင်းလျှင် အမြင့် 15 နှုန်းဖြင့် တွက်ပါသည် (Font size 10 အတွက် အဆင်ပြေစေရန်)
+    // Marks (colIdx 11) ထဲက စာသားက ပိုရှည်နေနိုင်ရင် အဲ့ဒီအတွက်ပါ ထည့်တွက်ပေးနိုင်ပါတယ်
+    dataRow.height = lineCount * 11; 
+}
+
+dataRow.eachCell((cell, colIdx) => {
+    cell.font = { size: 10 };
+    let hAlign = colIdx >= 7 && colIdx <= 10 ? 'right' : 'left';
+    if (colIdx === 1 || colIdx === 2 || colIdx === 4) hAlign = 'center';
+
+    cell.alignment = {
+        vertical: 'middle',
+        horizontal: hAlign,
+        wrapText: (colIdx === 3 || colIdx === 11) // Itineraries (3) နှင့် Marks (11) အတွက် Wrap Text
+    };
+    cell.border = { 
+        top: {style:'thin'}, 
+        left: {style:'thin'}, 
+        bottom: {style:'thin'}, 
+        right: {style:'thin'} 
+    };
+});
                     });
 
                     if (adjDept === dept) dTotalA += adjInput;
@@ -1407,13 +1473,11 @@
 
                     // Signature
                     const sigSpaceRow = wsMain.addRow([]);
-                    // UPDATED: အမြင့်ကို 75 အထိ မြှင့်ပေးထားသည် (စိုက်မမှန်တာ ဖြေရှင်းရန်)
                     sigSpaceRow.height = 55; 
 
                     if (imageId !== null) {
                         wsMain.addImage(imageId, {
-                            // Center over I, J, K (cols 8, 9, 10)
-                            tl: { col: 9.9, row: sigSpaceRow.number -1 },
+                            tl: { col: 9.6, row: sigSpaceRow.number -1 },
                             br: { col: 10.2, row: sigSpaceRow.number },
                             editMode: 'oneCell'
                         });
@@ -1429,7 +1493,7 @@
                     nameRow.getCell(9).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
                     nameRow.getCell(9).alignment = { horizontal: 'center' };
 
-                    wsMain.addRow([]); // Single Clean Gap Between Departments
+                    wsMain.addRow([]); 
                 }
 
                 // Summary Sheet Setup
@@ -1447,7 +1511,7 @@
                 sumTitleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
                 sumTitleRow.height = 28;
 
-                const sumHeaderRow = wsSummary.addRow(['No.', 'Department Description', 'Total Liters', 'Amount']);
+                const sumHeaderRow = wsSummary.addRow(['No.', 'Descriptions', 'Total Liters', 'Amount']);
                 sumHeaderRow.height = 24;
                 sumHeaderRow.eachCell((cell) => {
                     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
@@ -1483,11 +1547,9 @@
 
                 // Summary Signature
                 const sumSigSpace = wsSummary.addRow([]);
-                // UPDATED
                 sumSigSpace.height = 55;
                 if (imageId !== null) {
                     wsSummary.addImage(imageId, {
-                        // Center over C, D (cols 2, 3)
                         tl: { col: 2.9, row: sumSigSpace.number - 1 },
                         br: { col: 3.3, row: sumSigSpace.number },
                         editMode: 'oneCell'
@@ -1520,10 +1582,10 @@
             const ws = workbook.addWorksheet('Yearly_Detail');
 
             ws.columns = [
-                { key: 'id', width: 22 }, { key: 'filledDate', width: 14 }, { key: 'itineraries', width: 45 },
-                { key: 'issuedDate', width: 14 }, { key: 'boatId', width: 15 }, { key: 'dept', width: 20 },
-                { key: 'liter', width: 12 }, { key: 'priceDrum', width: 14 }, { key: 'priceLtr', width: 12 },
-                { key: 'totalAmount', width: 18 }, { key: 'marks', width: 25 }
+                { key: 'id', width: 22 }, { key: 'filledDate', width: 10.5 }, { key: 'itineraries', width: 45 },
+                { key: 'issuedDate', width: 10.5 }, { key: 'boatId', width: 10 }, { key: 'dept', width: 27 },
+                { key: 'liter', width: 9 }, { key: 'priceDrum', width: 10.5 }, { key: 'priceLtr', width: 8 },
+                { key: 'totalAmount', width: 18 }, { key: 'marks', width: 20 }
             ];
 
             let imageId = null;
@@ -1551,6 +1613,15 @@
                     cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
                 });
 
+                // Department Name Sub-Header (Newly Added)
+                const deptHeaderRow = ws.addRow([`ဌာနအမည် : ${dept}`]);
+                ws.mergeCells(`A${deptHeaderRow.number}:K${deptHeaderRow.number}`);
+                deptHeaderRow.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1E3A8A' } };
+                deptHeaderRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E7FF' } };
+                deptHeaderRow.getCell(1).alignment = { vertical: 'middle', horizontal: 'left' };
+                deptHeaderRow.getCell(1).border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                deptHeaderRow.height = 22;
+
                 let dTotalL = 0, dTotalA = 0;
                 REPORT_GROUPS_DATA[dept].forEach(row => {
                     let literNum = Math.round(parseFloat(row.liter) || 0);
@@ -1564,11 +1635,21 @@
                         formatToDDMMYYYY(row.issuedDate), row.boatId || "", row.issuedDept || "",
                         literNum, priceDrumNum, priceLtrNum, amountNum, row.marks || ""
                     ]);
-                    dataRow.height = 20;
+                    
+                    if (!row.itineraries || row.itineraries.length <= 40) {
+                        dataRow.height = 20;
+                    }
+
                     dataRow.eachCell((cell, colIdx) => {
                         cell.font = { size: 10 };
-                        cell.alignment = { vertical: 'middle', horizontal: colIdx >= 7 && colIdx <= 10 ? 'right' : 'left' };
-                        if (colIdx === 1 || colIdx === 2 || colIdx === 4) cell.alignment.horizontal = 'center';
+                        let hAlign = colIdx >= 7 && colIdx <= 10 ? 'right' : 'left';
+                        if (colIdx === 1 || colIdx === 2 || colIdx === 4) hAlign = 'center';
+
+                        cell.alignment = {
+                            vertical: 'middle',
+                            horizontal: hAlign,
+                            wrapText: (colIdx === 3 || colIdx === 11) // Itineraries (3) နှင့် Marks (11) အတွက် Wrap Text အလိုအလျောက် ထည့်ပေးထားသည်
+                        };
                         cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
                     });
                 });
@@ -1591,11 +1672,9 @@
                 noteRow.getCell(1).font = { italic: true, size: 9, color: { argb: 'FF475569' } };
 
                 const sigSpaceRow = ws.addRow([]);
-                // UPDATED
                 sigSpaceRow.height = 75;
                 if (imageId !== null) {
                     ws.addImage(imageId, {
-                        // Center over I, J, K (cols 8, 9, 10) - Fixed inverted br/tl
                         tl: { col: 8.5, row: sigSpaceRow.number - 1 },
                         br: { col: 10.5, row: sigSpaceRow.number },
                         editMode: 'oneCell'
@@ -1619,110 +1698,171 @@
             saveAs(new Blob([buffer]), `Yearly_Detail_Report_${year}.xlsx`);
         }
 
-        async function exportYearlySummaryToExcel() {
+       async function exportYearlySummaryToExcel() {
             const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            let rows = document.querySelectorAll('#reportTableBody tr.data-row:not(.year-header)');
-            let yearlyData = {}; 
-            
-            rows.forEach(row => {
-                let monthYearStr = row.cells[0].innerText.trim(); 
-                let parts = monthYearStr.split(',');
-                if(parts.length === 2) {
-                    let m = parts[0].trim();
-                    let y = parts[1].trim();
-                    let liter = parseFloat(row.cells[2].innerText.replace(/,/g, '')) || 0;
-                    let amtCell = row.querySelector('.row-amt');
-                    let amount = amtCell ? (parseFloat(amtCell.innerText.replace(/,/g, '')) || 0) : 0;
-                    
-                    if(!yearlyData[y]) {
-                        yearlyData[y] = {};
-                        monthNames.forEach(mn => yearlyData[y][mn] = { l: 0, a: 0 });
-                    }
-                    if(yearlyData[y][m]) {
-                        yearlyData[y][m].l += liter;
-                        yearlyData[y][m].a += amount;
-                    }
-                }
-            });
 
             const workbook = new ExcelJS.Workbook();
             const ws = workbook.addWorksheet('Yearly_Summary');
-            ws.columns = [{ width: 8 }, { width: 20 }, { width: 16 }, { width: 20 }, { width: 25 }];
+
+            // Columns များကို တောင်းဆိုထားသည့်အတိုင်း ပြင်ဆင်သတ်မှတ်ခြင်း
+            ws.columns = [
+                { key: 'no', width: 8 },
+                { key: 'month', width: 20 },
+                { key: 'liter', width: 16 },
+                { key: 'amount', width: 20 },
+                { key: 'marks', width: 25 }
+            ];
 
             let imageId = null;
             if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
                 imageId = workbook.addImage({ base64: savedSignatureBase64, extension: 'png' });
             }
 
+            let adjDept = document.getElementById('adjustDept').value;
             let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
-            let years = Object.keys(yearlyData).sort();
 
-            years.forEach((y, yIndex) => {
-                const titleRow = ws.addRow(["My Mergui Fuel Issued Recorded Summary For Yearly"]);
+            let startY = parseInt(document.getElementById('filterStartYear').value) || 2020;
+            let endY = parseInt(document.getElementById('filterEndYear').value) || 2040;
+
+            // ဌာန (Department) အလိုက် Data များကို ခွဲခြား၍ Loop ပတ်ခြင်း
+            for (let dept in REPORT_GROUPS_DATA) {
+                
+                // ၁။ သက်ဆိုင်ရာ ဌာနအတွက် လအလိုက် Data များ တွက်ချက်ခြင်း
+                let yearlyData = {};
+                for (let y = startY; y <= endY; y++) {
+                    let monthlyData = {};
+                    for (let i = 1; i <= 12; i++) monthlyData[String(i).padStart(2, '0')] = { l: 0, a: 0 };
+
+                    let hasData = false;
+                    REPORT_GROUPS_DATA[dept].forEach(row => {
+                        let d = new Date(row.filledDate);
+                        if (d.getFullYear() === y) {
+                            let m = String(d.getMonth() + 1).padStart(2, '0');
+                            monthlyData[m].l += Math.round(parseFloat(row.liter)) || 0;
+                            monthlyData[m].a += Math.round(parseFloat(row.totalAmount)) || 0;
+                            hasData = true;
+                        }
+                    });
+
+                    if (hasData) {
+                        yearlyData[y] = monthlyData;
+                    }
+                }
+
+                // အကယ်၍ ထိုနှစ်အတွင်း ဌာနအတွက် Data မရှိပါက ကျော်သွားမည်
+                if (Object.keys(yearlyData).length === 0) continue;
+
+                // ၂။ Title ရေးဆွဲခြင်း
+                const titleRow = ws.addRow(["My Mergui Speed Boat's Fuel Issued Record Summary For Yearly"]);
                 ws.mergeCells(`A${titleRow.number}:E${titleRow.number}`);
                 titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1E40AF' } };
-                titleRow.getCell(1).alignment = { horizontal: 'center' };
+                titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+                titleRow.height = 28;
 
-                const headerRow = ws.addRow(["No.", "Month", "Total Litter", "Total Amount", "Marks"]);
+                // ၃။ ဌာနအမည် ခေါင်းစဉ် (Department Sub-Header) ရေးဆွဲခြင်း
+                const deptHeaderRow = ws.addRow([`အသုံးပြုသည့်ဌာန : ${dept}`]);
+                ws.mergeCells(`A${deptHeaderRow.number}:E${deptHeaderRow.number}`);
+                deptHeaderRow.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1E3A8A' } };
+                deptHeaderRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E7FF' } };
+                deptHeaderRow.getCell(1).alignment = { vertical: 'middle', horizontal: 'left' };
+                deptHeaderRow.getCell(1).border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                deptHeaderRow.height = 22;
+
+                // ၄။ Table ခေါင်းစဉ် (Table Header) ရေးဆွဲခြင်း
+                const headerRow = ws.addRow(["Sr.No", "Month(လ)", "Total Liters", "Total Amount", "Marks"]);
+                headerRow.height = 24;
                 headerRow.eachCell(cell => {
                     cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
                     cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-                    cell.alignment = { horizontal: 'center' };
+                    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                    cell.border = { top: {style:'thin', color: { argb: 'FFFFFFFF' }}, left: {style:'thin', color: { argb: 'FFFFFFFF' }}, bottom: {style:'thin', color: { argb: 'FFFFFFFF' }}, right: {style:'thin', color: { argb: 'FFFFFFFF' }} };
                 });
 
-                const yearHeader = ws.addRow([`Year : ${y}`, "", "", "", ""]);
-                ws.mergeCells(`A${yearHeader.number}:E${yearHeader.number}`);
-                yearHeader.getCell(1).font = { bold: true };
+                let deptTotalL = 0;
+                let deptTotalA = 0;
+                let srNo = 1;
 
-                let no = 1, yTotalL = 0, yTotalA = 0;
-                monthNames.forEach(m => {
-                    let l = yearlyData[y][m].l, a = yearlyData[y][m].a;
-                    if (l > 0 || a > 0) {
-                        const dRow = ws.addRow([no++, m, l, a, ""]);
-                        dRow.eachCell((cell, cIdx) => {
-                            if (cIdx >= 3) cell.alignment = { horizontal: 'right' };
-                            cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                        });
-                        yTotalL += l; yTotalA += a;
+                // ၅။ ဌာနအလိုက် Data အကြောင်းများ ရေးဆွဲခြင်း
+                for (let y in yearlyData) {
+                    // နှစ် (Year) ကို ပြသရန်
+                    const yearHeader = ws.addRow([`Year : ${y}`, "", "", "", ""]);
+                    ws.mergeCells(`A${yearHeader.number}:E${yearHeader.number}`);
+                    yearHeader.getCell(1).font = { bold: true, color: { argb: 'FF333333' } };
+                    yearHeader.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F5F9' } };
+                    yearHeader.getCell(1).border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+
+                    for (let m = 1; m <= 12; m++) {
+                        let mStr = String(m).padStart(2, '0');
+                        let l = yearlyData[y][mStr].l;
+                        let a = yearlyData[y][mStr].a;
+
+                        if (l > 0 || a > 0) {
+                            let monthName = monthNames[m - 1];
+                            const dRow = ws.addRow([srNo++, monthName, l, a, ""]);
+                            dRow.eachCell((cell, cIdx) => {
+                                if (cIdx === 1) cell.alignment = { horizontal: 'center' };
+                                if (cIdx >= 3 && cIdx <= 4) cell.alignment = { horizontal: 'right' };
+                                cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                            });
+                            deptTotalL += l;
+                            deptTotalA += a;
+                        }
                     }
-                });
+                }
 
-                if (yIndex === years.length - 1 && adjInput !== 0) yTotalA += adjInput;
+                // Adjustments စစ်ဆေးခြင်း
+                if (adjDept === dept) {
+                    deptTotalA += adjInput;
+                }
 
-                const totRow = ws.addRow(["", "Total", yTotalL, yTotalA, ""]);
+                // ၆။ အားလုံးစုစုပေါင်း (Total Row)
+                const totRow = ws.addRow(["", "Total", deptTotalL, deptTotalA, ""]);
+                totRow.height = 22;
                 totRow.eachCell((cell, cIdx) => {
                     cell.font = { bold: true };
-                    if (cIdx >= 3) cell.alignment = { horizontal: 'right' };
-                    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                    if (cIdx >= 3 && cIdx <= 4) cell.alignment = { horizontal: 'right' };
+                    if (cIdx === 2) cell.alignment = { horizontal: 'right' };
+                    if (cIdx >= 2) cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
                 });
 
+                // ၇။ မှတ်ချက်
+                const noteRow = ws.addRow(['မှတ်ချက် - (အစွန်းထွက်) ဆီကုမ္ပဏီမှ အစွန်း တွေဖြတ်ပေးထားသော တန်ဖိုးများကိုခွဲပြထားပါသည်။']);
+                ws.mergeCells(`A${noteRow.number}:E${noteRow.number}`);
+                noteRow.getCell(1).font = { italic: true, size: 9, color: { argb: 'FF475569' } };
+                noteRow.height = 18;
+
+                // ၈။ လက်မှတ်ထိုးရန် နေရာ (Signature Block)
                 const sigSpaceRow = ws.addRow([]);
-                // UPDATED
-                sigSpaceRow.height = 75;
+                sigSpaceRow.height = 65;
+                
                 if (imageId !== null) {
                     ws.addImage(imageId, {
-                        // Center over D (col 3)
-                        tl: { col: 2.7, row: sigSpaceRow.number - 1 },
-                        br: { col: 4.3, row: sigSpaceRow.number },
+                        tl: { col: 4.05, row: sigSpaceRow.number - 1 },
+                        br: { col: 4.8, row: sigSpaceRow.number },
                         editMode: 'oneCell'
                     });
                 }
 
                 const recRow = ws.addRow(["", "", "", "Recorded and Proved By", ""]);
-                recRow.getCell(4).font = { bold: true, color: { argb: 'FF1E3A8A' } };
+                ws.mergeCells(`D${recRow.number}:E${recRow.number}`);
+                recRow.getCell(4).font = { bold: true, size: 10, color: { argb: 'FF1E3A8A' } };
                 recRow.getCell(4).alignment = { horizontal: 'center' };
 
                 const nameRow = ws.addRow(["", "", "", "NAY LIN HTIKE", ""]);
-                nameRow.getCell(4).font = { bold: true, color: { argb: 'FFDC2626' } };
+                ws.mergeCells(`D${nameRow.number}:E${nameRow.number}`);
+                nameRow.getCell(4).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
                 nameRow.getCell(4).alignment = { horizontal: 'center' };
 
+                // နောက်ထပ် ဌာနတစ်ခုအတွက် Space ချန်ခြင်း
                 ws.addRow([]);
-            });
+                ws.addRow([]);
+            }
 
+            // Excel File ကို Download ချရန်
             let sYear = document.getElementById('filterStartYear').value || "Start";
             let eYear = document.getElementById('filterEndYear').value || "End";
             const buffer = await workbook.xlsx.writeBuffer();
-            saveAs(new Blob([buffer]), `Yearly_Summary_${sYear}_to_${eYear}.xlsx`);
+            saveAs(new Blob([buffer]), `Yearly_Summary_By_Dept_${sYear}_to_${eYear}.xlsx`);
         }
     </script>
 </body>
