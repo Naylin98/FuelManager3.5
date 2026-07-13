@@ -244,9 +244,11 @@
                         </div>
                     </div>
                     
-                    <div class="overflow-x-auto custom-scrollbar w-full">
+                    <!-- Modified Draft Table Container for Vertical & Horizontal Scrolling -->
+                    <div class="overflow-auto custom-scrollbar w-full max-h-[500px] sm:max-h-[600px]">
                         <table class="w-full text-left border-collapse min-w-[800px]">
-                            <thead>
+                            <!-- Added sticky top-0 to thead -->
+                            <thead class="sticky top-0 z-10 shadow-sm">
                                 <tr class="bg-slate-800">
                                     <th class="th-style text-slate-200 pl-6 border-b-0">ID</th>
                                     <th class="th-style text-slate-200 border-b-0">Filled Date</th>
@@ -260,7 +262,7 @@
                                     <th class="th-style text-slate-200 pr-6 text-center border-b-0">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="draftTableBody" class="divide-y divide-slate-100 font-medium">
+                            <tbody id="draftTableBody" class="divide-y divide-slate-100 font-medium bg-white">
                                 <tr>
                                     <td colspan="10" class="p-10 text-center text-slate-400">
                                         <i class="fa-regular fa-folder-open text-3xl mb-2 text-slate-300 block"></i>
@@ -354,7 +356,8 @@
                         </div>
                     </div>
 
-                    <div class="overflow-x-auto border border-slate-300 rounded-xl custom-scrollbar max-h-[600px] shadow-sm w-full">
+                    <!-- Modified Report Table Container to overflow-auto for Vertical Scrolling -->
+                    <div class="overflow-auto border border-slate-300 rounded-xl custom-scrollbar max-h-[600px] shadow-sm w-full">
                         <table id="excelReportTable" class="w-full text-left border-collapse bg-white min-w-[900px]">
                             <thead class="sticky top-0 z-10 shadow-sm">
                                 <tr class="bg-slate-800" id="reportTableHeader">
