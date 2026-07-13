@@ -50,8 +50,81 @@
         .bg-gradient-header { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
     </style>
 </head>
-<!-- Removed min-h-screen and replaced with h-full structure -->
 <body class="text-slate-800 flex flex-col lg:flex-row relative w-full h-full">
+
+    <!-- ================= AUTHENTICATION OVERLAY ================= -->
+    <div id="authOverlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1614165936126-22485f5366fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center before:absolute before:inset-0 before:bg-slate-900/80 backdrop-blur-md transition-opacity duration-500">
+        
+        <!-- Auth Card -->
+        <div class="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-lg border border-white/20 p-8 sm:p-10 rounded-3xl shadow-2xl mx-4">
+            
+            <!-- Logo & Title -->
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto shadow-lg mb-4 shadow-indigo-500/30">
+                    <i class="fa-solid fa-gas-pump text-white text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-white tracking-wide">Fuel Manager</h2>
+                <p class="text-indigo-200 text-sm mt-2" id="authSubtitle">Welcome back! Please login to continue.</p>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <form id="loginForm" onsubmit="handleAuth(event, 'login')" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5 tracking-wider uppercase">Email Address</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-envelope absolute left-4 top-3.5 text-slate-400"></i>
+                        <input type="email" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition" placeholder="admin@example.com">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5 tracking-wider uppercase">Password</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-4 top-3.5 text-slate-400"></i>
+                        <input type="password" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition" placeholder="••••••••">
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-3.5 mt-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-500/30 transform transition hover:-translate-y-0.5">
+                    Log In To System
+                </button>
+                <div class="text-center pt-4 border-t border-white/10 mt-6">
+                    <p class="text-sm text-slate-400">New user? <a href="#" onclick="toggleAuth('signup')" class="text-indigo-400 hover:text-indigo-300 font-bold transition">Create an account</a></p>
+                </div>
+            </form>
+
+            <!-- SIGN UP FORM (Hidden by Default) -->
+            <form id="signupForm" onsubmit="handleAuth(event, 'signup')" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5 tracking-wider uppercase">Full Name</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-user absolute left-4 top-3.5 text-slate-400"></i>
+                        <input type="text" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition" placeholder="Your Name">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5 tracking-wider uppercase">Email Address</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-envelope absolute left-4 top-3.5 text-slate-400"></i>
+                        <input type="email" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition" placeholder="admin@example.com">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5 tracking-wider uppercase">Password</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-lock absolute left-4 top-3.5 text-slate-400"></i>
+                        <input type="password" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition" placeholder="••••••••">
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-3.5 mt-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-500/30 transform transition hover:-translate-y-0.5">
+                    Sign Up & Continue
+                </button>
+                <div class="text-center pt-4 border-t border-white/10 mt-6">
+                    <p class="text-sm text-slate-400">Already have an account? <a href="#" onclick="toggleAuth('login')" class="text-emerald-400 hover:text-emerald-300 font-bold transition">Log In</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- ================= END AUTHENTICATION OVERLAY ================= -->
+
 
     <!-- Mobile Backdrop Overlay -->
     <div id="sidebarOverlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/60 z-20 hidden lg:hidden transition-opacity duration-300"></div>
@@ -101,6 +174,11 @@
                 </span>
                 <span id="statusText" class="text-slate-300 font-semibold truncate">Link မချိတ်ရသေးပါ</span>
             </div>
+            <!-- Added Logout Button for completeness -->
+            <button onclick="logoutSystem()" class="w-full mt-4 flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-red-500/20 hover:text-red-400 border border-slate-700 hover:border-red-500/50 transition duration-200 font-bold text-xs">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Log Out</span>
+            </button>
         </div>
     </div>
 
@@ -262,10 +340,8 @@
                         </div>
                     </div>
                     
-                    <!-- Touch Scroll Added -->
                     <div class="overflow-auto custom-scrollbar touch-scroll w-full max-h-[500px] sm:max-h-[600px]">
                         <table class="w-full text-left border-collapse min-w-[800px]">
-                            <!-- Added sticky top-0 to thead -->
                             <thead class="sticky top-0 z-10 shadow-sm">
                                 <tr class="bg-slate-800">
                                     <th class="th-style text-slate-200 pl-6 border-b-0">ID</th>
@@ -374,7 +450,6 @@
                         </div>
                     </div>
 
-                    <!-- Touch Scroll Added -->
                     <div class="overflow-auto border border-slate-300 rounded-xl custom-scrollbar touch-scroll max-h-[600px] shadow-sm w-full">
                         <table id="excelReportTable" class="w-full text-left border-collapse bg-white min-w-[900px]">
                             <thead class="sticky top-0 z-10 shadow-sm">
@@ -416,6 +491,7 @@
 
             <!-- 4. SETTINGS TAB -->
             <div id="settings-tab" class="tab-content hidden max-w-5xl mx-auto space-y-6">
+                <!-- Google App Script Link Setup -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
                     <div class="border-b border-slate-100 pb-3 mb-5">
                         <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2">
@@ -492,8 +568,114 @@
         </main>
     </div>
 
-    <!-- JAVASCRIPT IS UNTOUCHED -->
+    <!-- JAVASCRIPT SECTION -->
     <script>
+        /* =======================================================
+           NEW AUTHENTICATION JAVASCRIPT
+           ======================================================= */
+        // Check if user was previously logged in
+        if(localStorage.getItem('v5_logged_in') === 'true') {
+            document.getElementById('authOverlay').style.display = 'none';
+        }
+
+        function toggleAuth(mode) {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const subtitle = document.getElementById('authSubtitle');
+            
+            if(mode === 'signup') {
+                loginForm.classList.add('hidden');
+                signupForm.classList.remove('hidden');
+                subtitle.innerText = "Create a new account to get started.";
+            } else {
+                signupForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+                subtitle.innerText = "Welcome back! Please login to continue.";
+            }
+        }
+
+        async function handleAuth(e, action) {
+            e.preventDefault();
+
+            // ပထမဆုံးအကြိမ် Login ဝင်ရန် Google App Script Link လိုအပ်ပါသည်
+            let targetUrl = WEB_APP_URL || localStorage.getItem('v5_google_web_app_url');
+            if (!targetUrl) {
+                targetUrl = prompt("စနစ်စတင်ရန် (သို့) Login ဝင်ရန် Google App Script API URL ကို ထည့်ပါ :");
+                if(!targetUrl) return alert("API URL မရှိဘဲ စနစ်ထဲဝင်၍မရပါ။");
+                localStorage.setItem('v5_google_web_app_url', targetUrl);
+                WEB_APP_URL = targetUrl;
+            }
+
+            const form = e.target;
+            const btn = form.querySelector('button[type="submit"]');
+            const originalBtnHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> စစ်ဆေးနေပါသည်...`;
+            btn.disabled = true;
+
+            // Form ထဲမှ ဒေတာများကို ရယူခြင်း
+            let payload = { action: action };
+            const inputs = form.querySelectorAll('input');
+            if(action === 'login') {
+                payload.email = inputs[0].value;
+                payload.password = inputs[1].value;
+            } else { // signup
+                payload.name = inputs[0].value;
+                payload.email = inputs[1].value;
+                payload.password = inputs[2].value;
+            }
+
+            try {
+                // Google Sheet သို့ ပေးပို့စစ်ဆေးခြင်း
+                let res = await fetch(targetUrl, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                let result = await res.json();
+
+                if(result.status === 'success') {
+                    // Login / Signup အောင်မြင်ပါက
+                    localStorage.setItem('v5_logged_in', 'true');
+                    localStorage.setItem('v5_user_name', result.name || payload.name);
+                    document.getElementById('authSubtitle').innerText = result.message;
+                    
+                    const overlay = document.getElementById('authOverlay');
+                    overlay.classList.add('opacity-0'); 
+                    setTimeout(() => {
+                        overlay.style.display = 'none'; 
+                    }, 500);
+                    
+                    // စနစ်ထဲသို့ရောက်ပါက Data များစတင်ဆွဲယူရန်
+                    fetchSettingsFromSheet();
+                    fetchNextID();
+                } else {
+                    // Error ဖြစ်ပါက
+                    alert("အမှား: " + result.message);
+                }
+            } catch (err) {
+                alert("ချိတ်ဆက်မှု ပြဿနာရှိနေပါသည်။ Settings တွင် API Link မှန်ကန်မှုရှိမရှိ စစ်ဆေးပါ။\nError: " + err.message);
+            }
+
+            btn.innerHTML = originalBtnHtml;
+            btn.disabled = false;
+        }
+
+        function logoutSystem() {
+            localStorage.removeItem('v5_logged_in');
+            const overlay = document.getElementById('authOverlay');
+            overlay.style.display = 'flex';
+            
+            // Allow browser to render display:flex before animating opacity back
+            setTimeout(() => {
+                overlay.classList.remove('opacity-0');
+            }, 10);
+            
+            // Auto close sidebar if on mobile
+            toggleSidebar(false);
+        }
+        /* ======================================================= */
+
+
+        // (အောက်တွင် မူလ JavaScript Code အဟောင်းများ အကုန်အတိုင်း ရှိနေပါသည်)
         let WEB_APP_URL = localStorage.getItem('v5_google_web_app_url') || "";
         let savedSignatureBase64 = localStorage.getItem('v5_signature_base64') || "";
         let DRAFT_DATA = [];
@@ -621,7 +803,7 @@
         }
 
         function switchTab(tabId) {
-            toggleSidebar(false); // Auto close sidebar on mobile when tab is clicked
+            toggleSidebar(false); 
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
             
@@ -1330,9 +1512,6 @@
             });
         }
         
-        /* =========================================================
-           ADVANCED EXCEL EXPORT USING EXCELJS (100% PERFECT FORMAT)
-           ========================================================= */
         async function exportToExcel() {
             try {
                 if (!isReportGenerated) {
@@ -1364,27 +1543,16 @@
                 const wsMain = workbook.addWorksheet('Fuel_Report');
                 const wsSummary = workbook.addWorksheet('Summary');
 
-                // Column Setup
                 wsMain.columns = [
-                    { key: 'id', width: 20 },
-                    { key: 'filledDate', width: 11 },
-                    { key: 'itineraries', width: 50 },
-                    { key: 'issuedDate', width: 11 },
-                    { key: 'boatId', width: 10 },
-                    { key: 'dept', width: 26 },
-                    { key: 'liter', width: 9 },
-                    { key: 'priceDrum', width: 12 },
-                    { key: 'priceLtr', width: 9 },
-                    { key: 'totalAmount', width: 15 },
-                    { key: 'marks', width: 15 }
+                    { key: 'id', width: 20 }, { key: 'filledDate', width: 11 }, { key: 'itineraries', width: 50 },
+                    { key: 'issuedDate', width: 11 }, { key: 'boatId', width: 10 }, { key: 'dept', width: 26 },
+                    { key: 'liter', width: 9 }, { key: 'priceDrum', width: 12 }, { key: 'priceLtr', width: 9 },
+                    { key: 'totalAmount', width: 15 }, { key: 'marks', width: 15 }
                 ];
 
                 let imageId = null;
                 if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
-                    imageId = workbook.addImage({
-                        base64: savedSignatureBase64,
-                        extension: 'png',
-                    });
+                    imageId = workbook.addImage({ base64: savedSignatureBase64, extension: 'png' });
                 }
 
                 let summaryData = [];
@@ -1392,7 +1560,6 @@
                 let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
 
                 for (let dept in REPORT_GROUPS_DATA) {
-                    // Title
                     const titleText = `My Mergui Speed Boat's Fuel Issued Record For ${dateStr}`;
                     const titleRow = wsMain.addRow([titleText]);
                     wsMain.mergeCells(`A${titleRow.number}:K${titleRow.number}`);
@@ -1400,7 +1567,6 @@
                     titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
                     titleRow.height = 28;
 
-                    // Header
                     const headerRow = wsMain.addRow(['ID', 'Filled Date', 'Itineraries', 'Issued Date', 'Boat ID', 'Department', 'Liter', 'Price/Drum', 'Price(1L)', 'Total Amount', 'Marks']);
                     headerRow.height = 24;
                     headerRow.eachCell((cell) => {
@@ -1410,7 +1576,6 @@
                         cell.border = { top: {style:'thin', color: { argb: 'FFFFFFFF' }}, left: {style:'thin', color: { argb: 'FFFFFFFF' }}, bottom: {style:'thin', color: { argb: 'FFFFFFFF' }}, right: {style:'thin', color: { argb: 'FFFFFFFF' }} };
                     });
 
-                    // Department Name Sub-Header (Newly Added)
                     const deptHeaderRow = wsMain.addRow([`အသုံးပြုသည့်ဌာန(သို့)စာရင်းအမျိုးအစား : ${dept}`]);
                     wsMain.mergeCells(`A${deptHeaderRow.number}:K${deptHeaderRow.number}`);
                     deptHeaderRow.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1E3A8A' } };
@@ -1428,54 +1593,35 @@
                         dTotalL += literNum; dTotalA += amountNum;
 
                         const dataRow = wsMain.addRow([
-                            row.id || "",
-                            formatToDDMMYYYY(row.filledDate),
-                            row.itineraries || "",
-                            formatToDDMMYYYY(row.issuedDate),
-                            row.boatId || "",
-                            row.issuedDept || "",
-                            literNum,
-                            priceDrumNum,
-                            priceLtrNum,
-                            amountNum,
-                            row.marks || ""
+                            row.id || "", formatToDDMMYYYY(row.filledDate), row.itineraries || "",
+                            formatToDDMMYYYY(row.issuedDate), row.boatId || "", row.issuedDept || "",
+                            literNum, priceDrumNum, priceLtrNum, amountNum, row.marks || ""
                         ]);
                         
-                        // စာသားအရှည်ပေါ်မူတည်ပြီး Row Height ကို Dynamic တွက်ချက်ခြင်း
-if (!row.itineraries || row.itineraries.length <= 40) {
-    dataRow.height = 20;
-} else {
-    // စာလုံးရေ ၄၀ လျှင် တစ်ကြောင်း (1 line) အဖြစ် ယူဆ၍ တွက်ချက်ခြင်း
-    let lineCount = Math.ceil(row.itineraries.length / 40);
-    
-    // တစ်ကြောင်းလျှင် အမြင့် 15 နှုန်းဖြင့် တွက်ပါသည် (Font size 10 အတွက် အဆင်ပြေစေရန်)
-    // Marks (colIdx 11) ထဲက စာသားက ပိုရှည်နေနိုင်ရင် အဲ့ဒီအတွက်ပါ ထည့်တွက်ပေးနိုင်ပါတယ်
-    dataRow.height = lineCount * 11; 
-}
+                        if (!row.itineraries || row.itineraries.length <= 40) {
+                            dataRow.height = 20;
+                        } else {
+                            let lineCount = Math.ceil(row.itineraries.length / 40);
+                            dataRow.height = lineCount * 11; 
+                        }
 
-dataRow.eachCell((cell, colIdx) => {
-    cell.font = { size: 10 };
-    let hAlign = colIdx >= 7 && colIdx <= 10 ? 'right' : 'left';
-    if (colIdx === 1 || colIdx === 2 || colIdx === 4) hAlign = 'center';
+                        dataRow.eachCell((cell, colIdx) => {
+                            cell.font = { size: 10 };
+                            let hAlign = colIdx >= 7 && colIdx <= 10 ? 'right' : 'left';
+                            if (colIdx === 1 || colIdx === 2 || colIdx === 4) hAlign = 'center';
 
-    cell.alignment = {
-        vertical: 'middle',
-        horizontal: hAlign,
-        wrapText: (colIdx === 3 || colIdx === 11) // Itineraries (3) နှင့် Marks (11) အတွက် Wrap Text
-    };
-    cell.border = { 
-        top: {style:'thin'}, 
-        left: {style:'thin'}, 
-        bottom: {style:'thin'}, 
-        right: {style:'thin'} 
-    };
-});
+                            cell.alignment = {
+                                vertical: 'middle',
+                                horizontal: hAlign,
+                                wrapText: (colIdx === 3 || colIdx === 11) 
+                            };
+                            cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                        });
                     });
 
                     if (adjDept === dept) dTotalA += adjInput;
                     summaryData.push({ name: dept, liters: dTotalL, amount: dTotalA });
 
-                    // Subtotal
                     const subtotalRow = wsMain.addRow(['', '', '', '', '', `${dept} Sub-total:`, dTotalL, '', '', dTotalA, '']);
                     subtotalRow.height = 22;
                     subtotalRow.eachCell((cell, colIdx) => {
@@ -1487,13 +1633,11 @@ dataRow.eachCell((cell, colIdx) => {
                         }
                     });
 
-                    // Remark
                     const noteRow = wsMain.addRow(['မှတ်ချက် - (အစွန်းထွက်) ဆီကုမ္ပဏီမှ အစွန်း တွေဖြတ်ပေးထားသော တန်ဖိုးများကိုခွဲပြထားပါသည်။']);
                     wsMain.mergeCells(`A${noteRow.number}:K${noteRow.number}`);
                     noteRow.getCell(1).font = { italic: true, size: 9, color: { argb: 'FF475569' } };
                     noteRow.height = 18;
 
-                    // Signature
                     const sigSpaceRow = wsMain.addRow([]);
                     sigSpaceRow.height = 55; 
 
@@ -1518,12 +1662,8 @@ dataRow.eachCell((cell, colIdx) => {
                     wsMain.addRow([]); 
                 }
 
-                // Summary Sheet Setup
                 wsSummary.columns = [
-                    { key: 'no', width: 8 },
-                    { key: 'dept', width: 35 },
-                    { key: 'liters', width: 16 },
-                    { key: 'amount', width: 20 }
+                    { key: 'no', width: 8 }, { key: 'dept', width: 35 }, { key: 'liters', width: 16 }, { key: 'amount', width: 20 }
                 ];
 
                 const sumTitleText = `My Mergui Speed Boat's Fuel Issued Record Summary For ${dateStr}`;
@@ -1567,7 +1707,6 @@ dataRow.eachCell((cell, colIdx) => {
                     }
                 });
 
-                // Summary Signature
                 const sumSigSpace = wsSummary.addRow([]);
                 sumSigSpace.height = 55;
                 if (imageId !== null) {
@@ -1588,7 +1727,6 @@ dataRow.eachCell((cell, colIdx) => {
                 sumName.getCell(3).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
                 sumName.getCell(3).alignment = { horizontal: 'center' };
 
-                // Download File
                 const buffer = await workbook.xlsx.writeBuffer();
                 saveAs(new Blob([buffer]), `Fuel_Report_${dateStr.replace(/[^a-zA-Z0-9 -]/g, '_').trim()}.xlsx`);
             } catch (error) {
@@ -1635,7 +1773,6 @@ dataRow.eachCell((cell, colIdx) => {
                     cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
                 });
 
-                // Department Name Sub-Header (Newly Added)
                 const deptHeaderRow = ws.addRow([`ဌာနအမည် : ${dept}`]);
                 ws.mergeCells(`A${deptHeaderRow.number}:K${deptHeaderRow.number}`);
                 deptHeaderRow.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1E3A8A' } };
@@ -1670,7 +1807,7 @@ dataRow.eachCell((cell, colIdx) => {
                         cell.alignment = {
                             vertical: 'middle',
                             horizontal: hAlign,
-                            wrapText: (colIdx === 3 || colIdx === 11) // Itineraries (3) နှင့် Marks (11) အတွက် Wrap Text အလိုအလျောက် ထည့်ပေးထားသည်
+                            wrapText: (colIdx === 3 || colIdx === 11) 
                         };
                         cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
                     });
@@ -1726,13 +1863,9 @@ dataRow.eachCell((cell, colIdx) => {
             const workbook = new ExcelJS.Workbook();
             const ws = workbook.addWorksheet('Yearly_Summary');
 
-            // Columns များကို တောင်းဆိုထားသည့်အတိုင်း ပြင်ဆင်သတ်မှတ်ခြင်း
             ws.columns = [
-                { key: 'no', width: 8 },
-                { key: 'month', width: 20 },
-                { key: 'liter', width: 16 },
-                { key: 'amount', width: 20 },
-                { key: 'marks', width: 25 }
+                { key: 'no', width: 8 }, { key: 'month', width: 20 }, { key: 'liter', width: 16 },
+                { key: 'amount', width: 20 }, { key: 'marks', width: 25 }
             ];
 
             let imageId = null;
@@ -1746,10 +1879,8 @@ dataRow.eachCell((cell, colIdx) => {
             let startY = parseInt(document.getElementById('filterStartYear').value) || 2020;
             let endY = parseInt(document.getElementById('filterEndYear').value) || 2040;
 
-            // ဌာန (Department) အလိုက် Data များကို ခွဲခြား၍ Loop ပတ်ခြင်း
             for (let dept in REPORT_GROUPS_DATA) {
                 
-                // ၁။ သက်ဆိုင်ရာ ဌာနအတွက် လအလိုက် Data များ တွက်ချက်ခြင်း
                 let yearlyData = {};
                 for (let y = startY; y <= endY; y++) {
                     let monthlyData = {};
@@ -1771,17 +1902,14 @@ dataRow.eachCell((cell, colIdx) => {
                     }
                 }
 
-                // အကယ်၍ ထိုနှစ်အတွင်း ဌာနအတွက် Data မရှိပါက ကျော်သွားမည်
                 if (Object.keys(yearlyData).length === 0) continue;
 
-                // ၂။ Title ရေးဆွဲခြင်း
                 const titleRow = ws.addRow(["My Mergui Speed Boat's Fuel Issued Record Summary For Yearly"]);
                 ws.mergeCells(`A${titleRow.number}:E${titleRow.number}`);
                 titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1E40AF' } };
                 titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
                 titleRow.height = 28;
 
-                // ၃။ ဌာနအမည် ခေါင်းစဉ် (Department Sub-Header) ရေးဆွဲခြင်း
                 const deptHeaderRow = ws.addRow([`အသုံးပြုသည့်ဌာန : ${dept}`]);
                 ws.mergeCells(`A${deptHeaderRow.number}:E${deptHeaderRow.number}`);
                 deptHeaderRow.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1E3A8A' } };
@@ -1790,7 +1918,6 @@ dataRow.eachCell((cell, colIdx) => {
                 deptHeaderRow.getCell(1).border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
                 deptHeaderRow.height = 22;
 
-                // ၄။ Table ခေါင်းစဉ် (Table Header) ရေးဆွဲခြင်း
                 const headerRow = ws.addRow(["Sr.No", "Month(လ)", "Total Liters", "Total Amount", "Marks"]);
                 headerRow.height = 24;
                 headerRow.eachCell(cell => {
@@ -1804,9 +1931,7 @@ dataRow.eachCell((cell, colIdx) => {
                 let deptTotalA = 0;
                 let srNo = 1;
 
-                // ၅။ ဌာနအလိုက် Data အကြောင်းများ ရေးဆွဲခြင်း
                 for (let y in yearlyData) {
-                    // နှစ် (Year) ကို ပြသရန်
                     const yearHeader = ws.addRow([`Year : ${y}`, "", "", "", ""]);
                     ws.mergeCells(`A${yearHeader.number}:E${yearHeader.number}`);
                     yearHeader.getCell(1).font = { bold: true, color: { argb: 'FF333333' } };
@@ -1832,12 +1957,10 @@ dataRow.eachCell((cell, colIdx) => {
                     }
                 }
 
-                // Adjustments စစ်ဆေးခြင်း
                 if (adjDept === dept) {
                     deptTotalA += adjInput;
                 }
 
-                // ၆။ အားလုံးစုစုပေါင်း (Total Row)
                 const totRow = ws.addRow(["", "Total", deptTotalL, deptTotalA, ""]);
                 totRow.height = 22;
                 totRow.eachCell((cell, cIdx) => {
@@ -1847,13 +1970,11 @@ dataRow.eachCell((cell, colIdx) => {
                     if (cIdx >= 2) cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
                 });
 
-                // ၇။ မှတ်ချက်
                 const noteRow = ws.addRow(['မှတ်ချက် - (အစွန်းထွက်) ဆီကုမ္ပဏီမှ အစွန်း တွေဖြတ်ပေးထားသော တန်ဖိုးများကိုခွဲပြထားပါသည်။']);
                 ws.mergeCells(`A${noteRow.number}:E${noteRow.number}`);
                 noteRow.getCell(1).font = { italic: true, size: 9, color: { argb: 'FF475569' } };
                 noteRow.height = 18;
 
-                // ၈။ လက်မှတ်ထိုးရန် နေရာ (Signature Block)
                 const sigSpaceRow = ws.addRow([]);
                 sigSpaceRow.height = 65;
                 
@@ -1875,16 +1996,13 @@ dataRow.eachCell((cell, colIdx) => {
                 nameRow.getCell(4).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
                 nameRow.getCell(4).alignment = { horizontal: 'center' };
 
-                // နောက်ထပ် ဌာနတစ်ခုအတွက် Space ချန်ခြင်း
                 ws.addRow([]);
                 ws.addRow([]);
             }
 
-            // Excel File ကို Download ချရန်
             let sYear = document.getElementById('filterStartYear').value || "Start";
-            let eYear = document.getElementById('filterEndYear').value || "End";
             const buffer = await workbook.xlsx.writeBuffer();
-            saveAs(new Blob([buffer]), `Yearly_Summary_By_Dept_${sYear}_to_${eYear}.xlsx`);
+            saveAs(new Blob([buffer]), `Yearly_Summary_Report_${sYear}.xlsx`);
         }
     </script>
 </body>
