@@ -11,10 +11,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
+        
+        /* Mobile Scroll & Height Fixes */
+        html, body {
+            height: 100%;
+            height: 100dvh; /* Mobile Browser viewport fix */
+            width: 100%;
+            overflow: hidden; /* Lock body scrolling, allow internal scrolling */
+            margin: 0;
+            padding: 0;
+        }
+
         body { 
             font-family: 'Pyidaungsu', 'Myanmar Text', 'Padauk', sans-serif; 
             background-color: #f8fafc;
         }
+
+        .touch-scroll {
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -34,14 +50,15 @@
         .bg-gradient-header { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
     </style>
 </head>
-<body class="min-h-screen text-slate-800 flex flex-col lg:flex-row overflow-hidden relative">
+<!-- Removed min-h-screen and replaced with h-full structure -->
+<body class="text-slate-800 flex flex-col lg:flex-row relative w-full h-full">
 
     <!-- Mobile Backdrop Overlay -->
     <div id="sidebarOverlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/60 z-20 hidden lg:hidden transition-opacity duration-300"></div>
 
     <!-- Sidebar Navigation -->
     <div id="mainSidebar" class="fixed lg:static inset-y-0 left-0 z-30 w-72 bg-gradient-header text-slate-200 flex flex-col shrink-0 h-full shadow-2xl transition-transform duration-300 transform -translate-x-full lg:translate-x-0">
-        <div class="p-6 border-b border-slate-700/50 flex items-center justify-between">
+        <div class="p-6 border-b border-slate-700/50 flex items-center justify-between shrink-0">
             <div class="flex items-center space-x-4">
                 <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-900/50">
                     <i class="fa-solid fa-gas-pump text-white text-xl"></i>
@@ -57,7 +74,7 @@
             </button>
         </div>
         
-        <nav class="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar touch-scroll min-h-0">
             <button onclick="switchTab('form-tab')" id="btn-form-tab" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl bg-indigo-600 text-white shadow-md transition duration-200 font-bold text-sm">
                 <i class="fa-solid fa-file-pen w-5 text-center text-lg"></i>
                 <span>စာရင်းသွင်းရန် Form</span>
@@ -76,7 +93,7 @@
             </button>
         </nav>
 
-        <div class="p-5 border-t border-slate-800">
+        <div class="p-5 border-t border-slate-800 shrink-0">
             <div class="flex items-center space-x-3 p-3 rounded-xl bg-slate-900 border border-slate-700 text-xs">
                 <span class="relative flex h-2.5 w-2.5 shrink-0">
                     <span id="statusPulse" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
@@ -88,7 +105,7 @@
     </div>
 
     <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-100 relative z-10 w-full">
+    <div class="flex-1 flex flex-col h-full min-h-0 overflow-hidden bg-slate-100 relative z-10 w-full">
         <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-8 shrink-0 shadow-sm z-10">
             <div class="flex items-center space-x-3 overflow-hidden">
                 <button onclick="toggleSidebar(true)" class="lg:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none">
@@ -102,7 +119,8 @@
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto custom-scrollbar p-4 sm:p-6 md:p-8">
+        <!-- Added min-h-0 and touch-scroll for reliable mobile scrolling -->
+        <main class="flex-1 overflow-y-auto custom-scrollbar touch-scroll p-4 sm:p-6 md:p-8 min-h-0 pb-12">
             <!-- 1. FORM TAB -->
             <div id="form-tab" class="tab-content max-w-7xl mx-auto space-y-6">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -244,8 +262,8 @@
                         </div>
                     </div>
                     
-                    <!-- Modified Draft Table Container for Vertical & Horizontal Scrolling -->
-                    <div class="overflow-auto custom-scrollbar w-full max-h-[500px] sm:max-h-[600px]">
+                    <!-- Touch Scroll Added -->
+                    <div class="overflow-auto custom-scrollbar touch-scroll w-full max-h-[500px] sm:max-h-[600px]">
                         <table class="w-full text-left border-collapse min-w-[800px]">
                             <!-- Added sticky top-0 to thead -->
                             <thead class="sticky top-0 z-10 shadow-sm">
@@ -351,13 +369,13 @@
                                 <select id="adjustDept" onchange="calculateNetTotal()" class="w-full sm:w-auto px-3 py-1.5 text-slate-900 font-bold rounded-md outline-none border border-amber-300 bg-white text-xs sm:text-sm">
                                     <option value="Grand">Grand Total (အားလုံးစုစုပေါင်း)</option>
                                 </select>
-                                <input type="number" step="1" id="adjustAmount" oninput="calculateNetTotal()" class="w-32 sm:w-40 px-3 py-1.5 text-right text-slate-900 font-mono font-bold rounded-md outline-none border border-amber-300 focus:border-amber-500 transition text-xs sm:text-sm" placeholder="Amount (0)">
+                                <input type="number" step="1" id="adjustAmount" oninput="calculateNetTotal()" class="w-32 sm:w-40 px-3 py-1.5 text-right text-slate-900 font-mono font-bold rounded-md outline-none border border-amber-300 focus:border-amber-50 transition text-xs sm:text-sm" placeholder="Amount (0)">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Modified Report Table Container to overflow-auto for Vertical Scrolling -->
-                    <div class="overflow-auto border border-slate-300 rounded-xl custom-scrollbar max-h-[600px] shadow-sm w-full">
+                    <!-- Touch Scroll Added -->
+                    <div class="overflow-auto border border-slate-300 rounded-xl custom-scrollbar touch-scroll max-h-[600px] shadow-sm w-full">
                         <table id="excelReportTable" class="w-full text-left border-collapse bg-white min-w-[900px]">
                             <thead class="sticky top-0 z-10 shadow-sm">
                                 <tr class="bg-slate-800" id="reportTableHeader">
@@ -449,7 +467,7 @@
                             <input type="text" id="newBoatInput" placeholder="ရေယာဉ်အသစ်..." class="form-input py-2">
                             <button id="btn-add-boat" onclick="addListItem('boat')" class="px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold rounded-xl transition"><i class="fa-solid fa-plus"></i></button>
                         </div>
-                        <div class="flex-1 overflow-y-auto custom-scrollbar border border-slate-200 rounded-xl bg-slate-50 p-2 shadow-inner">
+                        <div class="flex-1 overflow-y-auto custom-scrollbar touch-scroll border border-slate-200 rounded-xl bg-slate-50 p-2 shadow-inner min-h-0">
                             <ul id="boatListGrid" class="divide-y divide-slate-200 text-sm font-semibold text-slate-700"></ul>
                         </div>
                     </div>
@@ -465,7 +483,7 @@
                             <input type="text" id="newDeptInput" placeholder="ဌာနအသစ်..." class="form-input py-2">
                             <button id="btn-add-dept" onclick="addListItem('dept')" class="px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold rounded-xl transition"><i class="fa-solid fa-plus"></i></button>
                         </div>
-                        <div class="flex-1 overflow-y-auto custom-scrollbar border border-slate-200 rounded-xl bg-slate-50 p-2 shadow-inner">
+                        <div class="flex-1 overflow-y-auto custom-scrollbar touch-scroll border border-slate-200 rounded-xl bg-slate-50 p-2 shadow-inner min-h-0">
                             <ul id="deptListGrid" class="divide-y divide-slate-200 text-sm font-semibold text-slate-700"></ul>
                         </div>
                     </div>
@@ -474,6 +492,7 @@
         </main>
     </div>
 
+    <!-- JAVASCRIPT IS UNTOUCHED -->
     <script>
         let WEB_APP_URL = localStorage.getItem('v5_google_web_app_url') || "";
         let savedSignatureBase64 = localStorage.getItem('v5_signature_base64') || "";
