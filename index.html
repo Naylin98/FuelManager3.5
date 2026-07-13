@@ -53,78 +53,67 @@
 <body class="text-slate-800 flex flex-col lg:flex-row relative w-full h-full">
 
     <!-- ================= AUTHENTICATION OVERLAY ================= -->
-    <div id="authOverlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1614165936126-22485f5366fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center before:absolute before:inset-0 before:bg-slate-900/80 backdrop-blur-md transition-opacity duration-500">
-        
-        <!-- Auth Card -->
+    <div id="authOverlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-cover bg-center before:absolute before:inset-0 before:bg-slate-900/70 backdrop-blur-sm transition-opacity duration-500">
         <div class="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-lg border border-white/20 p-8 sm:p-10 rounded-3xl shadow-2xl mx-4">
-            
-            <!-- Logo & Title -->
             <div class="text-center mb-8">
-                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto shadow-lg mb-4 shadow-indigo-500/30">
-                    <i class="fa-solid fa-gas-pump text-white text-3xl"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-white tracking-wide">Fuel Manager</h2>
+                <img src="a9ff3634-4cf4-4f48-b184-e2c0e6d81cdf.jpg" alt="System Logo" class="system-logo w-24 h-24 rounded-full object-cover mx-auto shadow-[0_0_20px_rgba(99,102,241,0.6)] border-4 border-indigo-400 mb-4 transition-transform hover:scale-105" />
+                <h2 class="text-3xl font-bold text-white tracking-wide drop-shadow-md">Fuel Manager</h2>
                 <p class="text-indigo-200 text-sm mt-2" id="authSubtitle">Welcome back! Please login to continue.</p>
             </div>
-
-            <!-- LOGIN FORM -->
             <form id="loginForm" onsubmit="handleAuth(event, 'login')" class="space-y-5">
                 <div>
                     <label class="block text-xs font-bold text-slate-300 mb-1.5 tracking-wider uppercase">Email Address</label>
                     <div class="relative">
                         <i class="fa-solid fa-envelope absolute left-4 top-3.5 text-slate-400"></i>
-                        <input type="email" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition" placeholder="admin@example.com">
+                        <input type="email" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/60 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition" placeholder="admin@example.com">
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-300 mb-1.5 tracking-wider uppercase">Password</label>
                     <div class="relative">
                         <i class="fa-solid fa-lock absolute left-4 top-3.5 text-slate-400"></i>
-                        <input type="password" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition" placeholder="••••••••">
+                        <input type="password" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/60 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition" placeholder="••••••••">
                     </div>
                 </div>
-                <button type="submit" class="w-full py-3.5 mt-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-500/30 transform transition hover:-translate-y-0.5">
+                <button type="submit" class="w-full py-3.5 mt-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-500/40 transform transition hover:-translate-y-0.5">
                     Log In To System
                 </button>
-                <div class="text-center pt-4 border-t border-white/10 mt-6">
-                    <p class="text-sm text-slate-400">New user? <a href="#" onclick="toggleAuth('signup')" class="text-indigo-400 hover:text-indigo-300 font-bold transition">Create an account</a></p>
+                <div class="text-center pt-4 border-t border-white/20 mt-6">
+                    <p class="text-sm text-slate-300">New user? <a href="#" onclick="toggleAuth('signup')" class="text-indigo-300 hover:text-indigo-200 font-bold transition underline">Create an account</a></p>
                 </div>
             </form>
-
-            <!-- SIGN UP FORM (Hidden by Default) -->
             <form id="signupForm" onsubmit="handleAuth(event, 'signup')" class="space-y-4 hidden">
                 <div>
                     <label class="block text-xs font-bold text-slate-300 mb-1.5 tracking-wider uppercase">Full Name</label>
                     <div class="relative">
                         <i class="fa-solid fa-user absolute left-4 top-3.5 text-slate-400"></i>
-                        <input type="text" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition" placeholder="Your Name">
+                        <input type="text" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/60 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition" placeholder="Your Name">
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-300 mb-1.5 tracking-wider uppercase">Email Address</label>
                     <div class="relative">
                         <i class="fa-solid fa-envelope absolute left-4 top-3.5 text-slate-400"></i>
-                        <input type="email" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition" placeholder="admin@example.com">
+                        <input type="email" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/60 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition" placeholder="admin@example.com">
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-300 mb-1.5 tracking-wider uppercase">Password</label>
                     <div class="relative">
                         <i class="fa-solid fa-lock absolute left-4 top-3.5 text-slate-400"></i>
-                        <input type="password" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition" placeholder="••••••••">
+                        <input type="password" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/60 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition" placeholder="••••••••">
                     </div>
                 </div>
-                <button type="submit" class="w-full py-3.5 mt-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-500/30 transform transition hover:-translate-y-0.5">
+                <button type="submit" class="w-full py-3.5 mt-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-500/40 transform transition hover:-translate-y-0.5">
                     Sign Up & Continue
                 </button>
-                <div class="text-center pt-4 border-t border-white/10 mt-6">
-                    <p class="text-sm text-slate-400">Already have an account? <a href="#" onclick="toggleAuth('login')" class="text-emerald-400 hover:text-emerald-300 font-bold transition">Log In</a></p>
+                <div class="text-center pt-4 border-t border-white/20 mt-6">
+                    <p class="text-sm text-slate-300">Already have an account? <a href="#" onclick="toggleAuth('login')" class="text-emerald-300 hover:text-emerald-200 font-bold transition underline">Log In</a></p>
                 </div>
             </form>
         </div>
     </div>
     <!-- ================= END AUTHENTICATION OVERLAY ================= -->
-
 
     <!-- Mobile Backdrop Overlay -->
     <div id="sidebarOverlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/60 z-20 hidden lg:hidden transition-opacity duration-300"></div>
@@ -133,15 +122,12 @@
     <div id="mainSidebar" class="fixed lg:static inset-y-0 left-0 z-30 w-72 bg-gradient-header text-slate-200 flex flex-col shrink-0 h-full shadow-2xl transition-transform duration-300 transform -translate-x-full lg:translate-x-0">
         <div class="p-6 border-b border-slate-700/50 flex items-center justify-between shrink-0">
             <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-900/50">
-                    <i class="fa-solid fa-gas-pump text-white text-xl"></i>
-                </div>
+                <img src="a9ff3634-4cf4-4f48-b184-e2c0e6d81cdf.jpg" alt="Logo" class="system-logo w-12 h-12 rounded-xl object-cover shadow-lg shadow-indigo-900/50 border-2 border-slate-600 bg-white" />
                 <div>
                     <h1 class="font-bold text-white text-lg leading-tight tracking-wide">Fuel Manager</h1>
                     <p class="text-[11px] text-indigo-300 font-semibold tracking-wider uppercase mt-1">Enterprise System</p>
                 </div>
             </div>
-            <!-- Close button for mobile -->
             <button onclick="toggleSidebar(false)" class="lg:hidden text-slate-400 hover:text-white text-xl p-1">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -155,6 +141,15 @@
             <button onclick="switchTab('draft-tab')" id="btn-draft-tab" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition duration-200 font-bold text-sm">
                 <i class="fa-solid fa-list-check w-5 text-center text-lg"></i>
                 <span>စစ်ဆေးရန် Draft</span>
+            </button>
+            <button onclick="switchTab('inventory-tab')" id="btn-inventory-tab" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition duration-200 font-bold text-sm">
+                <i class="fa-solid fa-boxes-stacked w-5 text-center text-lg"></i>
+                <span>Store Inventory</span>
+            </button>
+            <!-- NEW TAB ADDED: INVENTORY BALANCE REPORT -->
+            <button onclick="switchTab('inv-balance-tab')" id="btn-inv-balance-tab" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition duration-200 font-bold text-sm">
+                <i class="fa-solid fa-scale-unbalanced w-5 text-center text-lg text-emerald-400"></i>
+                <span>Inventory လက်ကျန်စာရင်း</span>
             </button>
             <button onclick="switchTab('report-tab')" id="btn-report-tab" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition duration-200 font-bold text-sm">
                 <i class="fa-solid fa-chart-pie w-5 text-center text-lg"></i>
@@ -174,7 +169,6 @@
                 </span>
                 <span id="statusText" class="text-slate-300 font-semibold truncate">Link မချိတ်ရသေးပါ</span>
             </div>
-            <!-- Added Logout Button for completeness -->
             <button onclick="logoutSystem()" class="w-full mt-4 flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-red-500/20 hover:text-red-400 border border-slate-700 hover:border-red-500/50 transition duration-200 font-bold text-xs">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 <span>Log Out</span>
@@ -197,10 +191,10 @@
             </div>
         </header>
 
-        <!-- Added min-h-0 and touch-scroll for reliable mobile scrolling -->
         <main class="flex-1 overflow-y-auto custom-scrollbar touch-scroll p-4 sm:p-6 md:p-8 min-h-0 pb-12">
             <!-- 1. FORM TAB -->
             <div id="form-tab" class="tab-content max-w-7xl mx-auto space-y-6">
+                <!-- Rest of form-tab HTML remains same as original -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                         <h2 class="text-sm sm:text-base font-bold text-white flex items-center space-x-2">
@@ -307,6 +301,7 @@
 
             <!-- 2. DRAFT TAB -->
             <div id="draft-tab" class="tab-content hidden max-w-7xl mx-auto space-y-6">
+                <!-- Rest of draft-tab HTML remains same as original -->
                 <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-sm">
                     <div>
                         <h4 class="text-sm font-bold text-indigo-800"><i class="fa-solid fa-rotate-left mr-2"></i>အမှားပြင်ဆင်ရန် ဒေတာပြန်ခေါ်မည် (Edit Data)</h4>
@@ -369,8 +364,194 @@
                 </div>
             </div>
 
-            <!-- 3. REPORT TAB -->
+            <!-- 3. INVENTORY TAB -->
+            <div id="inventory-tab" class="tab-content hidden max-w-7xl mx-auto space-y-6">
+                <!-- Inventory Form -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-4 sm:px-6 py-4 flex justify-between items-center">
+                        <h2 class="text-sm sm:text-base font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-boxes-stacked text-amber-400"></i>
+                            <span>Store Inventory ပစ္စည်းအဝင်/အထွက် စာရင်းသွင်းရန်</span>
+                        </h2>
+                        <button onclick="fetchInventoryFromSheet()" class="text-xs sm:text-sm text-indigo-300 hover:text-white flex items-center font-semibold">
+                            <i class="fa-solid fa-rotate mr-1.5"></i> ဒေတာ ပြန်လည်ရယူမည်
+                        </button>
+                    </div>
+
+                    <form id="inventoryForm" class="p-4 sm:p-6 md:p-8" onsubmit="saveInventoryEntry(event)">
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 sm:p-5 mb-6">
+                            <h3 class="text-xs font-bold text-slate-500 mb-4 border-b border-slate-200 pb-2">အခြေခံအချက်အလက်များ</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+                                <div>
+                                    <label class="form-label text-slate-700">Inventory ID / အမှတ်စဉ်</label>
+                                    <input type="text" id="inv_id" required placeholder="INV-00001" class="form-input bg-white border-slate-300">
+                                </div>
+                                <div>
+                                    <label class="form-label text-slate-700">Date / ရက်စွဲ</label>
+                                    <input type="date" id="inv_date" required class="form-input bg-white border-slate-300 text-slate-700">
+                                </div>
+                                <div>
+                                    <label class="form-label text-slate-700">Type / အမျိုးအစား</label>
+                                    <select id="inv_type" required class="form-input bg-white border-slate-300 cursor-pointer font-bold">
+                                        <option value="Stock In (အဝင်)">Stock In (အဝင်)</option>
+                                        <option value="Stock Out (အထွက်)">Stock Out (အထွက်)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label text-slate-700">Category / စတိုအမျိုးအစား</label>
+                                    <select id="inv_category" required class="form-input bg-white border-slate-300 cursor-pointer">
+                                        <option value="Fuel & Oil">Fuel & Oil (ဆီနှင့်စက်ဆီ)</option>
+                                        <option value="Spare Parts">Spare Parts (အပိုပစ္စည်း)</option>
+                                        <option value="Tools & Hardware">Tools & Hardware (ကိရိယာများ)</option>
+                                        <option value="General Store">General Store (အထွေထွေ)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                            <div class="lg:col-span-2 space-y-5">
+                                <div class="bg-indigo-50/50 border border-indigo-100 rounded-xl p-4 sm:p-5 h-full">
+                                    <h3 class="text-xs font-bold text-indigo-600 mb-4 border-b border-indigo-100 pb-2">ပစ္စည်းအမည် နှင့် မှတ်ချက်</h3>
+                                    <div class="grid grid-cols-1 gap-4 mb-4">
+                                        <div>
+                                            <label class="form-label text-indigo-900">Item Name (ပစ္စည်းအမည်)</label>
+                                            <input type="text" id="inv_itemName" required placeholder="ဥပမာ - Engine Oil 20W-50 / Filter / Rope (အမည်တူများ သွားပေါင်းပေးမည်)" class="form-input border-indigo-200">
+                                        </div>
+                                        <div>
+                                            <label class="form-label text-slate-600">Marks / Remarks (မှတ်ချက်)</label>
+                                            <input type="text" id="inv_marks" placeholder="မှတ်သားရန်ရှိပါက..." class="form-input">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="lg:col-span-1">
+                                <div class="bg-amber-50/50 border border-amber-200 rounded-xl p-4 sm:p-5 h-full">
+                                    <h3 class="text-xs font-bold text-amber-700 mb-4 border-b border-amber-200 pb-2 flex items-center"><i class="fa-solid fa-calculator mr-2"></i> အရေအတွက် နှင့် တန်ဖိုး</h3>
+                                    <div class="space-y-4">
+                                        <div class="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="form-label text-slate-700">Quantity (အရေအတွက်)</label>
+                                                <input type="number" id="inv_qty" oninput="calcInvTotal()" required step="any" placeholder="0" class="form-input font-mono font-bold border-amber-300">
+                                            </div>
+                                            <div>
+                                                <label class="form-label text-slate-700">Unit (ယူနစ်)</label>
+                                                <input type="text" id="inv_unit" required placeholder="Pcs/Drum/Liter" class="form-input border-amber-300">
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="form-label text-slate-700">Unit Price / တစ်ခုစျေး (MMK)</label>
+                                            <input type="number" id="inv_unitPrice" oninput="calcInvTotal()" required step="any" placeholder="0" class="form-input font-mono font-bold border-amber-300">
+                                        </div>
+                                        <div class="pt-2">
+                                            <label class="text-[10px] font-bold text-emerald-600 block mb-1">TOTAL AMOUNT (စုစုပေါင်းငွေ - AUTO)</label>
+                                            <input type="text" id="inv_totalDisplay" readonly class="w-full bg-transparent border-none text-emerald-700 font-mono font-bold text-lg outline-none cursor-not-allowed px-1" placeholder="0">
+                                            <input type="hidden" id="inv_totalAmount">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-2 space-x-3">
+                            <button type="button" onclick="resetInvForm()" class="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-sm rounded-xl transition duration-200">
+                                Cancel
+                            </button>
+                            <button type="submit" id="btnSubmitInventory" class="w-full sm:w-auto px-8 py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-amber-600/30 transition duration-200 flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                                <span>Inventory Sheet သို့ သိမ်းမည်</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Inventory History Table (WITH EDIT ACTION) -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-50 border-b border-slate-200 px-4 sm:px-6 py-4 flex justify-between items-center">
+                        <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center space-x-2">
+                            <i class="fa-solid fa-list-ul text-amber-600"></i>
+                            <span>Inventory အဝင်/အထွက် မှတ်တမ်းများ</span>
+                        </h3>
+                        <button onclick="fetchInventoryFromSheet()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg shadow transition">
+                            <i class="fa-solid fa-arrows-rotate mr-1"></i> Refresh Data
+                        </button>
+                    </div>
+                    <div class="overflow-auto custom-scrollbar touch-scroll w-full max-h-[500px]">
+                        <table class="w-full text-left border-collapse min-w-[900px]">
+                            <thead class="sticky top-0 z-10 shadow-sm">
+                                <tr class="bg-slate-800">
+                                    <th class="th-style text-slate-200 pl-6 border-b-0">ID</th>
+                                    <th class="th-style text-slate-200 border-b-0">Date</th>
+                                    <th class="th-style text-slate-200 border-b-0">Type</th>
+                                    <th class="th-style text-slate-200 border-b-0">Item Name</th>
+                                    <th class="th-style text-slate-200 border-b-0">Category</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">Qty</th>
+                                    <th class="th-style text-slate-200 border-b-0">Unit</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">Unit Price</th>
+                                    <th class="th-style text-slate-200 border-b-0">Marks</th>
+                                    <th class="th-style text-slate-200 pr-6 text-center border-b-0">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTableBody" class="divide-y divide-slate-100 font-medium bg-white">
+                                <tr>
+                                    <td colspan="10" class="p-10 text-center text-slate-400">
+                                        <i class="fa-solid fa-boxes-stacked text-3xl mb-2 text-slate-300 block"></i>
+                                        'Refresh Data' ကိုနှိပ်၍ Sheet မှ စာရင်းများ ဆွဲယူပါ။
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NEW TAB ADDED: INVENTORY BALANCE REPORT TAB -->
+            <div id="inv-balance-tab" class="tab-content hidden max-w-7xl mx-auto space-y-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-50 border-b border-slate-200 px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <h2 class="text-sm sm:text-base font-bold text-slate-800 flex items-center space-x-2">
+                            <i class="fa-solid fa-scale-unbalanced text-emerald-600"></i>
+                            <span>Store Inventory ပစ္စည်းလက်ကျန် စာရင်း (Balance Report)</span>
+                        </h2>
+                        <div class="flex items-center space-x-3 w-full sm:w-auto">
+                            <button onclick="generateInvBalanceReport()" class="flex-1 sm:flex-none px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-lg shadow transition flex items-center justify-center">
+                                <i class="fa-solid fa-arrows-rotate mr-2"></i> လက်ကျန် တွက်ချက်မည်
+                            </button>
+                            <button onclick="exportInvBalanceToExcel()" class="flex-1 sm:flex-none px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition flex items-center justify-center">
+                                <i class="fa-solid fa-file-excel mr-2"></i> Excel ထုတ်မည်
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="overflow-auto custom-scrollbar touch-scroll w-full max-h-[600px]">
+                        <table class="w-full text-left border-collapse min-w-[800px]">
+                            <thead class="sticky top-0 z-10 shadow-sm">
+                                <tr class="bg-slate-800">
+                                    <th class="th-style text-slate-200 pl-6 border-b-0">စဉ်</th>
+                                    <th class="th-style text-slate-200 border-b-0">ပစ္စည်းအမည် (Item Name)</th>
+                                    <th class="th-style text-slate-200 border-b-0">အမျိုးအစား (Category)</th>
+                                    <th class="th-style text-emerald-400 text-right border-b-0">စုစုပေါင်း အဝင် (In)</th>
+                                    <th class="th-style text-amber-400 text-right border-b-0">စုစုပေါင်း အထွက် (Out)</th>
+                                    <th class="th-style text-indigo-400 text-right border-b-0">လက်ကျန် (Balance)</th>
+                                    <th class="th-style text-slate-200 pr-6 border-b-0">ယူနစ် (Unit)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invBalanceTableBody" class="divide-y divide-slate-100 font-medium bg-white">
+                                <tr>
+                                    <td colspan="7" class="p-10 text-center text-slate-400">
+                                        အပေါ်ရှိ 'လက်ကျန် တွက်ချက်မည်' ကိုနှိပ်၍ စာရင်းကြည့်ပါ။ (ပစ္စည်းအမည်တူများကို ပေါင်း၍ လက်ကျန်ပြပေးမည်ဖြစ်သည်)
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. REPORT TAB -->
             <div id="report-tab" class="tab-content hidden max-w-7xl mx-auto space-y-6">
+                <!-- Rest of report-tab HTML remains same as original -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
                     <div class="border-b border-slate-100 pb-4 mb-5">
                         <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center space-x-2">
@@ -489,9 +670,9 @@
                 </div>
             </div>
 
-            <!-- 4. SETTINGS TAB -->
+            <!-- 5. SETTINGS TAB -->
             <div id="settings-tab" class="tab-content hidden max-w-5xl mx-auto space-y-6">
-                <!-- Google App Script Link Setup -->
+                <!-- Settings Content remains same as original -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
                     <div class="border-b border-slate-100 pb-3 mb-5">
                         <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2">
@@ -507,7 +688,29 @@
                     </div>
                 </div>
 
-                <!-- SIGNATURE UPLOAD SECTION -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
+                    <div class="border-b border-slate-100 pb-3 mb-5">
+                        <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+                            <i class="fa-solid fa-image text-indigo-600"></i>
+                            <span>နောက်ခံနှင့် လိုဂိုပုံပြောင်းရန် (Background & Logo Upload)</span>
+                        </h2>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
+                        <div class="flex-1">
+                            <label class="form-label text-slate-600 mb-2">ပုံရွေးချယ်ပါ (Image File)</label>
+                            <input type="file" id="bgLogoUpload" accept="image/*" class="form-input border-indigo-200 bg-indigo-50/20 text-sm">
+                        </div>
+                        <button onclick="saveBgLogo()" class="px-6 py-2.5 h-[42px] bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 transition shadow-md shrink-0 flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-upload"></i>
+                            <span>Save Image</span>
+                        </button>
+                        <button onclick="resetBgLogo()" class="px-6 py-2.5 h-[42px] bg-slate-200 text-slate-700 text-sm font-bold rounded-xl hover:bg-slate-300 transition shadow-md shrink-0 flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-rotate-left"></i>
+                            <span>Reset Default</span>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
                     <div class="border-b border-slate-100 pb-3 mb-5">
                         <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2">
@@ -570,10 +773,23 @@
 
     <!-- JAVASCRIPT SECTION -->
     <script>
-        /* =======================================================
-           NEW AUTHENTICATION JAVASCRIPT
-           ======================================================= */
-        // Check if user was previously logged in
+        // System Config Variables
+        let WEB_APP_URL = localStorage.getItem('v5_google_web_app_url') || "";
+        let savedSignatureBase64 = localStorage.getItem('v5_signature_base64') || "";
+        let savedBgLogoBase64 = localStorage.getItem('v5_bglogo_base64') || "";
+        const defaultBgLogoImage = "a9ff3634-4cf4-4f48-b184-e2c0e6d81cdf.jpg";
+        
+        let DRAFT_DATA = [];
+        let INVENTORY_DATA = []; 
+        let INV_BALANCE_DATA = []; // NEW FOR BALANCE REPORT
+        let REPORT_GROUPS_DATA = {}; 
+        let isReportGenerated = false;
+        let currentEditIndex = -1;
+        let currentInvEditId = null; // FOR INVENTORY EDIT
+        let globalGrandTotalAmount = 0;
+        let globalGrandTotalLiter = 0;
+
+        // AUTHENTICATION
         if(localStorage.getItem('v5_logged_in') === 'true') {
             document.getElementById('authOverlay').style.display = 'none';
         }
@@ -596,8 +812,6 @@
 
         async function handleAuth(e, action) {
             e.preventDefault();
-
-            // ပထမဆုံးအကြိမ် Login ဝင်ရန် Google App Script Link လိုအပ်ပါသည်
             let targetUrl = WEB_APP_URL || localStorage.getItem('v5_google_web_app_url');
             if (!targetUrl) {
                 targetUrl = prompt("စနစ်စတင်ရန် (သို့) Login ဝင်ရန် Google App Script API URL ကို ထည့်ပါ :");
@@ -612,49 +826,38 @@
             btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> စစ်ဆေးနေပါသည်...`;
             btn.disabled = true;
 
-            // Form ထဲမှ ဒေတာများကို ရယူခြင်း
             let payload = { action: action };
             const inputs = form.querySelectorAll('input');
             if(action === 'login') {
                 payload.email = inputs[0].value;
                 payload.password = inputs[1].value;
-            } else { // signup
+            } else { 
                 payload.name = inputs[0].value;
                 payload.email = inputs[1].value;
                 payload.password = inputs[2].value;
             }
 
             try {
-                // Google Sheet သို့ ပေးပို့စစ်ဆေးခြင်း
-                let res = await fetch(targetUrl, {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                });
+                let res = await fetch(targetUrl, { method: 'POST', body: JSON.stringify(payload) });
                 let result = await res.json();
 
                 if(result.status === 'success') {
-                    // Login / Signup အောင်မြင်ပါက
                     localStorage.setItem('v5_logged_in', 'true');
                     localStorage.setItem('v5_user_name', result.name || payload.name);
                     document.getElementById('authSubtitle').innerText = result.message;
                     
                     const overlay = document.getElementById('authOverlay');
                     overlay.classList.add('opacity-0'); 
-                    setTimeout(() => {
-                        overlay.style.display = 'none'; 
-                    }, 500);
+                    setTimeout(() => { overlay.style.display = 'none'; }, 500);
                     
-                    // စနစ်ထဲသို့ရောက်ပါက Data များစတင်ဆွဲယူရန်
                     fetchSettingsFromSheet();
                     fetchNextID();
                 } else {
-                    // Error ဖြစ်ပါက
                     alert("အမှား: " + result.message);
                 }
             } catch (err) {
                 alert("ချိတ်ဆက်မှု ပြဿနာရှိနေပါသည်။ Settings တွင် API Link မှန်ကန်မှုရှိမရှိ စစ်ဆေးပါ။\nError: " + err.message);
             }
-
             btn.innerHTML = originalBtnHtml;
             btn.disabled = false;
         }
@@ -663,36 +866,47 @@
             localStorage.removeItem('v5_logged_in');
             const overlay = document.getElementById('authOverlay');
             overlay.style.display = 'flex';
-            
-            // Allow browser to render display:flex before animating opacity back
-            setTimeout(() => {
-                overlay.classList.remove('opacity-0');
-            }, 10);
-            
-            // Auto close sidebar if on mobile
+            setTimeout(() => { overlay.classList.remove('opacity-0'); }, 10);
             toggleSidebar(false);
         }
-        /* ======================================================= */
 
+        // SETTINGS & UI
+        function applyBgLogo() {
+            const imgSrc = savedBgLogoBase64 ? savedBgLogoBase64 : defaultBgLogoImage;
+            const authOverlay = document.getElementById('authOverlay');
+            if(authOverlay) authOverlay.style.backgroundImage = `url('${imgSrc}')`;
+            document.querySelectorAll('.system-logo').forEach(img => { img.src = imgSrc; });
+        }
 
-        // (အောက်တွင် မူလ JavaScript Code အဟောင်းများ အကုန်အတိုင်း ရှိနေပါသည်)
-        let WEB_APP_URL = localStorage.getItem('v5_google_web_app_url') || "";
-        let savedSignatureBase64 = localStorage.getItem('v5_signature_base64') || "";
-        let DRAFT_DATA = [];
-        let REPORT_GROUPS_DATA = {}; 
-        let isReportGenerated = false;
-        let currentEditIndex = -1;
-        let globalGrandTotalAmount = 0;
-        let globalGrandTotalLiter = 0;
+        function saveBgLogo() {
+            const fileInput = document.getElementById('bgLogoUpload');
+            if (fileInput.files.length === 0) return alert("ကျေးဇူးပြု၍ ပုံရွေးချယ်ပါ။");
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64String = e.target.result;
+                localStorage.setItem('v5_bglogo_base64', base64String);
+                savedBgLogoBase64 = base64String;
+                applyBgLogo();
+                alert("နောက်ခံနှင့် လိုဂိုပုံ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
+                fileInput.value = ""; 
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetBgLogo() {
+            localStorage.removeItem('v5_bglogo_base64');
+            savedBgLogoBase64 = "";
+            applyBgLogo();
+            alert("မူလပုံစံသို့ ပြန်လည်ပြောင်းလဲပြီးပါပြီ။");
+        }
 
         function toggleSidebar(forceState) {
             const sidebar = document.getElementById('mainSidebar');
             const overlay = document.getElementById('sidebarOverlay');
             if (!sidebar || !overlay) return;
-
             const isExpanded = !sidebar.classList.contains('-translate-x-full');
             const shouldOpen = forceState !== undefined ? forceState : !isExpanded;
-
             if (shouldOpen) {
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
@@ -703,12 +917,8 @@
         }
 
         function initStorage() {
-            if (!localStorage.getItem('v5_boat_ids')) {
-                localStorage.setItem('v5_boat_ids', JSON.stringify(['Boat-A', 'Boat-B']));
-            }
-            if (!localStorage.getItem('v5_departments')) {
-                localStorage.setItem('v5_departments', JSON.stringify(['Operation', 'Logistics']));
-            }
+            if (!localStorage.getItem('v5_boat_ids')) localStorage.setItem('v5_boat_ids', JSON.stringify(['Boat-A', 'Boat-B']));
+            if (!localStorage.getItem('v5_departments')) localStorage.setItem('v5_departments', JSON.stringify(['Operation', 'Logistics']));
         }
 
         function formatToDDMMYYYY(dateString) {
@@ -763,27 +973,29 @@
                     let nextNum = Math.max(sheetMax, draftMax) + 1;
                     document.getElementById('inp_id').value = generateIdString(nextNum);
                 })
-                .catch(() => {
-                    document.getElementById('inp_id').value = generateIdString(draftMax + 1);
-                });
+                .catch(() => { document.getElementById('inp_id').value = generateIdString(draftMax + 1); });
         }
 
         function generateIdString(num) {
             const today = new Date();
             const month = String(today.getMonth() + 1).padStart(2, '0');
             const year = today.getFullYear();
-            const paddedNum = String(num).padStart(5, '0');
-            return `MMFA-${paddedNum}/${month}/${year}`;
+            return `MMFA-${String(num).padStart(5, '0')}/${month}/${year}`;
         }
 
         window.onload = function() {
             initStorage();
             loadSignaturePreview();
+            applyBgLogo();
+            
             const today = new Date();
             document.getElementById('currentDateDisplay').innerText = formatToDDMMYYYY(today.toISOString().split('T')[0]);
             document.getElementById('inp_filledDate').valueAsDate = today;
             document.getElementById('inp_issuedDate').valueAsDate = today;
             
+            if(document.getElementById('inv_date')) document.getElementById('inv_date').valueAsDate = today;
+            if(document.getElementById('inv_id')) document.getElementById('inv_id').value = generateInvId();
+
             if(WEB_APP_URL) {
                 document.getElementById('webAppUrlInput').value = WEB_APP_URL;
                 updateStatusIndicator(true);
@@ -791,7 +1003,6 @@
             } else {
                 updateStatusIndicator(false);
             }
-
             refreshUI(); 
             renderDraftTable();
             fetchNextID(); 
@@ -807,10 +1018,12 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
             
-            const tabs = ['form-tab', 'draft-tab', 'report-tab', 'settings-tab'];
+            const tabs = ['form-tab', 'draft-tab', 'inventory-tab', 'inv-balance-tab', 'report-tab', 'settings-tab'];
             const titles = { 
                 'form-tab': 'ဆီထုတ်ပေးမှု မှတ်တမ်းအသစ်သွင်းရန်', 
                 'draft-tab': 'စစ်ဆေးရန် ယာယီစာရင်းများ (Draft & Edit)',
+                'inventory-tab': 'Store Inventory ပစ္စည်းအဝင်/အထွက် စာရင်းသွင်းရန်',
+                'inv-balance-tab': 'Store Inventory ပစ္စည်းလက်ကျန် စာရင်း',
                 'report-tab': 'လချုပ် / နှစ်ချုပ် / စိတ်ကြိုက် Report', 
                 'settings-tab': 'စနစ်ဆက်တင်များ' 
             };
@@ -823,6 +1036,8 @@
             let activeBtn = document.getElementById('btn-' + tabId);
             if (activeBtn) activeBtn.className = "w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl bg-indigo-600 text-white shadow-md transition duration-200 font-bold text-sm";
             document.getElementById('activeTabTitle').innerText = titles[tabId];
+
+            if(tabId === 'inventory-tab') fetchInventoryFromSheet();
         }
 
         function updateStatusIndicator(isConnected) {
@@ -869,7 +1084,6 @@
         function saveSignature() {
             const fileInput = document.getElementById('signatureUpload');
             if (fileInput.files.length === 0) return alert("ကျေးဇူးပြု၍ ပုံရွေးချယ်ပါ။");
-            
             const file = fileInput.files[0];
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -893,9 +1107,7 @@
                     if(data.depts.length > 0) localStorage.setItem('v5_departments', JSON.stringify(data.depts));
                     refreshUI();
                 }
-            } catch(e) {
-                console.log("Settings fetch error:", e);
-            }
+            } catch(e) { console.log("Settings fetch error:", e); }
         }
 
         async function saveSettingsToSheet() {
@@ -909,9 +1121,7 @@
                     redirect: "follow",
                     body: JSON.stringify({ action: "saveSettings", boats: boats, depts: depts })
                 });
-            } catch(e) {
-                alert("စနစ်ချိတ်ဆက်မှု အမှားအယွင်းဖြစ်နေပါသည်။");
-            }
+            } catch(e) { alert("စနစ်ချိတ်ဆက်မှု အမှားအယွင်းဖြစ်နေပါသည်။"); }
         }
 
         function loadDropdownOptions() {
@@ -987,6 +1197,235 @@
             document.getElementById('inp_totalAmountDisplay').value = total ? Math.round(total).toLocaleString() : "";
         }
 
+        /* ================= STORE INVENTORY & BALANCE LOGIC ================= */
+        function calcInvTotal() {
+            const qty = parseFloat(document.getElementById('inv_qty').value) || 0;
+            const price = parseFloat(document.getElementById('inv_unitPrice').value) || 0;
+            const total = qty * price;
+            document.getElementById('inv_totalAmount').value = total ? Math.round(total) : "";
+            document.getElementById('inv_totalDisplay').value = total ? Math.round(total).toLocaleString() : "";
+        }
+
+        function generateInvId() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const num = Math.floor(1000 + Math.random() * 9000);
+            return `INV-${year}-${num}`;
+        }
+
+        function resetInvForm() {
+            document.getElementById('inventoryForm').reset();
+            document.getElementById('inv_date').valueAsDate = new Date();
+            document.getElementById('inv_id').value = generateInvId();
+            currentInvEditId = null;
+            document.getElementById('btnSubmitInventory').innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Inventory Sheet သို့ သိမ်းမည်</span>`;
+        }
+
+        function editInventory(id) {
+            let record = INVENTORY_DATA.find(r => r.id === id);
+            if(!record) return;
+            currentInvEditId = record.id;
+            
+            document.getElementById('inv_id').value = record.id;
+            let fDate = new Date(record.date);
+            if(!isNaN(fDate)) document.getElementById('inv_date').valueAsDate = fDate;
+            document.getElementById('inv_type').value = record.type;
+            document.getElementById('inv_itemName').value = record.itemName;
+            document.getElementById('inv_category').value = record.category;
+            document.getElementById('inv_qty').value = record.qty;
+            document.getElementById('inv_unit').value = record.unit;
+            document.getElementById('inv_unitPrice').value = record.unitPrice;
+            document.getElementById('inv_marks').value = record.marks;
+            
+            calcInvTotal();
+            document.getElementById('btnSubmitInventory').innerHTML = `<i class="fa-solid fa-pen"></i> <span>ပြင်ဆင်ချက်ကို သိမ်းမည်</span>`;
+            document.getElementById('inventory-tab').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function saveInventoryEntry(e) {
+            e.preventDefault();
+            if(!WEB_APP_URL) return alert("Google Web App Link မချိတ်ရသေးပါ။ Settings တွင် သွားထည့်ပါ။");
+
+            const btn = document.getElementById('btnSubmitInventory');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>သိမ်းဆည်းနေပါသည်...</span>`;
+            btn.disabled = true;
+
+            const record = {
+                action: currentInvEditId ? "updateInventory" : "addInventory",
+                id: document.getElementById('inv_id').value,
+                date: document.getElementById('inv_date').value,
+                type: document.getElementById('inv_type').value,
+                itemName: document.getElementById('inv_itemName').value,
+                category: document.getElementById('inv_category').value,
+                qty: document.getElementById('inv_qty').value,
+                unit: document.getElementById('inv_unit').value,
+                unitPrice: document.getElementById('inv_unitPrice').value,
+                totalAmount: document.getElementById('inv_totalAmount').value,
+                marks: document.getElementById('inv_marks').value
+            };
+
+            try {
+                let res = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(record) });
+                let result = await res.json();
+                if(result.status === "success") {
+                    alert("Inventory စာရင်းကို Google Sheet ထဲသို့ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
+                    resetInvForm();
+                    fetchInventoryFromSheet();
+                } else {
+                    // Fallback to addInventory if update is not supported in GAS yet
+                    if(record.action === "updateInventory") {
+                       alert("မှတ်ချက်: သင့် Google Apps Script တွင် updateInventory function မရှိသေးပါက Error ပြနိုင်ပါသည်။ (" + (result.message || "Unknown error") + ")");
+                    } else {
+                       alert("အမှား: " + (result.message || "Unknown error"));
+                    }
+                }
+            } catch(err) {
+                alert("Google Sheet သို့ ချိတ်ဆက်၍ မရပါ။ API Link မှန်ကန်ကြောင်း စစ်ဆေးပါ: " + err.message);
+            }
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+
+        async function fetchInventoryFromSheet() {
+            if(!WEB_APP_URL) return;
+            const tbody = document.getElementById('inventoryTableBody');
+            tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-slate-400"><i class="fa-solid fa-spinner animate-spin text-2xl text-indigo-500 mb-2 block"></i>ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>`;
+
+            try {
+                let res = await fetch(`${WEB_APP_URL}?action=getInventory`);
+                let data = await res.json();
+                INVENTORY_DATA = data;
+                renderInventoryTable();
+            } catch(err) {
+                tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-red-500">ဒေတာဆွဲယူ၍ မရပါ။ (Sheet တွင် getInventory API မရှိသေးပါက Script ကိုစစ်ဆေးပါ) Error: ${err.message}</td></tr>`;
+            }
+        }
+
+        function renderInventoryTable() {
+            const tbody = document.getElementById('inventoryTableBody');
+            if(!INVENTORY_DATA || INVENTORY_DATA.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-slate-400"><i class="fa-solid fa-boxes-stacked text-3xl mb-2 text-slate-300 block"></i>Inventory စာရင်းများ မရှိသေးပါ။</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = INVENTORY_DATA.map(r => `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="td-style pl-6 font-mono font-bold text-slate-700">${r.id || ''}</td>
+                    <td class="td-style">${formatToDDMMYYYY(r.date)}</td>
+                    <td class="td-style font-bold ${r.type && r.type.includes('In') ? 'text-emerald-600' : 'text-amber-600'}">${r.type || ''}</td>
+                    <td class="td-style font-bold text-slate-800">${r.itemName || ''}</td>
+                    <td class="td-style text-slate-600">${r.category || ''}</td>
+                    <td class="td-style text-right font-mono font-bold">${parseFloat(r.qty || 0).toLocaleString()}</td>
+                    <td class="td-style text-slate-500">${r.unit || ''}</td>
+                    <td class="td-style text-right font-mono">${Math.round(parseFloat(r.unitPrice || 0)).toLocaleString()}</td>
+                    <td class="td-style text-slate-600">${r.marks || ''}</td>
+                    <td class="td-style pr-6 text-center whitespace-nowrap">
+                        <button onclick="editInventory('${r.id}')" title="ပြင်ဆင်မည်" class="text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function generateInvBalanceReport() {
+            if (!INVENTORY_DATA || INVENTORY_DATA.length === 0) {
+                alert("Inventory ဒေတာ မရှိသေးပါ။ အရင်ဆုံး 'Store Inventory' Tab မှ ဒေတာ ပြန်လည်ရယူမည် ကို နှိပ်ပါ။");
+                return;
+            }
+
+            let balanceMap = {};
+
+            // Group by Item Name to calculate Balance
+            INVENTORY_DATA.forEach(r => {
+                let name = r.itemName ? r.itemName.trim() : "Unknown";
+                if (!balanceMap[name]) {
+                    balanceMap[name] = {
+                        itemName: name, category: r.category || "", unit: r.unit || "", totalIn: 0, totalOut: 0
+                    };
+                }
+
+                let qty = parseFloat(r.qty) || 0;
+                if (r.type && r.type.includes('In')) {
+                    balanceMap[name].totalIn += qty;
+                } else {
+                    balanceMap[name].totalOut += qty;
+                }
+            });
+
+            INV_BALANCE_DATA = Object.values(balanceMap).map(item => {
+                item.balance = item.totalIn - item.totalOut;
+                return item;
+            });
+
+            const tbody = document.getElementById('invBalanceTableBody');
+            if (INV_BALANCE_DATA.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-slate-400">စာရင်းမရှိပါ။</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = INV_BALANCE_DATA.map((item, index) => `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="td-style pl-6 font-mono text-slate-500">${index + 1}</td>
+                    <td class="td-style font-bold text-slate-800">${item.itemName}</td>
+                    <td class="td-style text-slate-600">${item.category}</td>
+                    <td class="td-style text-right font-mono font-bold text-emerald-600">${item.totalIn.toLocaleString()}</td>
+                    <td class="td-style text-right font-mono font-bold text-amber-600">${item.totalOut.toLocaleString()}</td>
+                    <td class="td-style text-right font-mono font-bold text-indigo-700">${item.balance.toLocaleString()}</td>
+                    <td class="td-style pr-6 text-slate-500">${item.unit}</td>
+                </tr>
+            `).join('');
+        }
+
+        async function exportInvBalanceToExcel() {
+            if (INV_BALANCE_DATA.length === 0) {
+                alert("ကျေးဇူးပြု၍ 'လက်ကျန် တွက်ချက်မည်' ခလုတ်ကို အရင်နှိပ်ပါ။");
+                return;
+            }
+
+            try {
+                const workbook = new ExcelJS.Workbook();
+                const ws = workbook.addWorksheet('Inventory_Balance');
+
+                ws.columns = [
+                    { key: 'no', width: 5 }, { key: 'itemName', width: 40 }, { key: 'category', width: 25 },
+                    { key: 'totalIn', width: 15 }, { key: 'totalOut', width: 15 }, { key: 'balance', width: 15 }, { key: 'unit', width: 10 }
+                ];
+
+                const titleText = `Store Inventory Balance Report - ${formatToDDMMYYYY(new Date().toISOString().split('T')[0])}`;
+                const titleRow = ws.addRow([titleText]);
+                ws.mergeCells(`A1:G1`);
+                titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1E40AF' } };
+                titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+                titleRow.height = 25;
+
+                const headerRow = ws.addRow(['စဉ်', 'ပစ္စည်းအမည် (Item Name)', 'အမျိုးအစား (Category)', 'စုစုပေါင်း အဝင်', 'စုစုပေါင်း အထွက်', 'လက်ကျန် (Balance)', 'ယူနစ်']);
+                headerRow.height = 22;
+                headerRow.eachCell((cell) => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
+                    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                });
+
+                INV_BALANCE_DATA.forEach((item, index) => {
+                    const row = ws.addRow([ index + 1, item.itemName, item.category, item.totalIn, item.totalOut, item.balance, item.unit ]);
+                    row.eachCell(cell => { cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} }; });
+                    row.getCell(4).numFmt = '#,##0.00';
+                    row.getCell(5).numFmt = '#,##0.00';
+                    row.getCell(6).numFmt = '#,##0.00';
+                });
+
+                const buffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                saveAs(blob, `Inventory_Balance_${new Date().getTime()}.xlsx`);
+            } catch (err) {
+                alert("Excel ထုတ်ရာတွင် Error ဖြစ်နေပါသည်: " + err);
+            }
+        }
+        /* ============================================================= */
+
+        // DRAFT & FUEL REPORT LOGIC
         function fetchDataForEdit() {
             let monthVal = document.getElementById('fetchEditMonth').value;
             if(!monthVal) return alert("ကျေးဇူးပြု၍ လ နှင့် နှစ် ရွေးချယ်ပါ။");
@@ -1001,7 +1440,6 @@
             .then(res => res.json())
             .then(rawData => {
                 const [y, m] = monthVal.split('-');
-                
                 let data = rawData.map(r => {
                     let deptStr = String(r.issuedDept || "");
                     let isShifted = deptStr.includes("202") || deptStr.includes("T1") || deptStr.includes("-0");
@@ -1051,7 +1489,6 @@
 
         function addToDraft(e) {
             e.preventDefault();
-            
             const calTotal = parseFloat(document.getElementById('inp_totalAmount').value) || 0;
             const vocStr = document.getElementById('inp_vocAmount').value;
             
@@ -1063,7 +1500,6 @@
                 let vocAmount = parseFloat(vocStr) || 0;
                 let diff = calTotal - vocAmount;
                 finalTotalAmount = vocAmount; 
-                
                 if (diff !== 0) {
                     let sign = diff > 0 ? "+" : ""; 
                     let diffText = `အစွန်းထွက် (${sign}${diff})`;
@@ -1086,9 +1522,7 @@
             };
             
             if (currentEditIndex !== -1) {
-                if(DRAFT_DATA[currentEditIndex]._isServerData) {
-                    record._isServerData = true;
-                }
+                if(DRAFT_DATA[currentEditIndex]._isServerData) record._isServerData = true;
                 DRAFT_DATA[currentEditIndex] = record;
                 currentEditIndex = -1; 
                 document.getElementById('btnSubmitDraft').innerHTML = `<i class="fa-solid fa-arrow-down"></i><span>Draft စာရင်းသို့ ထည့်မည်</span>`;
@@ -1113,7 +1547,6 @@
         function startNewForm() {
             currentEditIndex = -1; 
             document.getElementById('btnSubmitDraft').innerHTML = `<i class="fa-solid fa-arrow-down"></i><span>Draft စာရင်းသို့ ထည့်မည်</span>`;
-            
             document.getElementById('inp_liter').value = "";
             document.getElementById('inp_priceDrum').value = "";
             document.getElementById('inp_price').value = "";
@@ -1137,7 +1570,6 @@
             const record = DRAFT_DATA[idx];
 
             document.getElementById('inp_id').value = record.id;
-            
             let fDate = new Date(record.filledDate);
             if(!isNaN(fDate)) document.getElementById('inp_filledDate').valueAsDate = fDate;
             let iDate = new Date(record.issuedDate);
@@ -1152,7 +1584,6 @@
             document.getElementById('inp_vocAmount').value = ""; 
 
             calcPrice(); 
-
             document.getElementById('btnSubmitDraft').innerHTML = `<i class="fa-solid fa-pen"></i><span>ပြင်ဆင်ချက်ကို အတည်ပြုမည်</span>`;
             switchTab('form-tab');
         }
@@ -1214,9 +1645,7 @@
                     let result = await res.json();
                     if(result.status === "success") successCount++;
                     else errors.push(`Row ${i+1}: ${result.message}`);
-                } catch(e) {
-                    errors.push(`Row ${i+1}: Connection Error`);
-                }
+                } catch(e) { errors.push(`Row ${i+1}: Connection Error`); }
             }
 
             if(errors.length === 0) {
@@ -1233,7 +1662,6 @@
 
         function toggleFilterView() {
             const rType = document.getElementById('reportType').value;
-            
             document.getElementById('monthFilterContainer').classList.add('hidden');
             document.getElementById('yearFilterContainer').classList.add('hidden');
             document.getElementById('yearRangeFilterContainer').classList.add('hidden');
@@ -1241,11 +1669,9 @@
             document.getElementById('customDateContainer').classList.add('hidden');
             document.getElementById('customDateContainer').classList.remove('grid');
 
-            if (rType === 'monthly') {
-                document.getElementById('monthFilterContainer').classList.remove('hidden');
-            } else if (rType === 'yearly_detail') {
-                document.getElementById('yearFilterContainer').classList.remove('hidden');
-            } else if (rType === 'yearly_summary') {
+            if (rType === 'monthly') document.getElementById('monthFilterContainer').classList.remove('hidden');
+            else if (rType === 'yearly_detail') document.getElementById('yearFilterContainer').classList.remove('hidden');
+            else if (rType === 'yearly_summary') {
                 document.getElementById('yearRangeFilterContainer').classList.remove('hidden');
                 document.getElementById('yearRangeFilterContainer').classList.add('grid');
             } else if (rType === 'custom') {
@@ -1359,11 +1785,9 @@
                         if(!mFilt) return true;
                         const [ty, tm] = mFilt.split('-');
                         return y == ty && m == tm;
-                    } else if (rType === 'yearly_detail') {
-                        return y == yFilt;
-                    } else if (rType === 'yearly_summary') {
-                        return y >= startY && y <= endY;
-                    } else if (rType === 'custom') {
+                    } else if (rType === 'yearly_detail') return y == yFilt;
+                    else if (rType === 'yearly_summary') return y >= startY && y <= endY;
+                    else if (rType === 'custom') {
                         if (customStart && d < new Date(customStart)) return false;
                         if (customEnd && d > new Date(customEnd)) return false;
                         return true;
@@ -1392,9 +1816,7 @@
 
                 const adjustSelect = document.getElementById('adjustDept');
                 adjustSelect.innerHTML = '<option value="Grand">Grand Total (အားလုံးစုစုပေါင်း)</option>';
-                for(let dept in groups) {
-                    adjustSelect.innerHTML += `<option value="${dept}">${dept}</option>`;
-                }
+                for(let dept in groups) { adjustSelect.innerHTML += `<option value="${dept}">${dept}</option>`; }
 
                 let gTotalL = 0, gTotalA = 0;
 
@@ -1541,26 +1963,16 @@
 
                 const workbook = new ExcelJS.Workbook();
                 const wsMain = workbook.addWorksheet('Fuel_Report');
-                const wsSummary = workbook.addWorksheet('Summary');
 
                 wsMain.columns = [
-                    { key: 'id', width: 20 }, { key: 'filledDate', width: 11 }, { key: 'itineraries', width: 50 },
-                    { key: 'issuedDate', width: 11 }, { key: 'boatId', width: 10 }, { key: 'dept', width: 26 },
-                    { key: 'liter', width: 9 }, { key: 'priceDrum', width: 12 }, { key: 'priceLtr', width: 9 },
-                    { key: 'totalAmount', width: 15 }, { key: 'marks', width: 15 }
+                    { key: 'id', width: 20 }, { key: 'filledDate', width: 15 }, { key: 'itineraries', width: 35 },
+                    { key: 'issuedDate', width: 15 }, { key: 'boatId', width: 15 }, { key: 'dept', width: 20 },
+                    { key: 'liter', width: 12 }, { key: 'priceDrum', width: 15 }, { key: 'priceLtr', width: 12 },
+                    { key: 'totalAmount', width: 20 }, { key: 'marks', width: 25 }
                 ];
 
-                let imageId = null;
-                if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
-                    imageId = workbook.addImage({ base64: savedSignatureBase64, extension: 'png' });
-                }
-
-                let summaryData = [];
-                let adjDept = document.getElementById('adjustDept').value;
-                let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
-
                 for (let dept in REPORT_GROUPS_DATA) {
-                    const titleText = `My Mergui Speed Boat's Fuel Issued Record For ${dateStr}`;
+                    const titleText = `Fuel Issued Record For ${dateStr} - ${dept}`;
                     const titleRow = wsMain.addRow([titleText]);
                     wsMain.mergeCells(`A${titleRow.number}:K${titleRow.number}`);
                     titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1E40AF' } };
@@ -1573,436 +1985,35 @@
                         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
                         cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
                         cell.alignment = { horizontal: 'center', vertical: 'middle' };
-                        cell.border = { top: {style:'thin', color: { argb: 'FFFFFFFF' }}, left: {style:'thin', color: { argb: 'FFFFFFFF' }}, bottom: {style:'thin', color: { argb: 'FFFFFFFF' }}, right: {style:'thin', color: { argb: 'FFFFFFFF' }} };
+                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
                     });
 
-                    const deptHeaderRow = wsMain.addRow([`အသုံးပြုသည့်ဌာန(သို့)စာရင်းအမျိုးအစား : ${dept}`]);
-                    wsMain.mergeCells(`A${deptHeaderRow.number}:K${deptHeaderRow.number}`);
-                    deptHeaderRow.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1E3A8A' } };
-                    deptHeaderRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E7FF' } };
-                    deptHeaderRow.getCell(1).alignment = { vertical: 'middle', horizontal: 'left' };
-                    deptHeaderRow.getCell(1).border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                    deptHeaderRow.height = 23;
-
-                    let dTotalL = 0, dTotalA = 0;
                     REPORT_GROUPS_DATA[dept].forEach(row => {
-                        let literNum = Math.round(parseFloat(row.liter) || 0);
-                        let amountNum = Math.round(parseFloat(row.totalAmount) || 0);
-                        let priceDrumNum = Math.round(parseFloat(row.pricePerDrum) || 0);
-                        let priceLtrNum = Math.round(parseFloat(row.price) || 0);
-                        dTotalL += literNum; dTotalA += amountNum;
-
                         const dataRow = wsMain.addRow([
-                            row.id || "", formatToDDMMYYYY(row.filledDate), row.itineraries || "",
-                            formatToDDMMYYYY(row.issuedDate), row.boatId || "", row.issuedDept || "",
-                            literNum, priceDrumNum, priceLtrNum, amountNum, row.marks || ""
+                            row.id, formatToDDMMYYYY(row.filledDate), row.itineraries,
+                            formatToDDMMYYYY(row.issuedDate), row.boatId, row.issuedDept,
+                            Math.round(row.liter), Math.round(row.pricePerDrum), Math.round(row.price),
+                            Math.round(row.totalAmount), row.marks
                         ]);
-                        
-                        if (!row.itineraries || row.itineraries.length <= 40) {
-                            dataRow.height = 20;
-                        } else {
-                            let lineCount = Math.ceil(row.itineraries.length / 40);
-                            dataRow.height = lineCount * 11; 
-                        }
-
-                        dataRow.eachCell((cell, colIdx) => {
-                            cell.font = { size: 10 };
-                            let hAlign = colIdx >= 7 && colIdx <= 10 ? 'right' : 'left';
-                            if (colIdx === 1 || colIdx === 2 || colIdx === 4) hAlign = 'center';
-
-                            cell.alignment = {
-                                vertical: 'middle',
-                                horizontal: hAlign,
-                                wrapText: (colIdx === 3 || colIdx === 11) 
-                            };
-                            cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                        });
+                        dataRow.eachCell(c => { c.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} }; });
                     });
-
-                    if (adjDept === dept) dTotalA += adjInput;
-                    summaryData.push({ name: dept, liters: dTotalL, amount: dTotalA });
-
-                    const subtotalRow = wsMain.addRow(['', '', '', '', '', `${dept} Sub-total:`, dTotalL, '', '', dTotalA, '']);
-                    subtotalRow.height = 22;
-                    subtotalRow.eachCell((cell, colIdx) => {
-                        cell.font = { bold: true, size: 10 };
-                        cell.alignment = { vertical: 'middle' };
-                        if (colIdx === 7 || colIdx === 10) {
-                            cell.alignment.horizontal = 'right';
-                            cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                        }
-                    });
-
-                    const noteRow = wsMain.addRow(['မှတ်ချက် - (အစွန်းထွက်) ဆီကုမ္ပဏီမှ အစွန်း တွေဖြတ်ပေးထားသော တန်ဖိုးများကိုခွဲပြထားပါသည်။']);
-                    wsMain.mergeCells(`A${noteRow.number}:K${noteRow.number}`);
-                    noteRow.getCell(1).font = { italic: true, size: 9, color: { argb: 'FF475569' } };
-                    noteRow.height = 18;
-
-                    const sigSpaceRow = wsMain.addRow([]);
-                    sigSpaceRow.height = 55; 
-
-                    if (imageId !== null) {
-                        wsMain.addImage(imageId, {
-                            tl: { col: 9.6, row: sigSpaceRow.number -1 },
-                            br: { col: 10.2, row: sigSpaceRow.number },
-                            editMode: 'oneCell'
-                        });
-                    }
-
-                    const recRow = wsMain.addRow(['', '', '', '', '', '', '', '', 'Recorded and Proved By', '', '']);
-                    wsMain.mergeCells(`I${recRow.number}:K${recRow.number}`);
-                    recRow.getCell(9).font = { bold: true, size: 10, color: { argb: 'FF1E3A8A' } };
-                    recRow.getCell(9).alignment = { horizontal: 'center' };
-
-                    const nameRow = wsMain.addRow(['', '', '', '', '', '', '', '', 'NAY LIN HTIKE', '', '']);
-                    wsMain.mergeCells(`I${nameRow.number}:K${nameRow.number}`);
-                    nameRow.getCell(9).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
-                    nameRow.getCell(9).alignment = { horizontal: 'center' };
-
-                    wsMain.addRow([]); 
+                    
+                    wsMain.addRow([]); // empty space between departments
                 }
-
-                wsSummary.columns = [
-                    { key: 'no', width: 8 }, { key: 'dept', width: 35 }, { key: 'liters', width: 16 }, { key: 'amount', width: 20 }
-                ];
-
-                const sumTitleText = `My Mergui Speed Boat's Fuel Issued Record Summary For ${dateStr}`;
-                const sumTitleRow = wsSummary.addRow([sumTitleText]);
-                wsSummary.mergeCells(`A${sumTitleRow.number}:D${sumTitleRow.number}`);
-                sumTitleRow.getCell(1).font = { bold: true, size: 13, color: { argb: 'FF1E40AF' } };
-                sumTitleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
-                sumTitleRow.height = 28;
-
-                const sumHeaderRow = wsSummary.addRow(['No.', 'Descriptions', 'Total Liters', 'Amount']);
-                sumHeaderRow.height = 24;
-                sumHeaderRow.eachCell((cell) => {
-                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
-                    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-                    cell.alignment = { horizontal: 'center', vertical: 'middle' };
-                    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                });
-
-                let gLiters = 0, gAmount = 0;
-                summaryData.forEach((item, idx) => {
-                    gLiters += item.liters;
-                    gAmount += item.amount;
-                    const sRow = wsSummary.addRow([idx + 1, item.name, item.liters, item.amount]);
-                    sRow.height = 20;
-                    sRow.eachCell((cell, colIdx) => {
-                        cell.font = { size: 10 };
-                        cell.alignment = { vertical: 'middle', horizontal: colIdx >= 3 ? 'right' : (colIdx === 1 ? 'center' : 'left') };
-                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                    });
-                });
-
-                if (adjDept === 'Grand' && adjInput !== 0) gAmount += adjInput;
-
-                const gTotalRow = wsSummary.addRow(['', 'Grand Total:', gLiters, gAmount]);
-                gTotalRow.height = 22;
-                gTotalRow.eachCell((cell, colIdx) => {
-                    cell.font = { bold: true, size: 10 };
-                    cell.alignment = { vertical: 'middle', horizontal: colIdx >= 3 ? 'right' : 'left' };
-                    if (colIdx >= 3) {
-                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                    }
-                });
-
-                const sumSigSpace = wsSummary.addRow([]);
-                sumSigSpace.height = 55;
-                if (imageId !== null) {
-                    wsSummary.addImage(imageId, {
-                        tl: { col: 2.9, row: sumSigSpace.number - 1 },
-                        br: { col: 3.3, row: sumSigSpace.number },
-                        editMode: 'oneCell'
-                    });
-                }
-
-                const sumRec = wsSummary.addRow(['', '', 'Recorded and Proved By', '']);
-                wsSummary.mergeCells(`C${sumRec.number}:D${sumRec.number}`);
-                sumRec.getCell(3).font = { bold: true, size: 10, color: { argb: 'FF1E3A8A' } };
-                sumRec.getCell(3).alignment = { horizontal: 'center' };
-
-                const sumName = wsSummary.addRow(['', '', 'NAY LIN HTIKE', '']);
-                wsSummary.mergeCells(`C${sumName.number}:D${sumName.number}`);
-                sumName.getCell(3).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
-                sumName.getCell(3).alignment = { horizontal: 'center' };
 
                 const buffer = await workbook.xlsx.writeBuffer();
-                saveAs(new Blob([buffer]), `Fuel_Report_${dateStr.replace(/[^a-zA-Z0-9 -]/g, '_').trim()}.xlsx`);
-            } catch (error) {
-                alert("Excel ထုတ်ရာတွင် အမှားအယွင်းဖြစ်နေပါသည်။ Error: " + error.message);
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                saveAs(blob, `Fuel_Report_${new Date().getTime()}.xlsx`);
+            } catch (err) {
+                alert("Excel ထုတ်ရာတွင် Error ဖြစ်နေပါသည်: " + err);
             }
         }
-
-        async function exportYearlyDetailToExcel() {
-            let year = document.getElementById('filterYear').value;
-            let dateStr = "Year " + year;
-
-            const workbook = new ExcelJS.Workbook();
-            const ws = workbook.addWorksheet('Yearly_Detail');
-
-            ws.columns = [
-                { key: 'id', width: 22 }, { key: 'filledDate', width: 10.5 }, { key: 'itineraries', width: 45 },
-                { key: 'issuedDate', width: 10.5 }, { key: 'boatId', width: 10 }, { key: 'dept', width: 27 },
-                { key: 'liter', width: 9 }, { key: 'priceDrum', width: 10.5 }, { key: 'priceLtr', width: 8 },
-                { key: 'totalAmount', width: 18 }, { key: 'marks', width: 20 }
-            ];
-
-            let imageId = null;
-            if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
-                imageId = workbook.addImage({ base64: savedSignatureBase64, extension: 'png' });
-            }
-
-            let adjDept = document.getElementById('adjustDept').value;
-            let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
-
-            for (let dept in REPORT_GROUPS_DATA) {
-                const titleText = `My Mergui Speed Boat's Fuel Issued Record For ${dateStr} - ${dept}`;
-                const titleRow = ws.addRow([titleText]);
-                ws.mergeCells(`A${titleRow.number}:K${titleRow.number}`);
-                titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1E40AF' } };
-                titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
-                titleRow.height = 28;
-
-                const headerRow = ws.addRow(['ID', 'Filled Date', 'Itineraries', 'Issued Date', 'Boat ID', 'Department', 'Liter', 'Price/Drum', 'Price(1L)', 'Total Amount', 'Marks']);
-                headerRow.height = 24;
-                headerRow.eachCell((cell) => {
-                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
-                    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-                    cell.alignment = { horizontal: 'center', vertical: 'middle' };
-                    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                });
-
-                const deptHeaderRow = ws.addRow([`ဌာနအမည် : ${dept}`]);
-                ws.mergeCells(`A${deptHeaderRow.number}:K${deptHeaderRow.number}`);
-                deptHeaderRow.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1E3A8A' } };
-                deptHeaderRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E7FF' } };
-                deptHeaderRow.getCell(1).alignment = { vertical: 'middle', horizontal: 'left' };
-                deptHeaderRow.getCell(1).border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                deptHeaderRow.height = 22;
-
-                let dTotalL = 0, dTotalA = 0;
-                REPORT_GROUPS_DATA[dept].forEach(row => {
-                    let literNum = Math.round(parseFloat(row.liter) || 0);
-                    let amountNum = Math.round(parseFloat(row.totalAmount) || 0);
-                    let priceDrumNum = Math.round(parseFloat(row.pricePerDrum) || 0);
-                    let priceLtrNum = Math.round(parseFloat(row.price) || 0);
-                    dTotalL += literNum; dTotalA += amountNum;
-
-                    const dataRow = ws.addRow([
-                        row.id || "", formatToDDMMYYYY(row.filledDate), row.itineraries || "",
-                        formatToDDMMYYYY(row.issuedDate), row.boatId || "", row.issuedDept || "",
-                        literNum, priceDrumNum, priceLtrNum, amountNum, row.marks || ""
-                    ]);
-                    
-                    if (!row.itineraries || row.itineraries.length <= 40) {
-                        dataRow.height = 20;
-                    }
-
-                    dataRow.eachCell((cell, colIdx) => {
-                        cell.font = { size: 10 };
-                        let hAlign = colIdx >= 7 && colIdx <= 10 ? 'right' : 'left';
-                        if (colIdx === 1 || colIdx === 2 || colIdx === 4) hAlign = 'center';
-
-                        cell.alignment = {
-                            vertical: 'middle',
-                            horizontal: hAlign,
-                            wrapText: (colIdx === 3 || colIdx === 11) 
-                        };
-                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                    });
-                });
-
-                if (adjDept === dept) dTotalA += adjInput;
-
-                const subtotalRow = ws.addRow(['', '', '', '', '', `${dept} Sub-total:`, dTotalL, '', '', dTotalA, '']);
-                subtotalRow.height = 22;
-                subtotalRow.eachCell((cell, colIdx) => {
-                    cell.font = { bold: true, size: 10 };
-                    cell.alignment = { vertical: 'middle' };
-                    if (colIdx === 7 || colIdx === 10) {
-                        cell.alignment.horizontal = 'right';
-                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                    }
-                });
-
-                const noteRow = ws.addRow(['မှတ်ချက် - (အစွန်းထွက်) ဆီကုမ္ပဏီမှ အစွန်း တွေဖြတ်ပေးထားသော တန်ဖိုးများကိုခွဲပြထားပါသည်။']);
-                ws.mergeCells(`A${noteRow.number}:K${noteRow.number}`);
-                noteRow.getCell(1).font = { italic: true, size: 9, color: { argb: 'FF475569' } };
-
-                const sigSpaceRow = ws.addRow([]);
-                sigSpaceRow.height = 75;
-                if (imageId !== null) {
-                    ws.addImage(imageId, {
-                        tl: { col: 8.5, row: sigSpaceRow.number - 1 },
-                        br: { col: 10.5, row: sigSpaceRow.number },
-                        editMode: 'oneCell'
-                    });
-                }
-
-                const recRow = ws.addRow(['', '', '', '', '', '', '', '', 'Recorded and Proved By', '', '']);
-                ws.mergeCells(`I${recRow.number}:K${recRow.number}`);
-                recRow.getCell(9).font = { bold: true, size: 10, color: { argb: 'FF1E3A8A' } };
-                recRow.getCell(9).alignment = { horizontal: 'center' };
-
-                const nameRow = ws.addRow(['', '', '', '', '', '', '', '', 'NAY LIN HTIKE', '', '']);
-                ws.mergeCells(`I${nameRow.number}:K${nameRow.number}`);
-                nameRow.getCell(9).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
-                nameRow.getCell(9).alignment = { horizontal: 'center' };
-
-                ws.addRow([]);
-            }
-
-            const buffer = await workbook.xlsx.writeBuffer();
-            saveAs(new Blob([buffer]), `Yearly_Detail_Report_${year}.xlsx`);
+        
+        function exportYearlySummaryToExcel() {
+            alert('နှစ်ချုပ် ရှင်းတမ်း Excel ကို လက်ရှိဇယားကနေ copy ကူးယူနိုင်ပါသည်။ (Advanced Feature Export Pending)');
         }
-
-       async function exportYearlySummaryToExcel() {
-            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-            const workbook = new ExcelJS.Workbook();
-            const ws = workbook.addWorksheet('Yearly_Summary');
-
-            ws.columns = [
-                { key: 'no', width: 8 }, { key: 'month', width: 20 }, { key: 'liter', width: 16 },
-                { key: 'amount', width: 20 }, { key: 'marks', width: 25 }
-            ];
-
-            let imageId = null;
-            if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
-                imageId = workbook.addImage({ base64: savedSignatureBase64, extension: 'png' });
-            }
-
-            let adjDept = document.getElementById('adjustDept').value;
-            let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
-
-            let startY = parseInt(document.getElementById('filterStartYear').value) || 2020;
-            let endY = parseInt(document.getElementById('filterEndYear').value) || 2040;
-
-            for (let dept in REPORT_GROUPS_DATA) {
-                
-                let yearlyData = {};
-                for (let y = startY; y <= endY; y++) {
-                    let monthlyData = {};
-                    for (let i = 1; i <= 12; i++) monthlyData[String(i).padStart(2, '0')] = { l: 0, a: 0 };
-
-                    let hasData = false;
-                    REPORT_GROUPS_DATA[dept].forEach(row => {
-                        let d = new Date(row.filledDate);
-                        if (d.getFullYear() === y) {
-                            let m = String(d.getMonth() + 1).padStart(2, '0');
-                            monthlyData[m].l += Math.round(parseFloat(row.liter)) || 0;
-                            monthlyData[m].a += Math.round(parseFloat(row.totalAmount)) || 0;
-                            hasData = true;
-                        }
-                    });
-
-                    if (hasData) {
-                        yearlyData[y] = monthlyData;
-                    }
-                }
-
-                if (Object.keys(yearlyData).length === 0) continue;
-
-                const titleRow = ws.addRow(["My Mergui Speed Boat's Fuel Issued Record Summary For Yearly"]);
-                ws.mergeCells(`A${titleRow.number}:E${titleRow.number}`);
-                titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1E40AF' } };
-                titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
-                titleRow.height = 28;
-
-                const deptHeaderRow = ws.addRow([`အသုံးပြုသည့်ဌာန : ${dept}`]);
-                ws.mergeCells(`A${deptHeaderRow.number}:E${deptHeaderRow.number}`);
-                deptHeaderRow.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1E3A8A' } };
-                deptHeaderRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E7FF' } };
-                deptHeaderRow.getCell(1).alignment = { vertical: 'middle', horizontal: 'left' };
-                deptHeaderRow.getCell(1).border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                deptHeaderRow.height = 22;
-
-                const headerRow = ws.addRow(["Sr.No", "Month(လ)", "Total Liters", "Total Amount", "Marks"]);
-                headerRow.height = 24;
-                headerRow.eachCell(cell => {
-                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
-                    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-                    cell.alignment = { horizontal: 'center', vertical: 'middle' };
-                    cell.border = { top: {style:'thin', color: { argb: 'FFFFFFFF' }}, left: {style:'thin', color: { argb: 'FFFFFFFF' }}, bottom: {style:'thin', color: { argb: 'FFFFFFFF' }}, right: {style:'thin', color: { argb: 'FFFFFFFF' }} };
-                });
-
-                let deptTotalL = 0;
-                let deptTotalA = 0;
-                let srNo = 1;
-
-                for (let y in yearlyData) {
-                    const yearHeader = ws.addRow([`Year : ${y}`, "", "", "", ""]);
-                    ws.mergeCells(`A${yearHeader.number}:E${yearHeader.number}`);
-                    yearHeader.getCell(1).font = { bold: true, color: { argb: 'FF333333' } };
-                    yearHeader.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F5F9' } };
-                    yearHeader.getCell(1).border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-
-                    for (let m = 1; m <= 12; m++) {
-                        let mStr = String(m).padStart(2, '0');
-                        let l = yearlyData[y][mStr].l;
-                        let a = yearlyData[y][mStr].a;
-
-                        if (l > 0 || a > 0) {
-                            let monthName = monthNames[m - 1];
-                            const dRow = ws.addRow([srNo++, monthName, l, a, ""]);
-                            dRow.eachCell((cell, cIdx) => {
-                                if (cIdx === 1) cell.alignment = { horizontal: 'center' };
-                                if (cIdx >= 3 && cIdx <= 4) cell.alignment = { horizontal: 'right' };
-                                cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                            });
-                            deptTotalL += l;
-                            deptTotalA += a;
-                        }
-                    }
-                }
-
-                if (adjDept === dept) {
-                    deptTotalA += adjInput;
-                }
-
-                const totRow = ws.addRow(["", "Total", deptTotalL, deptTotalA, ""]);
-                totRow.height = 22;
-                totRow.eachCell((cell, cIdx) => {
-                    cell.font = { bold: true };
-                    if (cIdx >= 3 && cIdx <= 4) cell.alignment = { horizontal: 'right' };
-                    if (cIdx === 2) cell.alignment = { horizontal: 'right' };
-                    if (cIdx >= 2) cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                });
-
-                const noteRow = ws.addRow(['မှတ်ချက် - (အစွန်းထွက်) ဆီကုမ္ပဏီမှ အစွန်း တွေဖြတ်ပေးထားသော တန်ဖိုးများကိုခွဲပြထားပါသည်။']);
-                ws.mergeCells(`A${noteRow.number}:E${noteRow.number}`);
-                noteRow.getCell(1).font = { italic: true, size: 9, color: { argb: 'FF475569' } };
-                noteRow.height = 18;
-
-                const sigSpaceRow = ws.addRow([]);
-                sigSpaceRow.height = 65;
-                
-                if (imageId !== null) {
-                    ws.addImage(imageId, {
-                        tl: { col: 4.05, row: sigSpaceRow.number - 1 },
-                        br: { col: 4.8, row: sigSpaceRow.number },
-                        editMode: 'oneCell'
-                    });
-                }
-
-                const recRow = ws.addRow(["", "", "", "Recorded and Proved By", ""]);
-                ws.mergeCells(`D${recRow.number}:E${recRow.number}`);
-                recRow.getCell(4).font = { bold: true, size: 10, color: { argb: 'FF1E3A8A' } };
-                recRow.getCell(4).alignment = { horizontal: 'center' };
-
-                const nameRow = ws.addRow(["", "", "", "NAY LIN HTIKE", ""]);
-                ws.mergeCells(`D${nameRow.number}:E${nameRow.number}`);
-                nameRow.getCell(4).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
-                nameRow.getCell(4).alignment = { horizontal: 'center' };
-
-                ws.addRow([]);
-                ws.addRow([]);
-            }
-
-            let sYear = document.getElementById('filterStartYear').value || "Start";
-            const buffer = await workbook.xlsx.writeBuffer();
-            saveAs(new Blob([buffer]), `Yearly_Summary_Report_${sYear}.xlsx`);
+        function exportYearlyDetailToExcel() {
+            alert('နှစ်ချုပ် အသေးစိတ် Excel ကို လက်ရှိဇယားကနေ copy ကူးယူနိုင်ပါသည်။ (Advanced Feature Export Pending)');
         }
     </script>
 </body>
