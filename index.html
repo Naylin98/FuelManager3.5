@@ -775,9 +775,9 @@
     <script>
         // System Config Variables
         let WEB_APP_URL = localStorage.getItem('v5_google_web_app_url') || "";
-        let savedSignatureBase64 = localStorage.getItem('v5_signature_base64') || "";
+        let savedSignatureBase64 ="https://drive.google.com/uc?export=view&id=1p40Fd1NlC7NIYrWSorNbvfexX3CclFys"; // ဤနေရာတွင် Local Storage မှ ဖတ်ရန်ပြင်ထားပါသည်
         let savedBgLogoBase64 = localStorage.getItem('v5_bglogo_base64') || "";
-        const defaultBgLogoImage = "a9ff3634-4cf4-4f48-b184-e2c0e6d81cdf.jpg";
+        const defaultBgLogoImage ="https://drive.google.com/uc?export=view&id=14S7ZJ65KM1gXNrvNDiioehWEYVBgKcS-";
         
         let DRAFT_DATA = [];
         let INVENTORY_DATA = []; 
@@ -878,28 +878,33 @@
             document.querySelectorAll('.system-logo').forEach(img => { img.src = imgSrc; });
         }
 
-        function saveBgLogo() {
-            const fileInput = document.getElementById('bgLogoUpload');
-            if (fileInput.files.length === 0) return alert("ကျေးဇူးပြု၍ ပုံရွေးချယ်ပါ။");
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64String = e.target.result;
-                localStorage.setItem('v5_bglogo_base64', base64String);
-                savedBgLogoBase64 = base64String;
-                applyBgLogo();
-                alert("နောက်ခံနှင့် လိုဂိုပုံ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
-                fileInput.value = ""; 
-            };
-            reader.readAsDataURL(file);
-        }
+        // နောက်ခံနှင့် လိုဂိုပုံပြောင်းရန် (Background & Logo Upload)
+function saveBgLogo() {
+    const fileInput = document.getElementById('bgLogoUpload');
+    if (fileInput.files.length === 0) return alert("ကျေးဇူးပြု၍ ပုံရွေးချယ်ပါ။");
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    reader.onload = async function(e) { // async ပြောင်းထားသည်
+        const base64String = e.target.result;
+        localStorage.setItem('v5_bglogo_base64', base64String);
+        savedBgLogoBase64 = base64String;
+        applyBgLogo();
+        await saveSettingsToSheet(); // Google Sheet သို့ ပို့ရန်
+        alert("နောက်ခံနှင့် လိုဂိုပုံ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
+        fileInput.value = ""; 
+    };
+    reader.readAsDataURL(file);
+}
 
-        function resetBgLogo() {
-            localStorage.removeItem('v5_bglogo_base64');
-            savedBgLogoBase64 = "";
-            applyBgLogo();
-            alert("မူလပုံစံသို့ ပြန်လည်ပြောင်းလဲပြီးပါပြီ။");
-        }
+function resetBgLogo() {
+    localStorage.removeItem('v5_bglogo_base64');
+    savedBgLogoBase64 = "";
+    applyBgLogo();
+    saveSettingsToSheet(); // Google Sheet သို့ ပို့ရန်
+    alert("မူလပုံစံသို့ ပြန်လည်ပြောင်းလဲပြီးပါပြီ။");
+}
+
+
 
         function toggleSidebar(forceState) {
             const sidebar = document.getElementById('mainSidebar');
@@ -1082,47 +1087,90 @@
         }
 
         function saveSignature() {
-            const fileInput = document.getElementById('signatureUpload');
-            if (fileInput.files.length === 0) return alert("ကျေးဇူးပြု၍ ပုံရွေးချယ်ပါ။");
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64String = e.target.result;
-                localStorage.setItem('v5_signature_base64', base64String);
-                savedSignatureBase64 = base64String;
-                loadSignaturePreview();
-                alert("လက်မှတ်ပုံ (Signature) အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
-                fileInput.value = ""; 
-            };
-            reader.readAsDataURL(file);
-        }
+    const fileInput = document.getElementById('signatureUpload');
+    if (fileInput.files.length === 0) return alert("ကျေးဇူးပြု၍ ပုံရွေးချယ်ပါ။");
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    reader.onload = async function(e) { // async ပြောင်းထားသည်
+        const base64String = e.target.result;
+        localStorage.setItem('v5_signature_base64', base64String);
+        savedSignatureBase64 = base64String;
+        loadSignaturePreview();
+        await saveSettingsToSheet(); // Google Sheet သို့ ပို့ရန်
+        alert("လက်မှတ်ပုံ (Signature) အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
+        fileInput.value = ""; 
+    };
+    reader.readAsDataURL(file);
+}
 
-        async function fetchSettingsFromSheet() {
+
+async function fetchSettingsFromSheet() {
             if(!WEB_APP_URL) return;
             try {
                 let res = await fetch(`${WEB_APP_URL}?action=getSettings`, { redirect: "follow" });
                 let data = await res.json();
-                if(data && data.boats && data.depts) {
-                    if(data.boats.length > 0) localStorage.setItem('v5_boat_ids', JSON.stringify(data.boats));
-                    if(data.depts.length > 0) localStorage.setItem('v5_departments', JSON.stringify(data.depts));
+                
+                if(data) {
+                    let fetchedBoats = data.boats || data.boatsData || [];
+                    let fetchedDepts = data.depts || data.deptsData || [];
+                    
+                    if(fetchedBoats.length > 0) localStorage.setItem('v5_boat_ids', JSON.stringify(fetchedBoats));
+                    if(fetchedDepts.length > 0) localStorage.setItem('v5_departments', JSON.stringify(fetchedDepts));
+                    
+                    // Google Drive Link ကို Direct Link အဖြစ် ပြောင်းပေးမည့် Helper Function
+                    const makeDirectLink = (url) => {
+                        if (url && url.includes("drive.google.com")) {
+                            let match = url.match(/id=([^&]+)/) || url.match(/d\/([a-zA-Z0-9_-]+)/);
+                            if (match) return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+                        }
+                        return url;
+                    };
+
+                    // Logo အား Google Sheet မှ ပြန်ခေါ်ခြင်း
+                    if(data.bgLogo) {
+                        let finalBgLogo = makeDirectLink(data.bgLogo);
+                        localStorage.setItem('v5_bglogo_base64', finalBgLogo);
+                        savedBgLogoBase64 = finalBgLogo;
+                        applyBgLogo();
+                    }
+                    
+                    // Signature အား Google Sheet မှ ပြန်ခေါ်ခြင်း
+                    if(data.signature) {
+                        let finalSignature = makeDirectLink(data.signature);
+                        localStorage.setItem('v5_signature_base64', finalSignature);
+                        savedSignatureBase64 = finalSignature;
+                        loadSignaturePreview();
+                    }
+                    
                     refreshUI();
                 }
             } catch(e) { console.log("Settings fetch error:", e); }
         }
 
         async function saveSettingsToSheet() {
-            if(!WEB_APP_URL) return;
-            const boats = JSON.parse(localStorage.getItem('v5_boat_ids') || '[]');
-            const depts = JSON.parse(localStorage.getItem('v5_departments') || '[]');
-            try {
-                await fetch(WEB_APP_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    redirect: "follow",
-                    body: JSON.stringify({ action: "saveSettings", boats: boats, depts: depts })
-                });
-            } catch(e) { alert("စနစ်ချိတ်ဆက်မှု အမှားအယွင်းဖြစ်နေပါသည်။"); }
-        }
+    if(!WEB_APP_URL) return;
+    
+    const boats = JSON.parse(localStorage.getItem('v5_boat_ids') || '[]');
+    const depts = JSON.parse(localStorage.getItem('v5_departments') || '[]');
+    
+    try {
+        await fetch(WEB_APP_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                action: "saveSettings",
+                bgLogo: typeof savedBgLogoBase64 !== 'undefined' ? savedBgLogoBase64 : "", 
+                signature: typeof savedSignatureBase64 !== 'undefined' ? savedSignatureBase64 : "",
+                boats: boats, 
+                depts: depts,
+                boatsData: boats, // နောက်ခံ Script ဗားရှင်းအားလုံးနှင့် အဆင်ပြေစေရန်
+                deptsData: depts
+            })
+        });
+    } catch(e) { 
+        console.log("Settings Sync Error:", e);
+        alert("စနစ်ချိတ်ဆက်မှု အမှားအယွင်းဖြစ်နေပါသည်။ API Link ကိုစစ်ဆေးပါ။"); 
+    }
+}
 
         function loadDropdownOptions() {
             const boats = JSON.parse(localStorage.getItem('v5_boat_ids') || '[]');
@@ -1389,7 +1437,7 @@
 
                 ws.columns = [
                     { key: 'no', width: 5 }, { key: 'itemName', width: 40 }, { key: 'category', width: 25 },
-                    { key: 'totalIn', width: 15 }, { key: 'totalOut', width: 15 }, { key: 'balance', width: 15 }, { key: 'unit', width: 10 }
+                    { key: 'totalIn', width: 15 }, { key: 'totalOut', width: 15 }, { key: 'balance', width: 20 }, { key: 'unit', width: 10 }
                 ];
 
                 const titleText = `Store Inventory Balance Report - ${formatToDDMMYYYY(new Date().toISOString().split('T')[0])}`;
@@ -1407,6 +1455,11 @@
                     cell.alignment = { horizontal: 'center', vertical: 'middle' };
                     cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
                 });
+                
+                let imageId = null;
+            if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
+                imageId = workbook.addImage({ base64: savedSignatureBase64, extension: 'png' });
+            }
 
                 INV_BALANCE_DATA.forEach((item, index) => {
                     const row = ws.addRow([ index + 1, item.itemName, item.category, item.totalIn, item.totalOut, item.balance, item.unit ]);
@@ -1415,6 +1468,26 @@
                     row.getCell(5).numFmt = '#,##0.00';
                     row.getCell(6).numFmt = '#,##0.00';
                 });
+
+                const sigSpaceRow = ws.addRow([]);
+                sigSpaceRow.height = 55;
+                if (imageId !== null) {
+                    ws.addImage(imageId, {
+                        tl: { col: 5.2, row: sigSpaceRow.number -1 },
+                        br: { col: 6.1, row: sigSpaceRow.number },
+                        editMode: 'oneCell'
+                    });
+                }
+
+                const recRow = ws.addRow(['', '', '', '','','Prepared By(ပြင်ဆင်သူ)', '']);
+                ws.mergeCells(`I${recRow.number}:K${recRow.number}`);
+                recRow.getCell(6).font = { bold: true, size: 10, color: { argb: 'FF1E3A8A' } };
+                recRow.getCell(6).alignment = { horizontal: 'center' };
+
+                const nameRow = ws.addRow(['', '', '', '','','NAY LIN HTIKE','']);
+                ws.mergeCells(`I${nameRow.number}:K${nameRow.number}`);
+                nameRow.getCell(6).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
+                nameRow.getCell(6).alignment = { horizontal: 'center' };
 
                 const buffer = await workbook.xlsx.writeBuffer();
                 const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -1934,7 +2007,7 @@
             });
         }
         
-        async function exportToExcel() {
+async function exportToExcel() {
             try {
                 if (!isReportGenerated) {
                     alert("ကျေးဇူးပြု၍ 'ရှာဖွေမည်' ခလုတ်ကို အရင်နှိပ်ပြီး Report ထုတ်ပါ။");
@@ -1963,16 +2036,26 @@
 
                 const workbook = new ExcelJS.Workbook();
                 const wsMain = workbook.addWorksheet('Fuel_Report');
+                const wsSummary = workbook.addWorksheet('Summary');
 
                 wsMain.columns = [
-                    { key: 'id', width: 20 }, { key: 'filledDate', width: 15 }, { key: 'itineraries', width: 35 },
-                    { key: 'issuedDate', width: 15 }, { key: 'boatId', width: 15 }, { key: 'dept', width: 20 },
-                    { key: 'liter', width: 12 }, { key: 'priceDrum', width: 15 }, { key: 'priceLtr', width: 12 },
-                    { key: 'totalAmount', width: 20 }, { key: 'marks', width: 25 }
+                    { key: 'id', width: 20 }, { key: 'filledDate', width: 11 }, { key: 'itineraries', width: 50 },
+                    { key: 'issuedDate', width: 11 }, { key: 'boatId', width: 10 }, { key: 'dept', width: 26 },
+                    { key: 'liter', width: 9 }, { key: 'priceDrum', width: 12 }, { key: 'priceLtr', width: 9 },
+                    { key: 'totalAmount', width: 15 }, { key: 'marks', width: 15 }
                 ];
 
+                let imageId = null;
+                if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
+                    imageId = workbook.addImage({ base64: savedSignatureBase64, extension: 'png' });
+                }
+
+                let summaryData = [];
+                let adjDept = document.getElementById('adjustDept').value;
+                let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
+
                 for (let dept in REPORT_GROUPS_DATA) {
-                    const titleText = `Fuel Issued Record For ${dateStr} - ${dept}`;
+                    const titleText = `My Mergui Speed Boat's Fuel Issued Record For ${dateStr}`;
                     const titleRow = wsMain.addRow([titleText]);
                     wsMain.mergeCells(`A${titleRow.number}:K${titleRow.number}`);
                     titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1E40AF' } };
@@ -1985,35 +2068,384 @@
                         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
                         cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
                         cell.alignment = { horizontal: 'center', vertical: 'middle' };
-                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                        cell.border = { top: {style:'thin', color: { argb: 'FFFFFFFF' }}, left: {style:'thin', color: { argb: 'FFFFFFFF' }}, bottom: {style:'thin', color: { argb: 'FFFFFFFF' }}, right: {style:'thin', color: { argb: 'FFFFFFFF' }} };
                     });
 
+                    const deptHeaderRow = wsMain.addRow([`အသုံးပြုသည့်ဌာန(သို့)စာရင်းအမျိုးအစား : ${dept}`]);
+                    wsMain.mergeCells(`A${deptHeaderRow.number}:K${deptHeaderRow.number}`);
+                    deptHeaderRow.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1E3A8A' } };
+                    deptHeaderRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E7FF' } };
+                    deptHeaderRow.getCell(1).alignment = { vertical: 'middle', horizontal: 'left' };
+                    deptHeaderRow.getCell(1).border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                    deptHeaderRow.height = 23;
+
+                    let dTotalL = 0, dTotalA = 0;
                     REPORT_GROUPS_DATA[dept].forEach(row => {
+                        let literNum = Math.round(parseFloat(row.liter) || 0);
+                        let amountNum = Math.round(parseFloat(row.totalAmount) || 0);
+                        let priceDrumNum = Math.round(parseFloat(row.pricePerDrum) || 0);
+                        let priceLtrNum = Math.round(parseFloat(row.price) || 0);
+                        dTotalL += literNum; dTotalA += amountNum;
+
                         const dataRow = wsMain.addRow([
-                            row.id, formatToDDMMYYYY(row.filledDate), row.itineraries,
-                            formatToDDMMYYYY(row.issuedDate), row.boatId, row.issuedDept,
-                            Math.round(row.liter), Math.round(row.pricePerDrum), Math.round(row.price),
-                            Math.round(row.totalAmount), row.marks
+                            row.id || "", formatToDDMMYYYY(row.filledDate), row.itineraries || "",
+                            formatToDDMMYYYY(row.issuedDate), row.boatId || "", row.issuedDept || "",
+                            literNum, priceDrumNum, priceLtrNum, amountNum, row.marks || ""
                         ]);
-                        dataRow.eachCell(c => { c.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} }; });
+                        
+                        if (!row.itineraries || row.itineraries.length <= 40) {
+                            dataRow.height = 20;
+                        } else {
+                            let lineCount = Math.ceil(row.itineraries.length / 40);
+                            dataRow.height = lineCount * 11; 
+                        }
+
+                        dataRow.eachCell((cell, colIdx) => {
+                            cell.font = { size: 10 };
+                            let hAlign = colIdx >= 7 && colIdx <= 10 ? 'right' : 'left';
+                            if (colIdx === 1 || colIdx === 2 || colIdx === 4) hAlign = 'center';
+
+                            cell.alignment = {
+                                vertical: 'middle',
+                                horizontal: hAlign,
+                                wrapText: (colIdx === 3 || colIdx === 11) 
+                            };
+                            cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                        });
                     });
-                    
-                    wsMain.addRow([]); // empty space between departments
+
+                    if (adjDept === dept) dTotalA += adjInput;
+                    summaryData.push({ name: dept, liters: dTotalL, amount: dTotalA });
+
+                    const subtotalRow = wsMain.addRow(['', '', '', '', '', `${dept} Sub-total:`, dTotalL, '', '', dTotalA, '']);
+                    subtotalRow.height = 22;
+                    subtotalRow.eachCell((cell, colIdx) => {
+                        cell.font = { bold: true, size: 10 };
+                        cell.alignment = { vertical: 'middle' };
+                        if (colIdx === 7 || colIdx === 10) {
+                            cell.alignment.horizontal = 'right';
+                            cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                        }
+                    });
+
+                    const noteRow = wsMain.addRow(['မှတ်ချက် - (အစွန်းထွက်) ဆီကုမ္ပဏီမှ အစွန်း တွေဖြတ်ပေးထားသော တန်ဖိုးများကိုခွဲပြထားပါသည်။']);
+                    wsMain.mergeCells(`A${noteRow.number}:K${noteRow.number}`);
+                    noteRow.getCell(1).font = { italic: true, size: 10, color: { argb: 'FF475569' } };
+                    noteRow.height = 18;
+
+                    const sigSpaceRow = wsMain.addRow([]);
+                    sigSpaceRow.height = 55; 
+
+                    if (imageId !== null) {
+                        wsMain.addImage(imageId, {
+                            tl: { col: 9.6, row: sigSpaceRow.number -1 },
+                            br: { col: 10.2, row: sigSpaceRow.number },
+                            editMode: 'oneCell'
+                        });
+                    }
+
+                    const recRow = wsMain.addRow(['', '', '', '', '', '', '', '', 'Recorded and Proved By', '', '']);
+                    wsMain.mergeCells(`I${recRow.number}:K${recRow.number}`);
+                    recRow.getCell(9).font = { bold: true, size: 10, color: { argb: 'FF1E3A8A' } };
+                    recRow.getCell(9).alignment = { horizontal: 'center' };
+
+                    const nameRow = wsMain.addRow(['', '', '', '', '', '', '', '', 'NAY LIN HTIKE', '', '']);
+                    wsMain.mergeCells(`I${nameRow.number}:K${nameRow.number}`);
+                    nameRow.getCell(9).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
+                    nameRow.getCell(9).alignment = { horizontal: 'center' };
+
+                    wsMain.addRow([]); 
                 }
 
+                wsSummary.columns = [
+                    { key: 'no', width: 8 }, { key: 'dept', width: 35 }, { key: 'liters', width: 16 }, { key: 'amount', width: 20 }
+                ];
+
+                const sumTitleText = `My Mergui Speed Boat's Fuel Issued Record Summary For ${dateStr}`;
+                const sumTitleRow = wsSummary.addRow([sumTitleText]);
+                wsSummary.mergeCells(`A${sumTitleRow.number}:D${sumTitleRow.number}`);
+                sumTitleRow.getCell(1).font = { bold: true, size: 13, color: { argb: 'FF1E40AF' } };
+                sumTitleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+                sumTitleRow.height = 28;
+
+                const sumHeaderRow = wsSummary.addRow(['No.', 'Descriptions', 'Total Liters', 'Amount']);
+                sumHeaderRow.height = 24;
+                sumHeaderRow.eachCell((cell) => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
+                    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                });
+
+                let gLiters = 0, gAmount = 0;
+                summaryData.forEach((item, idx) => {
+                    gLiters += item.liters;
+                    gAmount += item.amount;
+                    const sRow = wsSummary.addRow([idx + 1, item.name, item.liters, item.amount]);
+                    sRow.height = 20;
+                    sRow.eachCell((cell, colIdx) => {
+                        cell.font = { size: 10 };
+                        cell.alignment = { vertical: 'middle', horizontal: colIdx >= 3 ? 'right' : (colIdx === 1 ? 'center' : 'left') };
+                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                    });
+                });
+
+                if (adjDept === 'Grand' && adjInput !== 0) gAmount += adjInput;
+
+                const gTotalRow = wsSummary.addRow(['', 'Grand Total:', gLiters, gAmount]);
+                gTotalRow.height = 22;
+                gTotalRow.eachCell((cell, colIdx) => {
+                    cell.font = { bold: true, size: 10 };
+                    cell.alignment = { vertical: 'middle', horizontal: colIdx >= 3 ? 'right' : 'left' };
+                    if (colIdx >= 3) {
+                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                    }
+                });
+
+                const sumSigSpace = wsSummary.addRow([]);
+                sumSigSpace.height = 55;
+                if (imageId !== null) {
+                    wsSummary.addImage(imageId, {
+                        tl: { col: 2.9, row: sumSigSpace.number - 1 },
+                        br: { col: 3.3, row: sumSigSpace.number },
+                        editMode: 'oneCell'
+                    });
+                }
+
+                const sumRec = wsSummary.addRow(['', '', 'Prepared By(ပြင်ဆင်သူ)', '']);
+                wsSummary.mergeCells(`C${sumRec.number}:D${sumRec.number}`);
+                sumRec.getCell(3).font = { bold: true, size: 10, color: { argb: 'FF1E3A8A' } };
+                sumRec.getCell(3).alignment = { horizontal: 'center' };
+
+                const sumName = wsSummary.addRow(['', '', 'NAY LIN HTIKE', '']);
+                wsSummary.mergeCells(`C${sumName.number}:D${sumName.number}`);
+                sumName.getCell(3).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
+                sumName.getCell(3).alignment = { horizontal: 'center' };
+
                 const buffer = await workbook.xlsx.writeBuffer();
-                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                saveAs(blob, `Fuel_Report_${new Date().getTime()}.xlsx`);
-            } catch (err) {
-                alert("Excel ထုတ်ရာတွင် Error ဖြစ်နေပါသည်: " + err);
+                saveAs(new Blob([buffer]), `Fuel_Report_${dateStr.replace(/[^a-zA-Z0-9 -]/g, '_').trim()}.xlsx`);
+            } catch (error) {
+                alert("Excel ထုတ်ရာတွင် အမှားအယွင်းဖြစ်နေပါသည်။ Error: " + error.message);
             }
         }
-        
-        function exportYearlySummaryToExcel() {
-            alert('နှစ်ချုပ် ရှင်းတမ်း Excel ကို လက်ရှိဇယားကနေ copy ကူးယူနိုင်ပါသည်။ (Advanced Feature Export Pending)');
+
+        async function exportYearlyDetailToExcel() {
+            let year = document.getElementById('filterYear').value;
+            let dateStr = "Year " + year;
+
+            const workbook = new ExcelJS.Workbook();
+            const ws = workbook.addWorksheet('Yearly_Detail');
+
+            ws.columns = [
+                { key: 'id', width: 22 }, { key: 'filledDate', width: 10.5 }, { key: 'itineraries', width: 45 },
+                { key: 'issuedDate', width: 10.5 }, { key: 'boatId', width: 10 }, { key: 'dept', width: 27 },
+                { key: 'liter', width: 9 }, { key: 'priceDrum', width: 10.5 }, { key: 'priceLtr', width: 8 },
+                { key: 'totalAmount', width: 18 }, { key: 'marks', width: 20 }
+            ];
+
+            let imageId = null;
+            if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
+                imageId = workbook.addImage({ base64: savedSignatureBase64, extension: 'png' });
+            }
+
+            let adjDept = document.getElementById('adjustDept').value;
+            let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
+
+            for (let dept in REPORT_GROUPS_DATA) {
+                const titleText = `My Mergui Speed Boat's Fuel Issued Record For ${dateStr} - ${dept}`;
+                const titleRow = ws.addRow([titleText]);
+                ws.mergeCells(`A${titleRow.number}:K${titleRow.number}`);
+                titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1E40AF' } };
+                titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+                titleRow.height = 28;
+
+                const headerRow = ws.addRow(['ID', 'Filled Date', 'Itineraries', 'Issued Date', 'Boat ID', 'Department', 'Liter', 'Price/Drum', 'Price(1L)', 'Total Amount', 'Marks']);
+                headerRow.height = 24;
+                headerRow.eachCell((cell) => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
+                    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                });
+
+                const deptHeaderRow = ws.addRow([`ဌာနအမည် : ${dept}`]);
+                ws.mergeCells(`A${deptHeaderRow.number}:K${deptHeaderRow.number}`);
+                deptHeaderRow.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1E3A8A' } };
+                deptHeaderRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E7FF' } };
+                deptHeaderRow.getCell(1).alignment = { vertical: 'middle', horizontal: 'left' };
+                deptHeaderRow.getCell(1).border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                deptHeaderRow.height = 22;
+
+                let dTotalL = 0, dTotalA = 0;
+                REPORT_GROUPS_DATA[dept].forEach(row => {
+                    let literNum = Math.round(parseFloat(row.liter) || 0);
+                    let amountNum = Math.round(parseFloat(row.totalAmount) || 0);
+                    let priceDrumNum = Math.round(parseFloat(row.pricePerDrum) || 0);
+                    let priceLtrNum = Math.round(parseFloat(row.price) || 0);
+                    dTotalL += literNum; dTotalA += amountNum;
+
+                    const dataRow = ws.addRow([
+                        row.id || "", formatToDDMMYYYY(row.filledDate), row.itineraries || "",
+                        formatToDDMMYYYY(row.issuedDate), row.boatId || "", row.issuedDept || "",
+                        literNum, priceDrumNum, priceLtrNum, amountNum, row.marks || ""
+                    ]);
+                    
+                    if (!row.itineraries || row.itineraries.length <= 40) {
+                        dataRow.height = 20;
+                    }
+
+                    dataRow.eachCell((cell, colIdx) => {
+                        cell.font = { size: 10 };
+                        let hAlign = colIdx >= 7 && colIdx <= 10 ? 'right' : 'left';
+                        if (colIdx === 1 || colIdx === 2 || colIdx === 4) hAlign = 'center';
+
+                        cell.alignment = {
+                            vertical: 'middle',
+                            horizontal: hAlign,
+                            wrapText: (colIdx === 3 || colIdx === 11) 
+                        };
+                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                    });
+                });
+
+                if (adjDept === dept) dTotalA += adjInput;
+
+                const subtotalRow = ws.addRow(['', '', '', '', '', `${dept} Sub-total:`, dTotalL, '', '', dTotalA, '']);
+                subtotalRow.height = 22;
+                subtotalRow.eachCell((cell, colIdx) => {
+                    cell.font = { bold: true, size: 10 };
+                    cell.alignment = { vertical: 'middle' };
+                    if (colIdx === 7 || colIdx === 10) {
+                        cell.alignment.horizontal = 'right';
+                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                    }
+                });
+
+                const noteRow = ws.addRow(['မှတ်ချက် - (အစွန်းထွက်) ဆီကုမ္ပဏီမှ အစွန်း တွေဖြတ်ပေးထားသော တန်ဖိုးများကိုခွဲပြထားပါသည်။']);
+                ws.mergeCells(`A${noteRow.number}:K${noteRow.number}`);
+                noteRow.getCell(1).font = { italic: true, size: 10, color: { argb: 'FF475569' } };
+
+                const sigSpaceRow = ws.addRow([]);
+                sigSpaceRow.height = 75;
+                if (imageId !== null) {
+                    ws.addImage(imageId, {
+                        tl: { col: 8.5, row: sigSpaceRow.number - 1 },
+                        br: { col: 10.5, row: sigSpaceRow.number },
+                        editMode: 'oneCell'
+                    });
+                }
+
+                const recRow = ws.addRow(['', '', '', '', '', '', '', '', 'Prepared By(ပြင်ဆင်သူ)', '', '']);
+                ws.mergeCells(`I${recRow.number}:K${recRow.number}`);
+                recRow.getCell(9).font = { bold: true, size: 10, color: { argb: 'FF1E3A8A' } };
+                recRow.getCell(9).alignment = { horizontal: 'center' };
+
+                const nameRow = ws.addRow(['', '', '', '', '', '', '', '', 'NAY LIN HTIKE', '', '']);
+                ws.mergeCells(`I${nameRow.number}:K${nameRow.number}`);
+                nameRow.getCell(9).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
+                nameRow.getCell(9).alignment = { horizontal: 'center' };
+
+                ws.addRow([]);
+            }
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            saveAs(new Blob([buffer]), `Yearly_Detail_Report_${year}.xlsx`);
         }
-        function exportYearlyDetailToExcel() {
-            alert('နှစ်ချုပ် အသေးစိတ် Excel ကို လက်ရှိဇယားကနေ copy ကူးယူနိုင်ပါသည်။ (Advanced Feature Export Pending)');
+
+        async function exportYearlySummaryToExcel() {
+            let startY = parseInt(document.getElementById('filterStartYear').value) || 2020;
+            let endY = parseInt(document.getElementById('filterEndYear').value) || 2040;
+
+            const workbook = new ExcelJS.Workbook();
+            const ws = workbook.addWorksheet('Yearly_Summary');
+
+            ws.columns = [
+                { key: 'no', width: 8 }, { key: 'month', width: 20 }, { key: 'liter', width: 16 },
+                { key: 'amount', width: 20 }, { key: 'marks', width: 25 }
+            ];
+
+            let imageId = null;
+            if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
+                imageId = workbook.addImage({ base64: savedSignatureBase64, extension: 'png' });
+            }
+
+            let adjDept = document.getElementById('adjustDept').value;
+            let adjInput = Math.round(parseFloat(document.getElementById('adjustAmount').value)) || 0;
+
+            for (let dept in REPORT_GROUPS_DATA) {
+                let dLiters = 0, dAmount = 0;
+                
+                const deptTitle = ws.addRow([`Department: ${dept}`]);
+                ws.mergeCells(`A${deptTitle.number}:E${deptTitle.number}`);
+                deptTitle.getCell(1).font = { bold: true, size: 12, color: { argb: 'FF1E3A8A' } };
+                deptTitle.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E7FF' } };
+
+                const headerRow = ws.addRow(['No.', 'Month', 'Total Liter', 'Total Amount', 'Marks']);
+                headerRow.height = 24;
+                headerRow.eachCell((cell) => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
+                    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                });
+
+                for (let y = startY; y <= endY; y++) {
+                    let monthlyData = {};
+                    for(let i=1; i<=12; i++) monthlyData[String(i).padStart(2,'0')] = { liter: 0, amount: 0 };
+                    let hasData = false;
+
+                    REPORT_GROUPS_DATA[dept].forEach(row => {
+                        let d = new Date(row.filledDate);
+                        if (d.getFullYear() === y) {
+                            let m = String(d.getMonth()+1).padStart(2,'0');
+                            monthlyData[m].liter += Math.round(parseFloat(row.liter)) || 0;
+                            monthlyData[m].amount += Math.round(parseFloat(row.totalAmount)) || 0;
+                            hasData = true;
+                        }
+                    });
+
+                    if (hasData) {
+                        const yrRow = ws.addRow([`Year : ${y}`]);
+                        ws.mergeCells(`A${yrRow.number}:E${yrRow.number}`);
+                        yrRow.getCell(1).font = { bold: true, size: 11, color: { argb: 'FF1E293B' } };
+                        yrRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F5F9' } };
+
+                        let mIdx = 1;
+                        for(let m in monthlyData) {
+                            if(monthlyData[m].liter > 0 || monthlyData[m].amount > 0) {
+                                let mName = new Date(y, parseInt(m)-1, 1).toLocaleString('en-US', { month: 'long' });
+                                dLiters += monthlyData[m].liter;
+                                dAmount += monthlyData[m].amount;
+
+                                const r = ws.addRow([mIdx++, `${mName}, ${y}`, monthlyData[m].liter, monthlyData[m].amount, '-']);
+                                r.height = 20;
+                                r.eachCell((cell, colIdx) => {
+                                    cell.font = { size: 10 };
+                                    cell.alignment = { vertical: 'middle', horizontal: colIdx >= 3 && colIdx <= 4 ? 'right' : (colIdx === 1 ? 'center' : 'left') };
+                                    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                                });
+                            }
+                        }
+                    }
+                }
+
+                if (adjDept === dept) dAmount += adjInput;
+
+                const subRow = ws.addRow(['', `${dept} Sub-total:`, dLiters, dAmount, '']);
+                subRow.height = 22;
+                subRow.eachCell((cell, colIdx) => {
+                    cell.font = { bold: true, size: 10 };
+                    cell.alignment = { vertical: 'middle', horizontal: colIdx >= 3 && colIdx <= 4 ? 'right' : 'left' };
+                    if (colIdx === 3 || colIdx === 4) {
+                        cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                    }
+                });
+
+                ws.addRow([]);
+            }
+
+            const buffer = await workbook.xlsx.writeBuffer();
+            saveAs(new Blob([buffer]), `Yearly_Summary_Report_${startY}_${endY}.xlsx`);
         }
     </script>
 </body>
