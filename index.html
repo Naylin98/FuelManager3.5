@@ -775,10 +775,13 @@
     <script>
         // System Config Variables
         let WEB_APP_URL = localStorage.getItem('v5_google_web_app_url') || "";
-        let savedSignatureBase64 ="https://raw.githubusercontent.com/Naylin98/FuelManager3.5/main/signature.png"; // ဤနေရာတွင် Local Storage မှ ဖတ်ရန်ပြင်ထားပါသည်
-        let savedBgLogoBase64 = localStorage.getItem('v5_bglogo_base64') || "";
-        const defaultBgLogoImage ="https://raw.githubusercontent.com/Naylin98/FuelManager3.5/main/logo.png";
-        
+        // ၁။ ပထမဦးစွာ သင့်ရဲ့ GitHub Link တွေကို သတ်မှတ်ပါ
+         const defaultBgLogoImage = "https://raw.githubusercontent.com/Naylin98/FuelManager3.5/main/logo.png";
+         const defaultSignatureImage = "https://raw.githubusercontent.com/Naylin98/FuelManager3.5/main/signature.png";
+
+          // ၂။ localStorage ထဲမှာ ရှာမတွေ့ရင် Default အနေနဲ့ GitHub ပုံကို သုံးဖို့ ပြင်ပါ
+         let savedBgLogoBase64 = localStorage.getItem('v5_bglogo_base64') || defaultBgLogoImage;
+         let savedSignatureBase64 = localStorage.getItem('signature_base64') || defaultSignatureImage;
         let DRAFT_DATA = [];
         let INVENTORY_DATA = []; 
         let INV_BALANCE_DATA = []; // NEW FOR BALANCE REPORT
