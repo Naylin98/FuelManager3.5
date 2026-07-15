@@ -56,7 +56,7 @@
     <div id="authOverlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-cover bg-center before:absolute before:inset-0 before:bg-slate-900/70 backdrop-blur-sm transition-opacity duration-500">
         <div class="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-lg border border-white/20 p-8 sm:p-10 rounded-3xl shadow-2xl mx-4">
             <div class="text-center mb-8">
-                <img src="a9ff3634-4cf4-4f48-b184-e2c0e6d81cdf.jpg" alt="System Logo" class="system-logo w-24 h-24 rounded-full object-cover mx-auto shadow-[0_0_20px_rgba(99,102,241,0.6)] border-4 border-indigo-400 mb-4 transition-transform hover:scale-105" />
+                <img src="https://raw.githubusercontent.com/Naylin98/FuelManager3.5/main/logo.png" alt="System Logo" class="system-logo w-24 h-24 rounded-full object-cover mx-auto shadow-[0_0_20px_rgba(99,102,241,0.6)] border-4 border-indigo-400 mb-4 transition-transform hover:scale-105" />
                 <h2 class="text-3xl font-bold text-white tracking-wide drop-shadow-md">Fuel Manager</h2>
                 <p class="text-indigo-200 text-sm mt-2" id="authSubtitle">Welcome back! Please login to continue.</p>
             </div>
@@ -781,7 +781,7 @@
 
           // ၂။ localStorage ထဲမှာ ရှာမတွေ့ရင် Default အနေနဲ့ GitHub ပုံကို သုံးဖို့ ပြင်ပါ
          let savedBgLogoBase64 = localStorage.getItem('v5_bglogo_base64') || defaultBgLogoImage;
-         let savedSignatureBase64 = localStorage.getItem('signature_base64') || defaultSignatureImage;
+         let savedSignatureBase64 = localStorage.getItem('v5_signature_base64') || defaultSignatureImage;
         let DRAFT_DATA = [];
         let INVENTORY_DATA = []; 
         let INV_BALANCE_DATA = []; // NEW FOR BALANCE REPORT
@@ -875,11 +875,18 @@
 
         // SETTINGS & UI
         function applyBgLogo() {
-            const imgSrc = savedBgLogoBase64 ? savedBgLogoBase64 : defaultBgLogoImage;
-            const authOverlay = document.getElementById('authOverlay');
-            if(authOverlay) authOverlay.style.backgroundImage = `url('${imgSrc}')`;
-            document.querySelectorAll('.system-logo').forEach(img => { img.src = imgSrc; });
-        }
+    const imgSrc = savedBgLogoBase64 ? savedBgLogoBase64 : defaultBgLogoImage;
+    const authOverlay = document.getElementById('authOverlay');
+    if(authOverlay) authOverlay.style.backgroundImage = `url('${imgSrc}')`;
+    document.querySelectorAll('.system-logo').forEach(img => { 
+        img.src = imgSrc; 
+        // ပုံ Load လုပ်ရာတွင် Error ဖြစ်ပါက Default ပုံကို ပြသရန်
+        img.onerror = function() {
+            this.onerror = null;
+            this.src = defaultBgLogoImage;
+        };
+    });
+}
 
         // နောက်ခံနှင့် လိုဂိုပုံပြောင်းရန် (Background & Logo Upload)
 function saveBgLogo() {
@@ -950,39 +957,45 @@ function resetBgLogo() {
             return `${day}/${month}/${year}`;
         }
 
-        function fetchNextID() {
-            let draftMax = 0;
-            if (DRAFT_DATA.length > 0) {
-                let newDrafts = DRAFT_DATA.filter(d => !d._isServerData);
-                if(newDrafts.length > 0) {
-                    let lastId = newDrafts[newDrafts.length - 1].id;
-                    let match = lastId.match(/MMFA-(\d+)/);
-                    if (match) draftMax = parseInt(match[1], 10);
-                }
-            }
-
-            if (!WEB_APP_URL) {
-                document.getElementById('inp_id').value = generateIdString(draftMax + 1);
-                return;
-            }
-
-            fetch(`${WEB_APP_URL}?action=getData`)
-                .then(res => res.json())
-                .then(rawData => {
-                    let sheetMax = 0;
-                    rawData.forEach(row => {
-                         let idStr = row.id || "";
-                         let match = String(idStr).match(/MMFA-(\d+)/);
-                         if (match) {
-                             let num = parseInt(match[1], 10);
-                             if (num > sheetMax) sheetMax = num;
-                         }
-                    });
-                    let nextNum = Math.max(sheetMax, draftMax) + 1;
-                    document.getElementById('inp_id').value = generateIdString(nextNum);
-                })
-                .catch(() => { document.getElementById('inp_id').value = generateIdString(draftMax + 1); });
+function fetchNextID() {
+    let draftMax = 0;
+    if (DRAFT_DATA.length > 0) {
+        let newDrafts = DRAFT_DATA.filter(d => !d._isServerData);
+        if(newDrafts.length > 0) {
+            let lastId = newDrafts[newDrafts.length - 1].id;
+            let match = lastId.match(/MMFA-(\d+)/);
+            if (match) draftMax = parseInt(match[1], 10);
         }
+    }
+
+    if (!WEB_APP_URL) {
+        document.getElementById('inp_id').value = generateIdString(draftMax + 1);
+        return;
+    }
+
+    fetch(`${WEB_APP_URL}?action=getData`)
+        .then(res => res.json())
+        .then(rawData => {
+            let sheetMax = 0;
+            // Fix: Array ဖြစ်မှသာ loop ပတ်ရန် စစ်ဆေးခြင်း
+            if (Array.isArray(rawData)) {
+                rawData.forEach(row => {
+                     let idStr = row.id || "";
+                     let match = String(idStr).match(/MMFA-(\d+)/);
+                     if (match) {
+                         let num = parseInt(match[1], 10);
+                         if (num > sheetMax) sheetMax = num;
+                     }
+                });
+            }
+            let nextNum = Math.max(sheetMax, draftMax) + 1;
+            document.getElementById('inp_id').value = generateIdString(nextNum);
+        })
+        .catch((error) => { 
+            console.error("Fetch ID Error:", error);
+            document.getElementById('inp_id').value = generateIdString(draftMax + 1); 
+        });
+}
 
         function generateIdString(num) {
             const today = new Date();
@@ -1017,9 +1030,11 @@ function resetBgLogo() {
         };
 
         function refreshUI() {
-            loadDropdownOptions();
-            updateSettingsLists();
-        }
+    loadDropdownOptions();
+    updateSettingsLists();
+    applyBgLogo(); // နောက်ခံနှင့် လိုဂိုပုံကို အမြဲပေါ်စေရန်
+    loadSignaturePreview(); // လက်မှတ်ပုံကို အမြဲပေါ်စေရန်
+}
 
         function switchTab(tabId) {
             toggleSidebar(false); 
@@ -1077,18 +1092,22 @@ function resetBgLogo() {
         }
 
         function loadSignaturePreview() {
-            const img = document.getElementById('signaturePreview');
-            const txt = document.getElementById('noSignatureText');
-            if (savedSignatureBase64) {
-                img.src = savedSignatureBase64;
-                img.classList.remove('hidden');
-                txt.classList.add('hidden');
-            } else {
-                img.classList.add('hidden');
-                txt.classList.remove('hidden');
-            }
-        }
-
+    const img = document.getElementById('signaturePreview');
+    const txt = document.getElementById('noSignatureText');
+    if (savedSignatureBase64) {
+        img.src = savedSignatureBase64;
+        // ပုံ Load လုပ်ရာတွင် Error ဖြစ်ပါက Default ပုံကို ပြသရန်
+        img.onerror = function() {
+            this.onerror = null;
+            this.src = defaultSignatureImage;
+        };
+        img.classList.remove('hidden');
+        txt.classList.add('hidden');
+    } else {
+        img.classList.add('hidden');
+        txt.classList.remove('hidden');
+    }
+}
         function saveSignature() {
     const fileInput = document.getElementById('signatureUpload');
     if (fileInput.files.length === 0) return alert("ကျေးဇူးပြု၍ ပုံရွေးချယ်ပါ။");
@@ -1108,47 +1127,51 @@ function resetBgLogo() {
 
 
 async function fetchSettingsFromSheet() {
-            if(!WEB_APP_URL) return;
-            try {
-                let res = await fetch(`${WEB_APP_URL}?action=getSettings`, { redirect: "follow" });
-                let data = await res.json();
-                
-                if(data) {
-                    let fetchedBoats = data.boats || data.boatsData || [];
-                    let fetchedDepts = data.depts || data.deptsData || [];
-                    
-                    if(fetchedBoats.length > 0) localStorage.setItem('v5_boat_ids', JSON.stringify(fetchedBoats));
-                    if(fetchedDepts.length > 0) localStorage.setItem('v5_departments', JSON.stringify(fetchedDepts));
-                    
-                    // Google Drive Link ကို Direct Link အဖြစ် ပြောင်းပေးမည့် Helper Function
-                    const makeDirectLink = (url) => {
-                        if (url && url.includes("drive.google.com")) {
-                            let match = url.match(/id=([^&]+)/) || url.match(/d\/([a-zA-Z0-9_-]+)/);
-                            if (match) return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-                        }
-                        return url;
-                    };
-
-                    // Logo အား Google Sheet မှ ပြန်ခေါ်ခြင်း
-                    if(data.bgLogo) {
-                        let finalBgLogo = makeDirectLink(data.bgLogo);
-                        localStorage.setItem('v5_bglogo_base64', finalBgLogo);
-                        savedBgLogoBase64 = finalBgLogo;
-                        applyBgLogo();
-                    }
-                    
-                    // Signature အား Google Sheet မှ ပြန်ခေါ်ခြင်း
-                    if(data.signature) {
-                        let finalSignature = makeDirectLink(data.signature);
-                        localStorage.setItem('v5_signature_base64', finalSignature);
-                        savedSignatureBase64 = finalSignature;
-                        loadSignaturePreview();
-                    }
-                    
-                    refreshUI();
+    if(!WEB_APP_URL) return;
+    try {
+        let res = await fetch(`${WEB_APP_URL}?action=getSettings`, { redirect: "follow" });
+        let data = await res.json();
+        
+        if(data) {
+            let fetchedBoats = data.boats || data.boatsData || [];
+            let fetchedDepts = data.depts || data.deptsData || [];
+            
+            if(fetchedBoats.length > 0) localStorage.setItem('v5_boat_ids', JSON.stringify(fetchedBoats));
+            if(fetchedDepts.length > 0) localStorage.setItem('v5_departments', JSON.stringify(fetchedDepts));
+            
+            const makeDirectLink = (url) => {
+                if (url && url.includes("drive.google.com")) {
+                    let match = url.match(/id=([^&]+)/) || url.match(/d\/([a-zA-Z0-9_-]+)/);
+                    if (match) return `https://drive.google.com/uc?export=view&id=${match[1]}`;
                 }
-            } catch(e) { console.log("Settings fetch error:", e); }
+                return url;
+            };
+
+            // Fix: Valid ဖြစ်တဲ့ Link များကိုသာ လက်ခံရန် စစ်ဆေးခြင်း
+            if(data.bgLogo && data.bgLogo.length > 50) {
+                let finalBgLogo = makeDirectLink(data.bgLogo);
+                // Sheet မှလာသော Data သည် Base64 ဖြစ်ပါက Truncated ဖြစ်/မဖြစ် စစ်ဆေးရန် ခက်ခဲသဖြင့်
+                // Drive Link (သို့) http ဖြင့်စသော Link များကိုသာ ဦးစားပေးသုံးပါမည်။
+                if (finalBgLogo.startsWith('http') || finalBgLogo.startsWith('data:image')) {
+                    localStorage.setItem('v5_bglogo_base64', finalBgLogo);
+                    savedBgLogoBase64 = finalBgLogo;
+                    applyBgLogo();
+                }
+            }
+            
+            if(data.signature && data.signature.length > 50) {
+                let finalSignature = makeDirectLink(data.signature);
+                if (finalSignature.startsWith('http') || finalSignature.startsWith('data:image')) {
+                    localStorage.setItem('v5_signature_base64', finalSignature);
+                    savedSignatureBase64 = finalSignature;
+                    loadSignaturePreview();
+                }
+            }
+            
+            refreshUI();
         }
+    } catch(e) { console.log("Settings fetch error:", e); }
+}
 
         async function saveSettingsToSheet() {
     if(!WEB_APP_URL) return;
@@ -1460,9 +1483,31 @@ async function fetchSettingsFromSheet() {
                 });
                 
                 let imageId = null;
-            if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
-                imageId = workbook.addImage({ base64: savedSignatureBase64, extension: 'png' });
-            }
+
+// ပုံ Data စစ်ဆေးခြင်း
+if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
+    // Local က Base64 ရှိရင် အဲဒီအတိုင်းသုံးမယ်
+    const rawBase64Data = savedSignatureBase64.split(',')[1]; 
+    imageId = workbook.addImage({ base64: rawBase64Data, extension: 'png' });
+} else {
+    // Local က ပုံမရှိရင် (သို့မဟုတ်) Error တက်နေရင် GitHub URL ကနေ ယူသုံးမယ်
+    try {
+        const imageUrl = "https://raw.githubusercontent.com/Naylin98/FuelManager3.5/main/signature.png";
+        const response = await fetch(imageUrl); // GitHub မှ ပုံဆွဲခြင်း
+        const blob = await response.blob();
+        
+        // Blob ကို Base64 ပြောင်းခြင်း
+        const base64Data = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
+            reader.readAsDataURL(blob);
+        });
+
+        imageId = workbook.addImage({ base64: base64Data, extension: 'png' });
+    } catch (e) {
+        console.error("ပုံတင်သွင်းရန် အဆင်မပြေပါ:", e);
+    }
+}
 
                 INV_BALANCE_DATA.forEach((item, index) => {
                     const row = ws.addRow([ index + 1, item.itemName, item.category, item.totalIn, item.totalOut, item.balance, item.unit ]);
@@ -2049,9 +2094,31 @@ async function exportToExcel() {
                 ];
 
                 let imageId = null;
-                if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
-                    imageId = workbook.addImage({ base64: savedSignatureBase64, extension: 'png' });
-                }
+
+// ပုံ Data စစ်ဆေးခြင်း
+if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
+    // Local က Base64 ရှိရင် အဲဒီအတိုင်းသုံးမယ်
+    const rawBase64Data = savedSignatureBase64.split(',')[1]; 
+    imageId = workbook.addImage({ base64: rawBase64Data, extension: 'png' });
+} else {
+    // Local က ပုံမရှိရင် (သို့မဟုတ်) Error တက်နေရင် GitHub URL ကနေ ယူသုံးမယ်
+    try {
+        const imageUrl = "https://raw.githubusercontent.com/Naylin98/FuelManager3.5/main/signature.png";
+        const response = await fetch(imageUrl); // GitHub မှ ပုံဆွဲခြင်း
+        const blob = await response.blob();
+        
+        // Blob ကို Base64 ပြောင်းခြင်း
+        const base64Data = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
+            reader.readAsDataURL(blob);
+        });
+
+        imageId = workbook.addImage({ base64: base64Data, extension: 'png' });
+    } catch (e) {
+        console.error("ပုံတင်သွင်းရန် အဆင်မပြေပါ:", e);
+    }
+}
 
                 let summaryData = [];
                 let adjDept = document.getElementById('adjustDept').value;
@@ -2147,7 +2214,7 @@ async function exportToExcel() {
                         });
                     }
 
-                    const recRow = wsMain.addRow(['', '', '', '', '', '', '', '', 'Recorded and Proved By', '', '']);
+                    const recRow = wsMain.addRow(['', '', '', '', '', '', '', '', 'Prepared By(ပြင်ဆင်သူ)', '', '']);
                     wsMain.mergeCells(`I${recRow.number}:K${recRow.number}`);
                     recRow.getCell(9).font = { bold: true, size: 10, color: { argb: 'FF1E3A8A' } };
                     recRow.getCell(9).alignment = { horizontal: 'center' };
