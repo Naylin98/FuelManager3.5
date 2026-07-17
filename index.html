@@ -298,14 +298,20 @@
                 <!-- Rest of form-tab HTML remains same as original -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                        <h2 class="text-sm sm:text-base font-bold text-white flex items-center space-x-2">
-                            <i class="fa-solid fa-pen-to-square text-indigo-400"></i>
-                            <span>အချက်အလက်ဖြည့်စွက်ရန်</span>
-                        </h2>
-                        <button onclick="switchTab('draft-tab')" class="text-xs sm:text-sm text-slate-200 hover:text-white flex items-center font-semibold">
-                            စစ်ဆေးရန် Draft သို့သွားမည် <i class="fa-solid fa-arrow-right ml-2"></i>
-                        </button>
-                    </div>
+    <div class="flex flex-wrap items-center space-x-4 gap-y-2">
+        <h2 class="text-sm sm:text-base font-bold text-white flex items-center space-x-2">
+            <i class="fa-solid fa-pen-to-square text-indigo-400"></i>
+            <span>အချက်အလက်ဖြည့်စွက်ရန်</span>
+        </h2>
+        <!-- အသစ်ထည့်ထားသော Finished this month Button -->
+        <button id="btnFinishedMonth" type="button" onclick="handleFinishedMonthClick()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-lg shadow transition">
+            Finished this month
+        </button>
+    </div>
+    <button onclick="switchTab('draft-tab')" class="text-xs sm:text-sm text-slate-200 hover:text-white flex items-center font-semibold">
+        စစ်ဆေးရန် Draft သို့သွားမည် <i class="fa-solid fa-arrow-right ml-2"></i>
+    </button>
+</div>
 
                     <form id="entryForm" class="p-4 sm:p-6 md:p-8" onsubmit="addToDraft(event)">
                         <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 sm:p-5 mb-6">
@@ -655,11 +661,15 @@
                 <!-- Rest of report-tab HTML remains same as original -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
                     <div class="border-b border-slate-100 pb-4 mb-5">
-                        <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center space-x-2">
-                            <i class="fa-solid fa-chart-line text-emerald-600"></i>
-                            <span>လချုပ် / နှစ်ချုပ် / စိတ်ကြိုက် Report ထုတ်ရန်</span>
-                        </h2>
-                    </div>
+    <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center space-x-2 w-full">
+        <i class="fa-solid fa-chart-line text-emerald-600"></i>
+        <span>လချုပ် / နှစ်ချုပ် / စိတ်ကြိုက် Report ထုတ်ရန်</span>
+        <!-- အသစ်ထည့်ထားသော Status စာသား -->
+        <span id="reportFinishedStatus" class="ml-auto text-emerald-600 animate-pulse text-sm font-bold hidden border border-emerald-200 bg-emerald-50 px-3 py-1 rounded-full whitespace-nowrap">
+            Finished This Month
+        </span>
+    </h2>
+</div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 items-end">
                         <div class="col-span-1 md:col-span-2 lg:col-span-2">
@@ -1203,6 +1213,60 @@ function fetchNextID() {
             const year = today.getFullYear();
             return `MMFA-${String(num).padStart(5, '0')}/${month}/${year}`;
         }
+
+
+/* ================= FINISHED THIS MONTH LOGIC ================= */
+function handleFinishedMonthClick() {
+    // နှိပ်လိုက်ချိန်ကို LocalStorage ထဲသိမ်းမည်
+    localStorage.setItem('v5_finished_month_time', Date.now());
+    updateFinishedMonthUI();
+    alert("Finished this month အနေဖြင့် သတ်မှတ်လိုက်ပါပြီ။ Report တွင် သွားရောက်စစ်ဆေးနိုင်ပါသည်။");
+}
+
+function updateFinishedMonthUI() {
+    const btn = document.getElementById('btnFinishedMonth');
+    const statusText = document.getElementById('reportFinishedStatus');
+    if (!btn || !statusText) return;
+
+    const savedTime = localStorage.getItem('v5_finished_month_time');
+    
+    if (savedTime) {
+        const diffInMs = Date.now() - parseInt(savedTime);
+        const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000; // ၇ ရက် စာ မီလီစက္ကန့်
+        
+        if (diffInMs < sevenDaysInMs) {
+            // --- ၇ ရက် မပြည့်သေးလျှင် (Button ကို အနီပြောင်းမည် / Status အစိမ်း မိတ်တုတ်မတ်တုတ် ပြမည်) ---
+            btn.className = "px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white font-bold text-xs rounded-lg shadow transition";
+            
+            statusText.textContent = "Finished Last Month ( ပြီးခဲ့တဲ့လချုပ်ပြီးပါပြီ )";
+            statusText.className = "ml-auto text-emerald-600 animate-pulse text-sm font-bold border border-emerald-200 bg-emerald-50 px-3 py-1 rounded-full whitespace-nowrap";
+            statusText.classList.remove('hidden');
+        } else {
+            // --- ၇ ရက် ကျော်သွားလျှင် (Button ကို အစိမ်းပြန်ပြောင်းမည် / Status တွင် နောက်လစာသားပြမည်) ---
+            btn.className = "px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-lg shadow transition";
+            
+            statusText.textContent = "နောက် ၇ ရက်ကြာပြီး နောက်လအတွက်ဆက်သွားနေပြီ";
+            // animate-pulse (မိတ်တုတ်မတ်တုတ်) ကိုဖြုတ်ပြီး အပြာရောင်စာသားဖြင့် ပြမည်
+            statusText.className = "ml-auto text-blue-600 text-sm font-bold border border-blue-200 bg-blue-50 px-3 py-1 rounded-full whitespace-nowrap";
+            statusText.classList.remove('hidden');
+        }
+    } else {
+        // --- မနှိပ်ရသေးသော မူလအခြေအနေ ---
+        btn.className = "px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-lg shadow transition";
+        statusText.classList.add('hidden');
+    }
+}
+
+// Window Onload ထဲတွင် တစ်ခါတည်း Update ဖြစ်အောင် ထည့်သွင်းပေးခြင်း
+const originalWindowOnLoad = window.onload;
+window.onload = function(e) {
+    if(originalWindowOnLoad) originalWindowOnLoad(e);
+    updateFinishedMonthUI(); 
+};
+
+// ၁ မိနစ် (60000ms) တိုင်း Status ကို အလိုအလျောက် စစ်ဆေးပေးရန်
+setInterval(updateFinishedMonthUI, 60000);
+/* ============================================================= */
 
         window.onload = function() {
             initStorage();
