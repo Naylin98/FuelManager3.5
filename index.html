@@ -885,7 +885,7 @@
     <!-- JAVASCRIPT SECTION -->
     <script>
         // System Config Variables
-        let WEB_APP_URL ="https://script.google.com/macros/s/AKfycbxaXbfSApICiIG0JUtBB3gWUPCdK84v8B87PexwkY9NMxQ0pBwzOzwlkbOxVqdAWq9OCQ/exec";
+        let WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxaXbfSApICiIG0JUtBB3gWUPCdK84v8B87PexwkY9NMxQ0pBwzOzwlkbOxVqdAWq9OCQ/exec";
         // ၁။ ပထမဦးစွာ သင့်ရဲ့ GitHub Link တွေကို သတ်မှတ်ပါ
          const defaultBgLogoImage = "https://raw.githubusercontent.com/Naylin98/FuelManager3.5/main/logo.png";
          const defaultSignatureImage = "https://raw.githubusercontent.com/Naylin98/FuelManager3.5/main/signature.png";
@@ -1215,63 +1215,72 @@ function fetchNextID() {
         }
 
 
-/* ================= FINISHED THIS MONTH LOGIC ================= */
-function handleFinishedMonthClick() {
-    // နှိပ်လိုက်ချိန်ကို LocalStorage ထဲသိမ်းမည်
-    localStorage.setItem('v5_finished_month_time', Date.now());
-    updateFinishedMonthUI();
-    alert("Finished this month အနေဖြင့် သတ်မှတ်လိုက်ပါပြီ။ Report တွင် သွားရောက်စစ်ဆေးနိုင်ပါသည်။");
+/* ================= FINISHED THIS MONTH LOGIC (UPDATED) ================= */
+// ခလုတ်နှိပ်သောအခါ
+async function handleFinishedMonthClick() {
+    if(!WEB_APP_URL) return alert("API Link မချိတ်ရသေးပါ။");
+
+    const btn = document.getElementById('btnFinishedMonth');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Loading...`;
+    btn.disabled = true;
+
+    try {
+        let res = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            body: JSON.stringify({ action: "setFinishedMonthStatus" })
+        });
+        let result = await res.json();
+
+        if(result.status === 'success') {
+            alert("အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
+            updateFinishedMonthUI(); // UI ကို Update ပြန်လုပ်မည်
+        } else {
+            alert("အမှား: " + (result.message || "Unknown error"));
+        }
+    } catch (err) {
+        console.error("Error occurred: ", err);
+        alert("အမှားတစ်ခုခုဖြစ်နေပါသည်။ ချိတ်ဆက်မှုကို စစ်ဆေးပါ။");
+    }
+
+    btn.innerHTML = originalText;
+    btn.disabled = false;
 }
 
-function updateFinishedMonthUI() {
-    const btn = document.getElementById('btnFinishedMonth');
-    const statusText = document.getElementById('reportFinishedStatus');
-    if (!btn || !statusText) return;
+// Page တက်လာတိုင်း (Refresh လုပ်တိုင်း) အခြေအနေကို စစ်မယ်
+async function updateFinishedMonthUI() {
+    if(!WEB_APP_URL) return;
 
-    const savedTime = localStorage.getItem('v5_finished_month_time');
-    
-    if (savedTime) {
-        const diffInMs = Date.now() - parseInt(savedTime);
-        const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000; // ၇ ရက် စာ မီလီစက္ကန့်
+    try {
+        let res = await fetch(`${WEB_APP_URL}?action=getFinishedMonthStatus`);
+        let data = await res.json();
         
-        if (diffInMs < sevenDaysInMs) {
-            // --- ၇ ရက် မပြည့်သေးလျှင် (Button ကို အနီပြောင်းမည် / Status အစိမ်း မိတ်တုတ်မတ်တုတ် ပြမည်) ---
-            btn.className = "px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white font-bold text-xs rounded-lg shadow transition";
-            
-            statusText.textContent = "Finished Last Month ( ပြီးခဲ့တဲ့လချုပ်ပြီးပါပြီ )";
-            statusText.className = "ml-auto text-emerald-600 animate-pulse text-sm font-bold border border-emerald-200 bg-emerald-50 px-3 py-1 rounded-full whitespace-nowrap";
-            statusText.classList.remove('hidden');
+        const statusText = document.getElementById('reportFinishedStatus');
+        const btn = document.getElementById('btnFinishedMonth');
+        
+        // Backend မှ data.status ကို "FINISHED" ဟု ပြန်ပို့ပေးရန် လိုအပ်သည်
+        if (data.status === "FINISHED") {
+            // အတည်ပြုထားပြီးသားဖြစ်ရင်
+            if(statusText) {
+                statusText.textContent = "Finished Last Month ( အတည်ပြုပြီးပါပြီ )";
+                statusText.classList.remove('hidden');
+            }
+            if(btn) btn.style.display = 'none'; // ခလုတ်ကို ဖျောက်ထားမည်
         } else {
-            // --- ၇ ရက် ကျော်သွားလျှင် (Button ကို အစိမ်းပြန်ပြောင်းမည် / Status တွင် နောက်လစာသားပြမည်) ---
-            btn.className = "px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-lg shadow transition";
-            
-            statusText.textContent = "နောက် ၇ ရက်ကြာပြီး နောက်လအတွက်ဆက်သွားနေပြီ";
-            // animate-pulse (မိတ်တုတ်မတ်တုတ်) ကိုဖြုတ်ပြီး အပြာရောင်စာသားဖြင့် ပြမည်
-            statusText.className = "ml-auto text-blue-600 text-sm font-bold border border-blue-200 bg-blue-50 px-3 py-1 rounded-full whitespace-nowrap";
-            statusText.classList.remove('hidden');
+            // မဟုတ်သေးရင် ပုံမှန်အတိုင်းထားမည်
+            if(statusText) statusText.classList.add('hidden');
+            if(btn) btn.style.display = 'inline-block'; 
         }
-    } else {
-        // --- မနှိပ်ရသေးသော မူလအခြေအနေ ---
-        btn.className = "px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-lg shadow transition";
-        statusText.classList.add('hidden');
+    } catch (err) {
+        console.error("Failed to fetch finished status:", err);
     }
 }
-
-// Window Onload ထဲတွင် တစ်ခါတည်း Update ဖြစ်အောင် ထည့်သွင်းပေးခြင်း
-const originalWindowOnLoad = window.onload;
-window.onload = function(e) {
-    if(originalWindowOnLoad) originalWindowOnLoad(e);
-    updateFinishedMonthUI(); 
-};
-
-// ၁ မိနစ် (60000ms) တိုင်း Status ကို အလိုအလျောက် စစ်ဆေးပေးရန်
-setInterval(updateFinishedMonthUI, 60000);
-/* ============================================================= */
-
         window.onload = function() {
             initStorage();
             loadSignaturePreview();
             applyBgLogo();
+
+            updateFinishedMonthUI();
             
             const today = new Date();
             document.getElementById('currentDateDisplay').innerText = formatToDDMMYYYY(today.toISOString().split('T')[0]);
