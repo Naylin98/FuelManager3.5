@@ -233,7 +233,7 @@
 
         <main class="flex-1 overflow-y-auto custom-scrollbar touch-scroll p-4 sm:p-6 md:p-8 min-h-0 pb-12">
 <!-- Dashboard Tab (Content) -->
-<div id="dashboard-tab" class="tab-content hidden max-w-7xl mx-auto space-y-6">
+<div id="dashboard-tab" class="tab-content max-w-7xl mx-auto space-y-6">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Summary Cards -->
         <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
@@ -294,7 +294,7 @@
 </div>
 
             <!-- 1. FORM TAB -->
-            <div id="form-tab" class="tab-content max-w-7xl mx-auto space-y-6">
+            <div id="form-tab" class="tab-content hidden max-w-7xl mx-auto space-y-6">
                 <!-- Rest of form-tab HTML remains same as original -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
@@ -935,7 +935,7 @@ function checkSignupVisibility(emailValue) {
 }
         async function loadDashboardData() {
     const month = document.getElementById('dashMonth').value;
-    if(!month) return alert("ကျေးဇူးပြု၍ လ (Month) ကို ရွေးချယ်ပေးပါ။");
+    
     if(!WEB_APP_URL) return alert("API URL ချိတ်ဆက်ထားခြင်းမရှိပါ။ Settings တွင် စစ်ဆေးပါ။");
     
     const tbody = document.getElementById('dashTableBody');
@@ -1063,7 +1063,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
             
             // UI နှင့် Permission အားပြန်လည် ပွဲထုတ်ခြင်း
             applyRoleBasedAccess();
-            alert(result.message);
+            switchTab('dashboard-tab');
         } else {
             alert("အမှား: " + result.message);
         }
@@ -1279,7 +1279,11 @@ async function updateFinishedMonthUI() {
             initStorage();
             loadSignaturePreview();
             applyBgLogo();
-
+            const initToday = new Date();
+    const initCurrentMonth = initToday.getFullYear() + '-' + String(initToday.getMonth() + 1).padStart(2, '0');
+    if (document.getElementById('dashMonth')) {
+        document.getElementById('dashMonth').value = initCurrentMonth;
+    }
             updateFinishedMonthUI();
             
             const today = new Date();
@@ -1301,6 +1305,7 @@ async function updateFinishedMonthUI() {
             renderDraftTable();
             fetchNextID(); 
             applyRoleBasedAccess();
+          switchTab('dashboard-tab');
         };
 
         function refreshUI() {
