@@ -1248,6 +1248,7 @@ async function handleFinishedMonthClick() {
 }
 
 // Page တက်လာတိုင်း (Refresh လုပ်တိုင်း) အခြေအနေကို စစ်မယ်
+// Page တက်လာတိုင်း (Refresh လုပ်တိုင်း) အခြေအနေကို စစ်မယ်
 async function updateFinishedMonthUI() {
     if(!WEB_APP_URL) return;
 
@@ -1257,25 +1258,54 @@ async function updateFinishedMonthUI() {
         
         const statusText = document.getElementById('reportFinishedStatus');
         const btn = document.getElementById('btnFinishedMonth');
+
+        if (!statusText || !btn) return;
+
+        // "နောက်လအတွက်စာရင်းသွင်းနေပါသည်" စာသားနှင့် ပုံစံပြောင်းရန် Helper Function
+        const showRecordingNextMonth = () => {
+            statusText.innerHTML = `<i class="fa-solid fa-pen-nib mr-2"></i>နောက်လအတွက်စာရင်းသွင်းနေပါသည်`;
+            statusText.classList.remove('hidden', 'text-emerald-600', 'bg-emerald-50', 'border-emerald-200');
+            statusText.classList.add('text-indigo-600', 'bg-indigo-50', 'border-indigo-200');
+            btn.style.display = 'inline-block'; // ခလုတ်ကို ပြန်ပေါ်စေမည်
+        };
         
-        // Backend မှ data.status ကို "FINISHED" ဟု ပြန်ပို့ပေးရန် လိုအပ်သည်
-        if (data.status === "FINISHED") {
-            // အတည်ပြုထားပြီးသားဖြစ်ရင်
-            if(statusText) {
-                statusText.textContent = "Finished Last Month ( ပြုစုအတည်ပြုပြီးပါပြီ )";
-                statusText.classList.remove('hidden');
-            }
-            if(btn) btn.style.display = 'none'; // ခလုတ်ကို ဖျောက်ထားမည်
-        } else {
-            // မဟုတ်သေးရင် ပုံမှန်အတိုင်းထားမည်
-            if(statusText) statusText.classList.add('hidden');
-            if(btn) btn.style.display = 'inline-block'; 
+        // ၁။ Sheet ထဲမှ သွားဖျောက်လိုက်၍ (သို့) အသစ်ဖြစ်သွား၍ "FINISHED" မဟုတ်တော့လျှင်
+        if (data.status !== "FINISHED") {
+            showRecordingNextMonth();
+            return;
         }
+
+        // ၂။ Status က "FINISHED" ဖြစ်နေလျှင် ၇ ရက်ပြည့်မပြည့် စစ်ဆေးမည်
+        let isOver7Days = false;
+        
+        // မှတ်ချက် - backend မှ သိမ်းဆည်းခဲ့သောအချိန် (timestamp) ပြန်ပို့ပေးရန်လိုပါသည်။
+        if (data.timestamp) {
+            let finishedDate = new Date(data.timestamp);
+            let today = new Date();
+            let diffTime = today.getTime() - finishedDate.getTime();
+            let diffDays = diffTime / (1000 * 3600 * 24);
+            
+            if (diffDays >= 7) {
+                isOver7Days = true;
+            }
+        }
+
+        if (isOver7Days) {
+            // ၇ ရက်ပြည့်သွားလျှင် အလိုအလျောက် စာသားပြောင်းမည်
+            showRecordingNextMonth();
+        } else {
+            // ၇ ရက်မပြည့်သေးလျှင် "Finished Last Month" ကိုသာ ဆက်ပြထားမည်
+            statusText.textContent = "Finished Last Month ( ပြုစုပြီးစီးပါပြီ )";
+            statusText.classList.remove('hidden', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-200');
+            statusText.classList.add('text-emerald-600', 'bg-emerald-50', 'border-emerald-200');
+            btn.style.display = 'none'; // ခလုတ်ကို ဖျောက်ထားမည်
+        }
+
     } catch (err) {
         console.error("Failed to fetch finished status:", err);
     }
-}
-        window.onload = function() {
+}    
+    window.onload = function() {
             initStorage();
             loadSignaturePreview();
             applyBgLogo();
