@@ -4,20 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fuel Management Pro System</title>
+    <!-- External Libraries & Styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- ExcelJS & FileSaver Libraries for Real Image Embedding & Perfect Formatting -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
         
-        /* Mobile Scroll & Height Fixes */
         html, body {
             height: 100%;
-            height: 100dvh; /* Mobile Browser viewport fix */
+            height: 100dvh;
             width: 100%;
-            overflow: hidden; /* Lock body scrolling, allow internal scrolling */
+            overflow: hidden;
             margin: 0;
             padding: 0;
         }
@@ -27,10 +27,7 @@
             background-color: #f8fafc;
         }
 
-        .touch-scroll {
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-        }
-
+        .touch-scroll { -webkit-overflow-scrolling: touch; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -42,17 +39,16 @@
             color: #1e293b;
         }
         .form-input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15); background-color: #ffffff; }
-        .form-label { display: block; font-size: 0.75rem; font-weight: 700; color: #475569;   }
+        .form-label { display: block; font-size: 0.75rem; font-weight: 700; color: #475569; }
         
         .th-style { padding: 12px 16px; font-size: 0.75rem; font-weight: 700; whitespace: nowrap; }
         .td-style { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; whitespace: nowrap; }
-        
         .bg-gradient-header { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
     </style>
 </head>
 <body class="text-slate-800 flex flex-col lg:flex-row relative w-full h-full">
 
-    <!-- ================= AUTHENTICATION OVERLAY ================= -->
+    <!-- ================= 1. AUTHENTICATION OVERLAY ================= -->
     <div id="authOverlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-cover bg-center before:absolute before:inset-0 before:bg-slate-900/70 backdrop-blur-sm transition-opacity duration-500">
         <div class="relative z-10 w-full max-w-md bg-white/10 backdrop-blur-lg border border-white/20 p-8 sm:p-10 rounded-3xl shadow-2xl mx-4">
             <div class="text-center mb-8">
@@ -60,15 +56,16 @@
                 <h2 class="text-3xl font-bold text-white tracking-wide drop-shadow-md">Fuel Manager</h2>
                 <p class="text-indigo-200 text-sm mt-2" id="authSubtitle">Welcome back! Please login to continue.</p>
             </div>
+
+            <!-- Login Form -->
             <form id="loginForm" onsubmit="handleAuth(event, 'login')" class="space-y-5">
                 <div>
-    <label class="block text-xs font-bold text-slate-300 mb-1.5 tracking-wider uppercase">Email Address</label>
-    <div class="relative">
-        <i class="fa-solid fa-envelope absolute left-4 top-3.5 text-slate-400"></i>
-        <!-- id နှင့် oninput ကို ထပ်ထည့်ထားပါသည် -->
-        <input type="email" id="loginEmail" oninput="checkSignupVisibility(this.value)" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/60 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition" placeholder="admin@example.com">
-    </div>
-</div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5 tracking-wider uppercase">Email Address</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-envelope absolute left-4 top-3.5 text-slate-400"></i>
+                        <input type="email" id="loginEmail" oninput="checkSignupVisibility(this.value)" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/60 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition" placeholder="admin@example.com">
+                    </div>
+                </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-300 mb-1.5 tracking-wider uppercase">Password</label>
                     <div class="relative">
@@ -79,11 +76,12 @@
                 <button type="submit" class="w-full py-3.5 mt-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-500/40 transform transition hover:-translate-y-0.5">
                     Log In To System
                 </button>
-                <!-- id နှင့် hidden class ကို ထပ်ထည့်ထားပါသည် -->
-<div id="signupLinkContainer" class="text-center pt-4 border-t border-white/20 mt-6 hidden">
-    <p class="text-sm text-slate-300">New user? <a href="#" onclick="toggleAuth('signup')" class="text-indigo-300 hover:text-indigo-200 font-bold transition underline">Create an account</a></p>
-</div>
+                <div id="signupLinkContainer" class="text-center pt-4 border-t border-white/20 mt-6 hidden">
+                    <p class="text-sm text-slate-300">New user? <a href="#" onclick="toggleAuth('signup')" class="text-indigo-300 hover:text-indigo-200 font-bold transition underline">Create an account</a></p>
+                </div>
             </form>
+
+            <!-- Signup Form -->
             <form id="signupForm" onsubmit="handleAuth(event, 'signup')" class="space-y-4 hidden">
                 <div>
                     <label class="block text-xs font-bold text-slate-300 mb-1.5 tracking-wider uppercase">Full Name</label>
@@ -105,40 +103,18 @@
                         <i class="fa-solid fa-lock absolute left-4 top-3.5 text-slate-400"></i>
                         <input type="password" required class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-900/60 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition" placeholder="••••••••">
                     </div>
-<!-- Allowed Tabs Selection (ခွင့်ပြုမည့် Tab များ) -->
-<div>
-    <label class="block text-xs font-bold text-slate-300 mb-1.5 tracking-wider uppercase">ခွင့်ပြုမည့် Tab များ (Select Allowed Tabs)</label>
-    <div class="grid grid-cols-2 gap-2 text-xs text-white bg-slate-900/60 p-3 rounded-xl border border-slate-600">
-        <label class="flex items-center space-x-2 cursor-pointer">
-            <input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="dashboard-tab" checked>
-            <span>Dashboard</span>
-        </label>
-        <label class="flex items-center space-x-2 cursor-pointer">
-            <input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="form-tab" checked>
-            <span>Form သွင်းရန်</span>
-        </label>
-        <label class="flex items-center space-x-2 cursor-pointer">
-            <input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="draft-tab" checked>
-            <span>Draft စစ်ရန်</span>
-        </label>
-        <label class="flex items-center space-x-2 cursor-pointer">
-            <input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="inventory-tab" checked>
-            <span>Store Inventory</span>
-        </label>
-        <label class="flex items-center space-x-2 cursor-pointer">
-            <input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="inv-balance-tab" checked>
-            <span>Inventory လက်ကျန်</span>
-        </label>
-        <label class="flex items-center space-x-2 cursor-pointer">
-            <input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="report-tab">
-            <span>Reports</span>
-        </label>
-        <label class="flex items-center space-x-2 cursor-pointer">
-            <input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="settings-tab">
-            <span>စနစ်ဆက်တင်များ</span>
-        </label>
-    </div>
-</div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-1.5 tracking-wider uppercase">ခွင့်ပြုမည့် Tab များ (Select Allowed Tabs)</label>
+                    <div class="grid grid-cols-2 gap-2 text-xs text-white bg-slate-900/60 p-3 rounded-xl border border-slate-600">
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="dashboard-tab" checked><span>Dashboard</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="form-tab" checked><span>Form သွင်းရန်</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="draft-tab" checked><span>Draft စစ်ရန်</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="inventory-tab" checked><span>Store Inventory</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="inv-balance-tab" checked><span>Inventory လက်ကျန်</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="report-tab"><span>Reports</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="settings-tab"><span>စနစ်ဆက်တင်များ</span></label>
+                    </div>
                 </div>
                 <button type="submit" class="w-full py-3.5 mt-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl font-bold text-sm shadow-lg shadow-emerald-500/40 transform transition hover:-translate-y-0.5">
                     Sign Up & Continue
@@ -149,12 +125,11 @@
             </form>
         </div>
     </div>
-    <!-- ================= END AUTHENTICATION OVERLAY ================= -->
 
     <!-- Mobile Backdrop Overlay -->
     <div id="sidebarOverlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/60 z-20 hidden lg:hidden transition-opacity duration-300"></div>
 
-    <!-- Sidebar Navigation -->
+    <!-- ================= 2. SIDEBAR NAVIGATION ================= -->
     <div id="mainSidebar" class="fixed lg:static inset-y-0 left-0 z-30 w-72 bg-gradient-header text-slate-200 flex flex-col shrink-0 h-full shadow-2xl transition-transform duration-300 transform -translate-x-full lg:translate-x-0">
         <div class="p-6 border-b border-slate-700/50 flex items-center justify-between shrink-0">
             <div class="flex items-center space-x-4">
@@ -170,7 +145,7 @@
         </div>
         
         <nav class="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar touch-scroll min-h-0">
-             <button onclick="switchTab('dashboard-tab')" id="btn-dashboard-tab" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition duration-200 font-bold text-sm">
+            <button onclick="switchTab('dashboard-tab')" id="btn-dashboard-tab" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition duration-200 font-bold text-sm">
                 <i class="fa-solid fa-gauge-high w-5 text-center text-lg"></i>
                 <span>Dashboard</span>
             </button>
@@ -186,7 +161,6 @@
                 <i class="fa-solid fa-boxes-stacked w-5 text-center text-lg"></i>
                 <span>Store Inventory</span>
             </button>
-            <!-- NEW TAB ADDED: INVENTORY BALANCE REPORT -->
             <button onclick="switchTab('inv-balance-tab')" id="btn-inv-balance-tab" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition duration-200 font-bold text-sm">
                 <i class="fa-solid fa-scale-unbalanced w-5 text-center text-lg text-emerald-400"></i>
                 <span>Inventory လက်ကျန်စာရင်း</span>
@@ -216,8 +190,9 @@
         </div>
     </div>
 
-    <!-- Main Content Area -->
+    <!-- ================= 3. MAIN CONTENT AREA ================= -->
     <div class="flex-1 flex flex-col h-full min-h-0 overflow-hidden bg-slate-100 relative z-10 w-full">
+        <!-- Header -->
         <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-8 shrink-0 shadow-sm z-10">
             <div class="flex items-center space-x-3 overflow-hidden">
                 <button onclick="toggleSidebar(true)" class="lg:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none">
@@ -231,87 +206,88 @@
             </div>
         </header>
 
+        <!-- Main Scrollable Body -->
         <main class="flex-1 overflow-y-auto custom-scrollbar touch-scroll p-4 sm:p-6 md:p-8 min-h-0 pb-12">
-<!-- Dashboard Tab (Content) -->
-<div id="dashboard-tab" class="tab-content max-w-7xl mx-auto space-y-6">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Summary Cards -->
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <h3 class="text-xs font-bold text-slate-500 uppercase">ဒီလအတွက် စုစုပေါင်းဆီ (Liter)</h3>
-            <p id="dashTotalLiter" class="text-3xl font-bold text-indigo-600 mt-2">0</p>
-        </div>
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <h3 class="text-xs font-bold text-slate-500 uppercase">ဒီလအတွက် စုစုပေါင်းငွေ (MMK)</h3>
-            <p id="dashTotalAmount" class="text-3xl font-bold text-emerald-600 mt-2">0</p>
-        </div>
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-            <h3 class="text-xs font-bold text-slate-500 uppercase">စုစုပေါင်း ခရီးစဉ်</h3>
-            <p id="dashTotalTrips" class="text-3xl font-bold text-amber-600 mt-2">0</p>
-        </div>
-    </div>
-    
-    <!-- လရွေးချယ်ရန် -->
-    <div class="bg-white p-4 rounded-xl border border-slate-200 flex items-center gap-4">
-        <input type="month" id="dashMonth" class="form-input w-auto">
-        <button onclick="loadDashboardData()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 transition text-white rounded-lg font-bold shadow-sm">
-            Refresh Dashboard
-        </button>
-    </div>
 
-    <!-- လအလိုက် အသေးစိတ် ဇယား (Dashboard Data Table) -->
-    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-6">
-        <div class="bg-slate-50 border-b border-slate-200 px-4 sm:px-6 py-4">
-            <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center space-x-2">
-                <i class="fa-solid fa-table-list text-indigo-600"></i>
-                <span>ရွေးချယ်ထားသောလ၏ အသေးစိတ်မှတ်တမ်းများ</span>
-            </h3>
-        </div>
-        <div class="overflow-auto custom-scrollbar touch-scroll w-full max-h-[400px]">
-            <table class="w-full text-left border-collapse min-w-[800px]">
-                <thead class="sticky top-0 z-10 shadow-sm bg-slate-800">
-    <tr>
-        <th class="th-style text-slate-200 pl-6 border-b-0">ID</th>
-        <th class="th-style text-slate-200 border-b-0">Date</th>
-        <th class="th-style text-slate-200 border-b-0">Itineraries</th> <!-- အသစ်ထည့်ထားသော ခေါင်းစဉ် -->
-        <th class="th-style text-slate-200 border-b-0">Issued Date</th>
-        <th class="th-style text-slate-200 border-b-0">Boat ID</th>
-        <th class="th-style text-slate-200 border-b-0">Department</th>
-        <th class="th-style text-slate-200 text-right border-b-0">Liter</th>
-        <th class="th-style text-slate-200 text-right pr-6 border-b-0">Total Amount</th>
-    </tr>
-</thead>
-<tbody id="dashTableBody" class="divide-y divide-slate-100 font-medium bg-white">
-    <tr>
-        <td colspan="7" class="p-10 text-center text-slate-400"> <!-- colspan ကို 7 သို့ ပြောင်းထားသည် -->
-            <i class="fa-solid fa-calendar-days text-3xl mb-2 text-slate-300 block"></i>
-            အပေါ်မှ လ (Month) ကိုရွေးချယ်ပြီး Refresh Dashboard ကိုနှိပ်ပါ။
-        </td>
-    </tr>
-</tbody>
-            </table>
-        </div>
-    </div>
-</div>
+            <!-- TAB 1: DASHBOARD TAB -->
+            <div id="dashboard-tab" class="tab-content max-w-7xl mx-auto space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <h3 class="text-xs font-bold text-slate-500 uppercase">ဒီလအတွက် စုစုပေါင်းဆီ (Liter)</h3>
+                        <p id="dashTotalLiter" class="text-3xl font-bold text-indigo-600 mt-2">0</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <h3 class="text-xs font-bold text-slate-500 uppercase">ဒီလအတွက် စုစုပေါင်းငွေ (MMK)</h3>
+                        <p id="dashTotalAmount" class="text-3xl font-bold text-emerald-600 mt-2">0</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <h3 class="text-xs font-bold text-slate-500 uppercase">စုစုပေါင်း ခရီးစဉ်</h3>
+                        <p id="dashTotalTrips" class="text-3xl font-bold text-amber-600 mt-2">0</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-4 rounded-xl border border-slate-200 flex items-center gap-4">
+                    <input type="month" id="dashMonth" class="form-input w-auto">
+                    <button onclick="loadDashboardData()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 transition text-white rounded-lg font-bold shadow-sm">
+                        Refresh Dashboard
+                    </button>
+                </div>
 
-            <!-- 1. FORM TAB -->
+                <!-- Dashboard Table with Datasheet Field Sequence -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-6">
+                    <div class="bg-slate-50 border-b border-slate-200 px-4 sm:px-6 py-4">
+                        <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center space-x-2">
+                            <i class="fa-solid fa-table-list text-indigo-600"></i>
+                            <span>ရွေးချယ်ထားသောလ၏ အသေးစိတ်မှတ်တမ်းများ</span>
+                        </h3>
+                    </div>
+                    <div class="overflow-auto custom-scrollbar touch-scroll w-full max-h-[400px]">
+                        <table class="w-full text-left border-collapse min-w-[1000px]">
+                            <thead class="sticky top-0 z-10 shadow-sm bg-slate-800">
+                                <tr>
+                                    <th class="th-style text-slate-200 pl-6 border-b-0">ID</th>
+                                    <th class="th-style text-slate-200 border-b-0">Filled Date</th>
+                                    <th class="th-style text-slate-200 border-b-0">Itineraries</th>
+                                    <th class="th-style text-slate-200 border-b-0">Boat ID</th>
+                                    <th class="th-style text-slate-200 border-b-0">Department</th>
+                                    <th class="th-style text-slate-200 border-b-0">Issued Date</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">Liter</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">Price (1L)</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">Price/Drum</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">Total Amount</th>
+                                    <th class="th-style text-slate-200 pr-6 border-b-0">Marks</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashTableBody" class="divide-y divide-slate-100 font-medium bg-white">
+                                <tr>
+                                    <td colspan="11" class="p-10 text-center text-slate-400">
+                                        <i class="fa-solid fa-calendar-days text-3xl mb-2 text-slate-300 block"></i>
+                                        အပေါ်မှ လ (Month) ကိုရွေးချယ်ပြီး Refresh Dashboard ကိုနှိပ်ပါ။
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: FORM TAB (Input Data) -->
             <div id="form-tab" class="tab-content hidden max-w-7xl mx-auto space-y-6">
-                <!-- Rest of form-tab HTML remains same as original -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-    <div class="flex flex-wrap items-center space-x-4 gap-y-2">
-        <h2 class="text-sm sm:text-base font-bold text-white flex items-center space-x-2">
-            <i class="fa-solid fa-pen-to-square text-indigo-400"></i>
-            <span>အချက်အလက်ဖြည့်စွက်ရန်</span>
-        </h2>
-        <!-- အသစ်ထည့်ထားသော Finished this month Button -->
-        <button id="btnFinishedMonth" type="button" onclick="handleFinishedMonthClick()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-lg shadow transition">
-            Finished this month
-        </button>
-    </div>
-    <button onclick="switchTab('draft-tab')" class="text-xs sm:text-sm text-slate-200 hover:text-white flex items-center font-semibold">
-        စစ်ဆေးရန် Draft သို့သွားမည် <i class="fa-solid fa-arrow-right ml-2"></i>
-    </button>
-</div>
+                        <div class="flex flex-wrap items-center space-x-4 gap-y-2">
+                            <h2 class="text-sm sm:text-base font-bold text-white flex items-center space-x-2">
+                                <i class="fa-solid fa-pen-to-square text-indigo-400"></i>
+                                <span>အချက်အလက်ဖြည့်စွက်ရန်</span>
+                            </h2>
+                            <button id="btnFinishedMonth" type="button" onclick="handleFinishedMonthClick()" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-lg shadow transition">
+                                Finished this month
+                            </button>
+                        </div>
+                        <button onclick="switchTab('draft-tab')" class="text-xs sm:text-sm text-slate-200 hover:text-white flex items-center font-semibold">
+                            စစ်ဆေးရန် Draft သို့သွားမည် <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
 
                     <form id="entryForm" class="p-4 sm:p-6 md:p-8" onsubmit="addToDraft(event)">
                         <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 sm:p-5 mb-6">
@@ -389,7 +365,7 @@
                                         
                                         <div class="pt-3 border-t border-amber-200 mt-2">
                                             <label class="text-[11px] font-bold text-blue-700 block mb-1">VOC AMOUNT (ဆိုင်ဘောက်ချာငွေ)</label>
-                                            <input type="number" id="inp_vocAmount" step="1" placeholder="ကွာခြားချက်ရှိပါက ထည့်ရန်" class="form-input font-mono font-bold text-base border-blue-300 focus:border-blue-500 focus:ring-blue-500">
+                                            <input type="number" id="inp_vocAmount" oninput="calcPrice()" step="1" placeholder="ကွာခြားချက်ရှိပါက ထည့်ရန်" class="form-input font-mono font-bold text-base border-blue-300 focus:border-blue-500 focus:ring-blue-500">
                                         </div>
                                     </div>
                                 </div>
@@ -406,9 +382,8 @@
                 </div>
             </div>
 
-            <!-- 2. DRAFT TAB -->
+            <!-- TAB 3: DRAFT TAB (Review & Edit Data) -->
             <div id="draft-tab" class="tab-content hidden max-w-7xl mx-auto space-y-6">
-                <!-- Rest of draft-tab HTML remains same as original -->
                 <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-sm">
                     <div>
                         <h4 class="text-sm font-bold text-indigo-800"><i class="fa-solid fa-rotate-left mr-2"></i>အမှားပြင်ဆင်ရန် ဒေတာပြန်ခေါ်မည် (Edit Data)</h4>
@@ -443,24 +418,27 @@
                     </div>
                     
                     <div class="overflow-auto custom-scrollbar touch-scroll w-full max-h-[500px] sm:max-h-[600px]">
-                        <table class="w-full text-left border-collapse min-w-[800px]">
+                        <table class="w-full text-left border-collapse min-w-[1000px]">
                             <thead class="sticky top-0 z-10 shadow-sm">
                                 <tr class="bg-slate-800">
-                                    <th class="th-style text-slate-200 pl-6 border-b-0">ID</th>
-                                    <th class="th-style text-slate-200 border-b-0">Filled Date</th>
-                                    <th class="th-style text-slate-200 border-b-0">Itineraries</th>
-                                    <th class="th-style text-emerald-400 border-b-0">Issued Date</th>
-                                    <th class="th-style text-slate-200 border-b-0">Boat ID</th>
-                                    <th class="th-style text-slate-200 border-b-0">Department</th>
-                                    <th class="th-style text-slate-200 text-right border-b-0">Liter</th>
-                                    <th class="th-style text-slate-200 text-right border-b-0">Total (MMK)</th>
+                                    <th class="th-style text-slate-200 pl-6 border-b-0">1. ID</th>
+                                    <th class="th-style text-slate-200 border-b-0">2. Filled Date</th>
+                                    <th class="th-style text-slate-200 border-b-0">3. Itineraries</th>
+                                    <th class="th-style text-slate-200 border-b-0">4. Boat ID</th>
+                                    <th class="th-style text-slate-200 border-b-0">5. Department</th>
+                                    <th class="th-style text-emerald-400 border-b-0">6. Issued Date</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">7. Liter</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">8. Price (1L)</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">9. Price/Drum</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">10. Total Amount</th>
+                                    <th class="th-style text-slate-200 border-b-0">11. Marks</th>
                                     <th class="th-style text-slate-200 text-center border-b-0">Status</th>
                                     <th class="th-style text-slate-200 pr-6 text-center border-b-0">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="draftTableBody" class="divide-y divide-slate-100 font-medium bg-white">
                                 <tr>
-                                    <td colspan="10" class="p-10 text-center text-slate-400">
+                                    <td colspan="13" class="p-10 text-center text-slate-400">
                                         <i class="fa-regular fa-folder-open text-3xl mb-2 text-slate-300 block"></i>
                                         အပေါ်မှ Form ကိုအရင်ဖြည့်ပါ သို့မဟုတ် ဒေတာပြန်ခေါ်ပါ။
                                     </td>
@@ -471,9 +449,8 @@
                 </div>
             </div>
 
-            <!-- 3. INVENTORY TAB -->
+            <!-- TAB 4: INVENTORY TAB -->
             <div id="inventory-tab" class="tab-content hidden max-w-7xl mx-auto space-y-6">
-                <!-- Inventory Form -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-4 sm:px-6 py-4 flex justify-between items-center">
                         <h2 class="text-sm sm:text-base font-bold text-white flex items-center space-x-2">
@@ -523,7 +500,7 @@
                                     <div class="grid grid-cols-1 gap-4 mb-4">
                                         <div>
                                             <label class="form-label text-indigo-900">Item Name (ပစ္စည်းအမည်)</label>
-                                            <input type="text" id="inv_itemName" required placeholder="ဥပမာ - Engine Oil 20W-50 / Filter / Rope (အမည်တူများ သွားပေါင်းပေးမည်)" class="form-input border-indigo-200">
+                                            <input type="text" id="inv_itemName" required placeholder="ဥပမာ - Engine Oil 20W-50 / Filter / Rope" class="form-input border-indigo-200">
                                         </div>
                                         <div>
                                             <label class="form-label text-slate-600">Marks / Remarks (မှတ်ချက်)</label>
@@ -573,7 +550,7 @@
                     </form>
                 </div>
 
-                <!-- Inventory History Table (WITH EDIT ACTION) -->
+                <!-- Inventory History Table -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="bg-slate-50 border-b border-slate-200 px-4 sm:px-6 py-4 flex justify-between items-center">
                         <h3 class="text-sm sm:text-base font-bold text-slate-800 flex items-center space-x-2">
@@ -613,7 +590,7 @@
                 </div>
             </div>
 
-            <!-- NEW TAB ADDED: INVENTORY BALANCE REPORT TAB -->
+            <!-- TAB 5: INVENTORY BALANCE REPORT TAB -->
             <div id="inv-balance-tab" class="tab-content hidden max-w-7xl mx-auto space-y-6">
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="bg-slate-50 border-b border-slate-200 px-4 sm:px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -647,7 +624,7 @@
                             <tbody id="invBalanceTableBody" class="divide-y divide-slate-100 font-medium bg-white">
                                 <tr>
                                     <td colspan="7" class="p-10 text-center text-slate-400">
-                                        အပေါ်ရှိ 'လက်ကျန် တွက်ချက်မည်' ကိုနှိပ်၍ စာရင်းကြည့်ပါ။ (ပစ္စည်းအမည်တူများကို ပေါင်း၍ လက်ကျန်ပြပေးမည်ဖြစ်သည်)
+                                        အပေါ်ရှိ 'လက်ကျန် တွက်ချက်မည်' ကိုနှိပ်၍ စာရင်းကြည့်ပါ။
                                     </td>
                                 </tr>
                             </tbody>
@@ -656,21 +633,20 @@
                 </div>
             </div>
 
-            <!-- 4. REPORT TAB -->
+            <!-- TAB 6: REPORT TAB -->
             <div id="report-tab" class="tab-content hidden max-w-7xl mx-auto space-y-6">
-                <!-- Rest of report-tab HTML remains same as original -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
                     <div class="border-b border-slate-100 pb-4 mb-5">
-    <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center space-x-2 w-full">
-        <i class="fa-solid fa-chart-line text-emerald-600"></i>
-        <span>လချုပ် / နှစ်ချုပ် / စိတ်ကြိုက် Report ထုတ်ရန်</span>
-        <!-- အသစ်ထည့်ထားသော Status စာသား -->
-        <span id="reportFinishedStatus" class="ml-auto text-emerald-600 animate-pulse text-sm font-bold hidden border border-emerald-200 bg-emerald-50 px-3 py-1 rounded-full whitespace-nowrap">
-            Finished This Month
-        </span>
-    </h2>
-</div>
+                        <h2 class="text-base sm:text-lg font-bold text-slate-900 flex items-center space-x-2 w-full">
+                            <i class="fa-solid fa-chart-line text-emerald-600"></i>
+                            <span>လချုပ် / နှစ်ချုပ် / စိတ်ကြိုက် Report ထုတ်ရန်</span>
+                            <span id="reportFinishedStatus" class="ml-auto text-emerald-600 animate-pulse text-sm font-bold hidden border border-emerald-200 bg-emerald-50 px-3 py-1 rounded-full whitespace-nowrap">
+                                Finished This Month
+                            </span>
+                        </h2>
+                    </div>
 
+                    <!-- Filter Control Panel -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 items-end">
                         <div class="col-span-1 md:col-span-2 lg:col-span-2">
                             <label class="form-label text-slate-600 mb-1">Report အမျိုးအစား ရွေးချယ်ရန်</label>
@@ -742,21 +718,22 @@
                         </div>
                     </div>
 
+                    <!-- Report Output Table -->
                     <div class="overflow-auto border border-slate-300 rounded-xl custom-scrollbar touch-scroll max-h-[600px] shadow-sm w-full">
-                        <table id="excelReportTable" class="w-full text-left border-collapse bg-white min-w-[900px]">
+                        <table id="excelReportTable" class="w-full text-left border-collapse bg-white min-w-[1000px]">
                             <thead class="sticky top-0 z-10 shadow-sm">
                                 <tr class="bg-slate-800" id="reportTableHeader">
-                                    <th class="th-style pl-6 text-slate-200 border-b-0">ID</th>
-                                    <th class="th-style text-slate-200 border-b-0">Filled Date</th>
-                                    <th class="th-style text-slate-200 border-b-0">Itineraries</th>
-                                    <th class="th-style text-emerald-400 border-b-0">Issued Date</th>
-                                    <th class="th-style text-slate-200 border-b-0">Boat ID</th>
-                                    <th class="th-style text-slate-200 border-b-0">Department</th>
-                                    <th class="th-style text-slate-200 text-right border-b-0">Liter</th>
-                                    <th class="th-style text-slate-200 text-right border-b-0">Price/Drum</th>
-                                    <th class="th-style text-slate-200 text-right border-b-0">Price(1L)</th>
-                                    <th class="th-style pr-6 text-slate-200 text-right border-b-0">Total Amount</th>
-                                    <th class="th-style pr-6 text-slate-200 border-b-0">Marks</th>
+                                    <th class="th-style pl-6 text-slate-200 border-b-0">1. ID</th>
+                                    <th class="th-style text-slate-200 border-b-0">2. Filled Date</th>
+                                    <th class="th-style text-slate-200 border-b-0">3. Itineraries</th>
+                                    <th class="th-style text-slate-200 border-b-0">4. Boat ID</th>
+                                    <th class="th-style text-slate-200 border-b-0">5. Department</th>
+                                    <th class="th-style text-emerald-400 border-b-0">6. Issued Date</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">7. Liter</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">8. Price (1L)</th>
+                                    <th class="th-style text-slate-200 text-right border-b-0">9. Price/Drum</th>
+                                    <th class="th-style pr-6 text-slate-200 text-right border-b-0">10. Total Amount</th>
+                                    <th class="th-style pr-6 text-slate-200 border-b-0">11. Marks</th>
                                 </tr>
                             </thead>
                             <tbody id="reportTableBody" class="divide-y divide-slate-100 bg-white">
@@ -781,9 +758,8 @@
                 </div>
             </div>
 
-            <!-- 5. SETTINGS TAB -->
+            <!-- TAB 7: SETTINGS TAB -->
             <div id="settings-tab" class="tab-content hidden max-w-5xl mx-auto space-y-6">
-                <!-- Settings Content remains same as original -->
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-6">
                     <div class="border-b border-slate-100 pb-3 mb-5">
                         <h2 class="text-base font-bold text-slate-900 flex items-center space-x-2">
@@ -882,32 +858,83 @@
         </main>
     </div>
 
-    <!-- JAVASCRIPT SECTION -->
-    <script>
-        // System Config Variables
-        let WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxaXbfSApICiIG0JUtBB3gWUPCdK84v8B87PexwkY9NMxQ0pBwzOzwlkbOxVqdAWq9OCQ/exec";
-        // ၁။ ပထမဦးစွာ သင့်ရဲ့ GitHub Link တွေကို သတ်မှတ်ပါ
-         const defaultBgLogoImage = "https://raw.githubusercontent.com/Naylin98/FuelManager3.5/main/logo.png";
-         const defaultSignatureImage = "https://raw.githubusercontent.com/Naylin98/FuelManager3.5/main/signature.png";
 
-          // ၂။ localStorage ထဲမှာ ရှာမတွေ့ရင် Default အနေနဲ့ GitHub ပုံကို သုံးဖို့ ပြင်ပါ
-         let savedBgLogoBase64 = localStorage.getItem('v5_bglogo_base64') || defaultBgLogoImage;
-         let savedSignatureBase64 = localStorage.getItem('v5_signature_base64') || defaultSignatureImage;
+<!-- ================= JAVASCRIPT SECTION ================= -->
+    <script>
+        /* ================= 1. CONFIG & GLOBAL VARIABLES ================= */
+        let WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxaXbfSApICiIG0JUtBB3gWUPCdK84v8B87PexwkY9NMxQ0pBwzOzwlkbOxVqdAWq9OCQ/exec";
+        const defaultBgLogoImage = "https://raw.githubusercontent.com/Naylin98/FuelManager3.5/main/logo.png";
+        const defaultSignatureImage = "https://raw.githubusercontent.com/Naylin98/FuelManager3.5/main/signature.png";
+
+        let savedBgLogoBase64 = localStorage.getItem('v5_bglogo_base64') || defaultBgLogoImage;
+        let savedSignatureBase64 = localStorage.getItem('v5_signature_base64') || defaultSignatureImage;
+        
         let DRAFT_DATA = [];
         let INVENTORY_DATA = []; 
-        let INV_BALANCE_DATA = []; // NEW FOR BALANCE REPORT
+        let INV_BALANCE_DATA = [];
         let REPORT_GROUPS_DATA = {}; 
         let isReportGenerated = false;
         let currentEditIndex = -1;
-        let currentInvEditId = null; // FOR INVENTORY EDIT
+        let currentInvEditId = null;
         let globalGrandTotalAmount = 0;
         let globalGrandTotalLiter = 0;
 
-        // AUTHENTICATION
-        if(localStorage.getItem('v5_logged_in') === 'true') {
-            document.getElementById('authOverlay').style.display = 'none';
+        /* ================= 2. INITIALIZATION & SYSTEM LOAD ================= */
+        window.onload = function() {
+            initStorage();
+            loadSignaturePreview();
+            applyBgLogo();
+            
+            const initToday = new Date();
+            const initCurrentMonth = initToday.getFullYear() + '-' + String(initToday.getMonth() + 1).padStart(2, '0');
+            if (document.getElementById('dashMonth')) {
+                document.getElementById('dashMonth').value = initCurrentMonth;
+            }
+            if(document.getElementById('filterMonth')) {
+                document.getElementById('filterMonth').value = initCurrentMonth;
+            }
+            
+            updateFinishedMonthUI();
+            
+            document.getElementById('currentDateDisplay').innerText = formatToDDMMYYYY(initToday.toISOString().split('T')[0]);
+            document.getElementById('inp_filledDate').valueAsDate = initToday;
+            document.getElementById('inp_issuedDate').valueAsDate = initToday;
+            
+            if(document.getElementById('inv_date')) document.getElementById('inv_date').valueAsDate = initToday;
+            if(document.getElementById('inv_id')) document.getElementById('inv_id').value = generateInvId();
+
+            if(localStorage.getItem('v5_logged_in') === 'true') {
+                document.getElementById('authOverlay').style.display = 'none';
+            }
+
+            if(WEB_APP_URL) {
+                document.getElementById('webAppUrlInput').value = WEB_APP_URL;
+                updateStatusIndicator(true);
+                fetchSettingsFromSheet(); 
+            } else {
+                updateStatusIndicator(false);
+            }
+
+            refreshUI(); 
+            renderDraftTable();
+            fetchNextID(); 
+            applyRoleBasedAccess();
+            switchTab('dashboard-tab');
+        };
+
+        function initStorage() {
+            if (!localStorage.getItem('v5_boat_ids')) localStorage.setItem('v5_boat_ids', JSON.stringify(['Boat-A', 'Boat-B']));
+            if (!localStorage.getItem('v5_departments')) localStorage.setItem('v5_departments', JSON.stringify(['Operation', 'Logistics']));
         }
 
+        function refreshUI() {
+            loadDropdownOptions();
+            updateSettingsLists();
+            applyBgLogo();
+            loadSignaturePreview();
+        }
+
+        /* ================= 3. AUTHENTICATION & ACCESS CONTROL ================= */
         function toggleAuth(mode) {
             const loginForm = document.getElementById('loginForm');
             const signupForm = document.getElementById('signupForm');
@@ -923,157 +950,75 @@
                 subtitle.innerText = "Welcome back! Please login to continue.";
             }
         }
-        // Email အကွက်ကို စစ်ဆေးမည့် Function
-function checkSignupVisibility(emailValue) {
-    const signupLink = document.getElementById('signupLinkContainer');
-    // ရိုက်ထည့်လိုက်သော Email သည် admin@mm.com ဖြစ်မှသာ hidden class ကိုဖယ်ရှား၍ ပြသမည်
-    if (emailValue.trim() === 'admin@mm.com') {
-        signupLink.classList.remove('hidden');
-    } else {
-        signupLink.classList.add('hidden');
-    }
-}
-        async function loadDashboardData() {
-    const month = document.getElementById('dashMonth').value;
-    
-    if(!WEB_APP_URL) return alert("API URL ချိတ်ဆက်ထားခြင်းမရှိပါ။ Settings တွင် စစ်ဆေးပါ။");
-    
-    const tbody = document.getElementById('dashTableBody');
-    tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-indigo-500"><i class="fa-solid fa-spinner animate-spin text-2xl mb-2 block"></i>ဒေတာများ ဆွဲယူတွက်ချက်နေပါသည်...</td></tr>`;
 
-    try {
-        // API ကနေ Data ဆွဲမယ်
-        let res = await fetch(`${WEB_APP_URL}?action=getData`);
-        let data = await res.json();
-        
-        // အသစ် အစားထိုးရန် Code
-const [y, m] = month.split('-');
-const filtered = data.filter(r => {
-    if(!r.filledDate) return false;
-    const d = new Date(r.filledDate);
-    if (isNaN(d.getTime())) {
-        // Date format ကြောင့် Parse လုပ်မရပါက String ပုံစံဖြင့် အရန်စစ်ဆေးရန် (Optional)
-        return r.filledDate.includes(`${m}/${y}`) || r.filledDate.includes(`${y}-${m}`);
-    }
-    return d.getFullYear() == y && String(d.getMonth() + 1).padStart(2, '0') == m;
-});
-        
-        let totalLiter = 0;
-        let totalAmount = 0;
-        let tableHTML = "";
-        
-        if (filtered.length === 0) {
-            tableHTML = `<tr><td colspan="6" class="p-10 text-center text-slate-400">ဤလအတွက် မှတ်တမ်းများ မရှိသေးပါ။</td></tr>`;
+        function checkSignupVisibility(emailValue) {
+            const signupLink = document.getElementById('signupLinkContainer');
+            if (emailValue.trim() === 'admin@mm.com') {
+                signupLink.classList.remove('hidden');
+            } else {
+                signupLink.classList.add('hidden');
+            }
         }
-        
-        filtered.forEach(r => {
-            let lit = parseFloat(r.liter) || 0;
-            let amt = parseFloat(r.totalAmount) || 0;
-            
-            totalLiter += lit;
-            totalAmount += amt;
-
-            tableHTML += `
-                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                    <td class="td-style pl-6 font-mono font-bold text-slate-700">${r.id || ''}</td>
-                    <td class="td-style">${formatToDDMMYYYY(r.filledDate)}</td>
-                    <td class="td-style pl-6 font-mono font-bold text-slate-700">${r.itineraries || ''}</td>
-                    <td class="td-style">${formatToDDMMYYYY(r.issuedDate)}</td>
-                    <td class="td-style text-indigo-600 font-bold">${r.boatId || ''}</td>
-                    <td class="td-style">${r.issuedDept || ''}</td>
-                    <td class="td-style text-right font-mono">${Math.round(lit).toLocaleString()}</td>
-                    <td class="td-style text-right font-mono font-bold text-slate-900 pr-6">${Math.round(amt).toLocaleString()}</td>
-                </tr>
-            `;
-        });
-        
-        // Summary Card များတွင် ပြသရန်
-        document.getElementById('dashTotalLiter').innerText = Math.round(totalLiter).toLocaleString();
-        document.getElementById('dashTotalAmount').innerText = Math.round(totalAmount).toLocaleString();
-        document.getElementById('dashTotalTrips').innerText = filtered.length;
-        
-        // ဇယားတွင် ပြသရန်
-        tbody.innerHTML = tableHTML;
-
-    } catch (error) {
-        console.error("Dashboard Fetch Error:", error);
-        tbody.innerHTML = `<tr><td colspan="6" class="p-10 text-center text-red-500">ဒေတာဆွဲယူရာတွင် အမှားအယွင်းရှိနေပါသည်။</td></tr>`;
-    }
-}
-
-// ၅ မိနစ် (၃၀၀,၀၀၀ မီလီစက္ကန့်) လျှင် တစ်ကြိမ် အလိုအလျောက် Data Refresh လုပ်ရန်
-setInterval(loadDashboardData, 300000);
-
-// Website (Dashboard) စတင်ဖွင့်လိုက်ချိန်မှာ Data ချက်ချင်းပေါ်နေစေရန် (လိုအပ်ပါက ထည့်သွင်းနိုင်ပါသည်)
-window.addEventListener('DOMContentLoaded', (event) => {
-    loadDashboardData();
-});
-
-
 
         async function handleAuth(e, action) {
-    e.preventDefault();
-    let targetUrl = WEB_APP_URL || localStorage.getItem('v5_google_web_app_url');
-    if (!targetUrl) {
-        targetUrl = prompt("စနစ်စတင်ရန် Google App Script API URL ကို ထည့်ပါ :");
-        if(!targetUrl) return alert("API URL မရှိဘဲ စနစ်ထဲဝင်၍မရပါ။");
-        localStorage.setItem('v5_google_web_app_url', targetUrl);
-        WEB_APP_URL = targetUrl;
-    }
-
-    const form = e.target;
-    const btn = form.querySelector('button[type="submit"]');
-    const originalBtnHtml = btn.innerHTML;
-    btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> စစ်ဆေးနေပါသည်...`;
-    btn.disabled = true;
-
-    let payload = { action: action };
-    const inputs = form.querySelectorAll('input');
-
-    if(action === 'login') {
-        payload.email = inputs[0].value;
-        payload.password = inputs[1].value;
-    } else { 
-        payload.name = inputs[0].value;
-        payload.email = inputs[1].value;
-        payload.password = inputs[2].value;
-
-        // Checkbox များမှ ရွေးချယ်ထားသော Tab များ
-        let selectedTabs = Array.from(document.querySelectorAll('.tab-perm-cb:checked')).map(cb => cb.value);
-        payload.allowedTabs = selectedTabs;
-    }
-
-    try {
-        let res = await fetch(targetUrl, { method: 'POST', body: JSON.stringify(payload) });
-        let result = await res.json();
-
-        if(result.status === 'success') {
-            // Sheet ထဲမှ ပြန်လာသော တန်ဖိုးများကို LocalStorage ထဲ သိမ်းဆည်းခြင်း
-            localStorage.setItem('v5_logged_in', 'true');
-            localStorage.setItem('v5_user_name', result.name);
-            localStorage.setItem('v5_user_role', result.role);
-            localStorage.setItem('v5_user_allowed_tabs', JSON.stringify(result.allowedTabs));
-
-            // Overlay မူလ Login Page ကို ပိတ်ခြင်း
-            const overlay = document.getElementById('authOverlay');
-            if (overlay) {
-                overlay.classList.add('opacity-0'); 
-                setTimeout(() => { overlay.style.display = 'none'; }, 500);
+            e.preventDefault();
+            let targetUrl = WEB_APP_URL || localStorage.getItem('v5_google_web_app_url');
+            if (!targetUrl) {
+                targetUrl = prompt("စနစ်စတင်ရန် Google App Script API URL ကို ထည့်ပါ :");
+                if(!targetUrl) return alert("API URL မရှိဘဲ စနစ်ထဲဝင်၍မရပါ။");
+                localStorage.setItem('v5_google_web_app_url', targetUrl);
+                WEB_APP_URL = targetUrl;
             }
-            
-            // UI နှင့် Permission အားပြန်လည် ပွဲထုတ်ခြင်း
-            applyRoleBasedAccess();
-            switchTab('dashboard-tab');
-        } else {
-            alert("အမှား: " + result.message);
-        }
-    } catch (err) {
-        alert("ချိတ်ဆက်မှု ပြဿနာရှိနေပါသည်။ Web App URL မှန်မမှန် စစ်ဆေးပါ။\nError: " + err.message);
-    }
 
-    btn.innerHTML = originalBtnHtml;
-    btn.disabled = false;
-}
+            const form = e.target;
+            const btn = form.querySelector('button[type="submit"]');
+            const originalBtnHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> စစ်ဆေးနေပါသည်...`;
+            btn.disabled = true;
+
+            let payload = { action: action };
+            const inputs = form.querySelectorAll('input');
+
+            if(action === 'login') {
+                payload.email = inputs[0].value;
+                payload.password = inputs[1].value;
+            } else { 
+                payload.name = inputs[0].value;
+                payload.email = inputs[1].value;
+                payload.password = inputs[2].value;
+                let selectedTabs = Array.from(document.querySelectorAll('.tab-perm-cb:checked')).map(cb => cb.value);
+                payload.allowedTabs = selectedTabs;
+            }
+
+            try {
+                let res = await fetch(targetUrl, { method: 'POST', body: JSON.stringify(payload) });
+                let result = await res.json();
+
+                if(result.status === 'success') {
+                    localStorage.setItem('v5_logged_in', 'true');
+                    localStorage.setItem('v5_user_name', result.name || '');
+                    localStorage.setItem('v5_user_role', result.role || 'user');
+                    localStorage.setItem('v5_user_allowed_tabs', JSON.stringify(result.allowedTabs || []));
+
+                    const overlay = document.getElementById('authOverlay');
+                    if (overlay) {
+                        overlay.classList.add('opacity-0'); 
+                        setTimeout(() => { overlay.style.display = 'none'; }, 500);
+                    }
+                    
+                    applyRoleBasedAccess();
+                    switchTab('dashboard-tab');
+                } else {
+                    alert("အမှား: " + result.message);
+                }
+            } catch (err) {
+                alert("ချိတ်ဆက်မှု ပြဿနာရှိနေပါသည်။ Web App URL မှန်မမှန် စစ်ဆေးပါ။\nError: " + err.message);
+            }
+
+            btn.innerHTML = originalBtnHtml;
+            btn.disabled = false;
+        }
+
         function logoutSystem() {
             localStorage.removeItem('v5_logged_in');
             localStorage.removeItem('v5_user_role');
@@ -1083,268 +1028,29 @@ window.addEventListener('DOMContentLoaded', (event) => {
             toggleSidebar(false);
         }
 
-        // SETTINGS & UI
-        function applyBgLogo() {
-    const imgSrc = savedBgLogoBase64 ? savedBgLogoBase64 : defaultBgLogoImage;
-    const authOverlay = document.getElementById('authOverlay');
-    if(authOverlay) authOverlay.style.backgroundImage = `url('${imgSrc}')`;
-    document.querySelectorAll('.system-logo').forEach(img => { 
-        img.src = imgSrc; 
-        // ပုံ Load လုပ်ရာတွင် Error ဖြစ်ပါက Default ပုံကို ပြသရန်
-        img.onerror = function() {
-            this.onerror = null;
-            this.src = defaultBgLogoImage;
-        };
-    });
-}
-
-        // နောက်ခံနှင့် လိုဂိုပုံပြောင်းရန် (Background & Logo Upload)
-function saveBgLogo() {
-    const fileInput = document.getElementById('bgLogoUpload');
-    if (fileInput.files.length === 0) return alert("ကျေးဇူးပြု၍ ပုံရွေးချယ်ပါ။");
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-    reader.onload = async function(e) { // async ပြောင်းထားသည်
-        const base64String = e.target.result;
-        localStorage.setItem('v5_bglogo_base64', base64String);
-        savedBgLogoBase64 = base64String;
-        applyBgLogo();
-        await saveSettingsToSheet(); // Google Sheet သို့ ပို့ရန်
-        alert("နောက်ခံနှင့် လိုဂိုပုံ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
-        fileInput.value = ""; 
-    };
-    reader.readAsDataURL(file);
-}
-
-function resetBgLogo() {
-    localStorage.removeItem('v5_bglogo_base64');
-    savedBgLogoBase64 = "";
-    applyBgLogo();
-    saveSettingsToSheet(); // Google Sheet သို့ ပို့ရန်
-    alert("မူလပုံစံသို့ ပြန်လည်ပြောင်းလဲပြီးပါပြီ။");
-}
-
-
-
-        function toggleSidebar(forceState) {
-            const sidebar = document.getElementById('mainSidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (!sidebar || !overlay) return;
-            const isExpanded = !sidebar.classList.contains('-translate-x-full');
-            const shouldOpen = forceState !== undefined ? forceState : !isExpanded;
-            if (shouldOpen) {
-                sidebar.classList.remove('-translate-x-full');
-                overlay.classList.remove('hidden');
-            } else {
-                sidebar.classList.add('-translate-x-full');
-                overlay.classList.add('hidden');
+        function applyRoleBasedAccess() {
+            let userRole = localStorage.getItem('v5_user_role') || 'user';
+            let allowedTabs = [];
+            try {
+                allowedTabs = JSON.parse(localStorage.getItem('v5_user_allowed_tabs')) || ['dashboard-tab', 'form-tab', 'draft-tab', 'inventory-tab', 'inv-balance-tab'];
+            } catch(e) {
+                allowedTabs = ['dashboard-tab', 'form-tab', 'draft-tab', 'inventory-tab', 'inv-balance-tab'];
             }
-        }
-
-        function initStorage() {
-            if (!localStorage.getItem('v5_boat_ids')) localStorage.setItem('v5_boat_ids', JSON.stringify(['Boat-A', 'Boat-B']));
-            if (!localStorage.getItem('v5_departments')) localStorage.setItem('v5_departments', JSON.stringify(['Operation', 'Logistics']));
-        }
-
-        function formatToDDMMYYYY(dateString) {
-            if(!dateString) return "";
-            let d = new Date(dateString);
-            if (isNaN(d.getTime())) {
-                if (dateString.includes('-')) {
-                    let parts = dateString.split('-');
-                    if (parts.length === 3) {
-                        let y = parts[0].length === 4 ? parts[0] : parts[2];
-                        let m = String(parts[1]).padStart(2, '0');
-                        let day = String(parts[0].length === 4 ? parts[2] : parts[0]).padStart(2, '0');
-                        return `${day}/${m}/${y}`;
+            
+            const allTabs = ['dashboard-tab', 'form-tab', 'draft-tab', 'inventory-tab', 'inv-balance-tab', 'report-tab', 'settings-tab'];
+            allTabs.forEach(tabId => {
+                let btn = document.getElementById('btn-' + tabId);
+                if (btn) {
+                    if (userRole === 'admin') {
+                        btn.style.display = 'flex'; 
+                    } else {
+                        btn.style.display = allowedTabs.includes(tabId) ? 'flex' : 'none';
                     }
                 }
-                return dateString;
-            }
-            let day = String(d.getDate()).padStart(2, '0');
-            let month = String(d.getMonth() + 1).padStart(2, '0');
-            let year = d.getFullYear();
-            return `${day}/${month}/${year}`;
+            });
         }
 
-function fetchNextID() {
-    let draftMax = 0;
-    if (DRAFT_DATA.length > 0) {
-        let newDrafts = DRAFT_DATA.filter(d => !d._isServerData);
-        if(newDrafts.length > 0) {
-            let lastId = newDrafts[newDrafts.length - 1].id;
-            let match = lastId.match(/MMFA-(\d+)/);
-            if (match) draftMax = parseInt(match[1], 10);
-        }
-    }
-
-    if (!WEB_APP_URL) {
-        document.getElementById('inp_id').value = generateIdString(draftMax + 1);
-        return;
-    }
-
-    fetch(`${WEB_APP_URL}?action=getData`)
-        .then(res => res.json())
-        .then(rawData => {
-            let sheetMax = 0;
-            // Fix: Array ဖြစ်မှသာ loop ပတ်ရန် စစ်ဆေးခြင်း
-            if (Array.isArray(rawData)) {
-                rawData.forEach(row => {
-                     let idStr = row.id || "";
-                     let match = String(idStr).match(/MMFA-(\d+)/);
-                     if (match) {
-                         let num = parseInt(match[1], 10);
-                         if (num > sheetMax) sheetMax = num;
-                     }
-                });
-            }
-            let nextNum = Math.max(sheetMax, draftMax) + 1;
-            document.getElementById('inp_id').value = generateIdString(nextNum);
-        })
-        .catch((error) => { 
-            console.error("Fetch ID Error:", error);
-            document.getElementById('inp_id').value = generateIdString(draftMax + 1); 
-        });
-}
-
-        function generateIdString(num) {
-            const today = new Date();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const year = today.getFullYear();
-            return `MMFA-${String(num).padStart(5, '0')}/${month}/${year}`;
-        }
-
-
-/* ================= FINISHED THIS MONTH LOGIC (UPDATED) ================= */
-// ခလုတ်နှိပ်သောအခါ
-async function handleFinishedMonthClick() {
-    if(!WEB_APP_URL) return alert("API Link မချိတ်ရသေးပါ။");
-
-    const btn = document.getElementById('btnFinishedMonth');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Loading...`;
-    btn.disabled = true;
-
-    try {
-        let res = await fetch(WEB_APP_URL, {
-            method: 'POST',
-            body: JSON.stringify({ action: "setFinishedMonthStatus" })
-        });
-        let result = await res.json();
-
-        if(result.status === 'success') {
-            alert("အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
-            updateFinishedMonthUI(); // UI ကို Update ပြန်လုပ်မည်
-        } else {
-            alert("အမှား: " + (result.message || "Unknown error"));
-        }
-    } catch (err) {
-        console.error("Error occurred: ", err);
-        alert("အမှားတစ်ခုခုဖြစ်နေပါသည်။ ချိတ်ဆက်မှုကို စစ်ဆေးပါ။");
-    }
-
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-}
-
-// Page တက်လာတိုင်း (Refresh လုပ်တိုင်း) အခြေအနေကို စစ်မယ်
-// Page တက်လာတိုင်း (Refresh လုပ်တိုင်း) အခြေအနေကို စစ်မယ်
-async function updateFinishedMonthUI() {
-    if(!WEB_APP_URL) return;
-
-    try {
-        let res = await fetch(`${WEB_APP_URL}?action=getFinishedMonthStatus`);
-        let data = await res.json();
-        
-        const statusText = document.getElementById('reportFinishedStatus');
-        const btn = document.getElementById('btnFinishedMonth');
-
-        if (!statusText || !btn) return;
-
-        // "နောက်လအတွက်စာရင်းသွင်းနေပါသည်" စာသားနှင့် ပုံစံပြောင်းရန် Helper Function
-        const showRecordingNextMonth = () => {
-            statusText.innerHTML = `<i class="fa-solid fa-pen-nib mr-2"></i>နောက်လအတွက်စာရင်းသွင်းနေပါသည်`;
-            statusText.classList.remove('hidden', 'text-emerald-600', 'bg-emerald-50', 'border-emerald-200');
-            statusText.classList.add('text-indigo-600', 'bg-indigo-50', 'border-indigo-200');
-            btn.style.display = 'inline-block'; // ခလုတ်ကို ပြန်ပေါ်စေမည်
-        };
-        
-        // ၁။ Sheet ထဲမှ သွားဖျောက်လိုက်၍ (သို့) အသစ်ဖြစ်သွား၍ "FINISHED" မဟုတ်တော့လျှင်
-        if (data.status !== "FINISHED") {
-            showRecordingNextMonth();
-            return;
-        }
-
-        // ၂။ Status က "FINISHED" ဖြစ်နေလျှင် ၇ ရက်ပြည့်မပြည့် စစ်ဆေးမည်
-        let isOver7Days = false;
-        
-        // မှတ်ချက် - backend မှ သိမ်းဆည်းခဲ့သောအချိန် (timestamp) ပြန်ပို့ပေးရန်လိုပါသည်။
-        if (data.timestamp) {
-            let finishedDate = new Date(data.timestamp);
-            let today = new Date();
-            let diffTime = today.getTime() - finishedDate.getTime();
-            let diffDays = diffTime / (1000 * 3600 * 24);
-            
-            if (diffDays >= 7) {
-                isOver7Days = true;
-            }
-        }
-
-        if (isOver7Days) {
-            // ၇ ရက်ပြည့်သွားလျှင် အလိုအလျောက် စာသားပြောင်းမည်
-            showRecordingNextMonth();
-        } else {
-            // ၇ ရက်မပြည့်သေးလျှင် "Finished Last Month" ကိုသာ ဆက်ပြထားမည်
-            statusText.textContent = "Finished Last Month ( ပြုစုပြီးစီးပါပြီ )";
-            statusText.classList.remove('hidden', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-200');
-            statusText.classList.add('text-emerald-600', 'bg-emerald-50', 'border-emerald-200');
-            btn.style.display = 'none'; // ခလုတ်ကို ဖျောက်ထားမည်
-        }
-
-    } catch (err) {
-        console.error("Failed to fetch finished status:", err);
-    }
-}    
-    window.onload = function() {
-            initStorage();
-            loadSignaturePreview();
-            applyBgLogo();
-            const initToday = new Date();
-    const initCurrentMonth = initToday.getFullYear() + '-' + String(initToday.getMonth() + 1).padStart(2, '0');
-    if (document.getElementById('dashMonth')) {
-        document.getElementById('dashMonth').value = initCurrentMonth;
-    }
-            updateFinishedMonthUI();
-            
-            const today = new Date();
-            document.getElementById('currentDateDisplay').innerText = formatToDDMMYYYY(today.toISOString().split('T')[0]);
-            document.getElementById('inp_filledDate').valueAsDate = today;
-            document.getElementById('inp_issuedDate').valueAsDate = today;
-            
-            if(document.getElementById('inv_date')) document.getElementById('inv_date').valueAsDate = today;
-            if(document.getElementById('inv_id')) document.getElementById('inv_id').value = generateInvId();
-
-            if(WEB_APP_URL) {
-                document.getElementById('webAppUrlInput').value = WEB_APP_URL;
-                updateStatusIndicator(true);
-                fetchSettingsFromSheet(); 
-            } else {
-                updateStatusIndicator(false);
-            }
-            refreshUI(); 
-            renderDraftTable();
-            fetchNextID(); 
-            applyRoleBasedAccess();
-          switchTab('dashboard-tab');
-        };
-
-        function refreshUI() {
-    loadDropdownOptions();
-    updateSettingsLists();
-    applyBgLogo(); // နောက်ခံနှင့် လိုဂိုပုံကို အမြဲပေါ်စေရန်
-    loadSignaturePreview(); // လက်မှတ်ပုံကို အမြဲပေါ်စေရန်
-}
-
+        /* ================= 4. NAVIGATION & TAB SWITCHING ================= */
         function switchTab(tabId) {
             toggleSidebar(false); 
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -1352,7 +1058,7 @@ async function updateFinishedMonthUI() {
             
             const tabs = ['dashboard-tab','form-tab', 'draft-tab', 'inventory-tab', 'inv-balance-tab', 'report-tab', 'settings-tab'];
             const titles = {    
-                'dashboard-tab': 'Dashboard စာရင်းချုပ်', // ခေါင်းစဉ်သစ်ထပ်ထည့်ပါ
+                'dashboard-tab': 'Dashboard စာရင်းချုပ်', 
                 'form-tab': 'ဆီထုတ်ပေးမှု မှတ်တမ်းအသစ်သွင်းရန်', 
                 'draft-tab': 'စစ်ဆေးရန် ယာယီစာရင်းများ (Draft & Edit)',
                 'inventory-tab': 'Store Inventory ပစ္စည်းအဝင်/အထွက် စာရင်းသွင်းရန်',
@@ -1373,249 +1079,429 @@ async function updateFinishedMonthUI() {
             if(tabId === 'inventory-tab') fetchInventoryFromSheet();
             if(tabId === 'inv-balance-tab') generateInvBalanceReport();
         }
-        
-        function applyRoleBasedAccess() {
-    let userRole = localStorage.getItem('v5_user_role') || 'user';
-    
-    // LocalStorage ထဲမှ ခွင့်ပြုထားသော Tab စာရင်းကို ယူခြင်း
-    let allowedTabs = [];
-    try {
-        allowedTabs = JSON.parse(localStorage.getItem('v5_user_allowed_tabs')) || ['dashboard-tab', 'form-tab', 'draft-tab', 'inventory-tab', 'inv-balance-tab'];
-    } catch(e) {
-        allowedTabs = ['dashboard-tab', 'form-tab', 'draft-tab', 'inventory-tab', 'inv-balance-tab'];
-    }
-    
-    // Tab အားလုံး၏ စာရင်း
-    const allTabs = ['dashboard-tab', 'form-tab', 'draft-tab', 'inventory-tab', 'inv-balance-tab', 'report-tab', 'settings-tab'];
-    
-    allTabs.forEach(tabId => {
-        let btn = document.getElementById('btn-' + tabId);
-        if (btn) {
-            if (userRole === 'admin') {
-                // Admin ဖြစ်ပါက Tab အားလုံး ပွင့်မည်
-                btn.style.display = 'flex'; 
+
+        function toggleSidebar(forceState) {
+            const sidebar = document.getElementById('mainSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (!sidebar || !overlay) return;
+            const isExpanded = !sidebar.classList.contains('-translate-x-full');
+            const shouldOpen = forceState !== undefined ? forceState : !isExpanded;
+            if (shouldOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
             } else {
-                // သာမန် User ဖြစ်ပါက သတ်မှတ်ခွင့်ပြုထားသော Tab များကိုသာ ပြပေးမည်
-                if (allowedTabs.includes(tabId)) {
-                    btn.style.display = 'flex';
-                } else {
-                    btn.style.display = 'none';
-                }
-            }
-        }
-    });
-}
-
-
-        function updateStatusIndicator(isConnected) {
-            const pulse = document.getElementById('statusPulse');
-            const dot = document.getElementById('statusDot');
-            const text = document.getElementById('statusText');
-            if(isConnected) {
-                pulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
-                dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500";
-                text.className = "text-emerald-400 font-bold";
-                text.innerText = "Link ချိတ်ဆက်ထားသည်";
-            } else {
-                pulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75";
-                dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500";
-                text.className = "text-red-400 font-bold";
-                text.innerText = "Link မချိတ်ရသေးပါ";
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
             }
         }
 
-        function saveWebAppUrl() {
-            const urlVal = document.getElementById('webAppUrlInput').value.trim();
-            if(!urlVal) return alert("URL ထည့်ပါ။");
-            localStorage.setItem('v5_google_web_app_url', urlVal);
-            WEB_APP_URL = urlVal;
-            updateStatusIndicator(true);
-            alert("API URL သိမ်းဆည်းပြီးပါပြီ။");
-            fetchSettingsFromSheet();
-            fetchNextID();
-        }
-
-        function loadSignaturePreview() {
-    const img = document.getElementById('signaturePreview');
-    const txt = document.getElementById('noSignatureText');
-    if (savedSignatureBase64) {
-        img.src = savedSignatureBase64;
-        // ပုံ Load လုပ်ရာတွင် Error ဖြစ်ပါက Default ပုံကို ပြသရန်
-        img.onerror = function() {
-            this.onerror = null;
-            this.src = defaultSignatureImage;
-        };
-        img.classList.remove('hidden');
-        txt.classList.add('hidden');
-    } else {
-        img.classList.add('hidden');
-        txt.classList.remove('hidden');
-    }
-}
-        function saveSignature() {
-    const fileInput = document.getElementById('signatureUpload');
-    if (fileInput.files.length === 0) return alert("ကျေးဇူးပြု၍ ပုံရွေးချယ်ပါ။");
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-    reader.onload = async function(e) { // async ပြောင်းထားသည်
-        const base64String = e.target.result;
-        localStorage.setItem('v5_signature_base64', base64String);
-        savedSignatureBase64 = base64String;
-        loadSignaturePreview();
-        await saveSettingsToSheet(); // Google Sheet သို့ ပို့ရန်
-        alert("လက်မှတ်ပုံ (Signature) အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
-        fileInput.value = ""; 
-    };
-    reader.readAsDataURL(file);
-}
-
-
-async function fetchSettingsFromSheet() {
-    if(!WEB_APP_URL) return;
-    try {
-        let res = await fetch(`${WEB_APP_URL}?action=getSettings`, { redirect: "follow" });
-        let data = await res.json();
-        
-        if(data) {
-            let fetchedBoats = data.boats || data.boatsData || [];
-            let fetchedDepts = data.depts || data.deptsData || [];
+        /* ================= 5. DASHBOARD FUNCTIONS ================= */
+        async function loadDashboardData() {
+            const month = document.getElementById('dashMonth').value;
+            if(!WEB_APP_URL) return alert("API URL ချိတ်ဆက်ထားခြင်းမရှိပါ။ Settings တွင် စစ်ဆေးပါ။");
             
-            if(fetchedBoats.length > 0) localStorage.setItem('v5_boat_ids', JSON.stringify(fetchedBoats));
-            if(fetchedDepts.length > 0) localStorage.setItem('v5_departments', JSON.stringify(fetchedDepts));
-            
-            const makeDirectLink = (url) => {
-                if (url && url.includes("drive.google.com")) {
-                    let match = url.match(/id=([^&]+)/) || url.match(/d\/([a-zA-Z0-9_-]+)/);
-                    if (match) return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-                }
-                return url;
-            };
+            const tbody = document.getElementById('dashTableBody');
+            tbody.innerHTML = `<tr><td colspan="11" class="p-10 text-center text-indigo-500"><i class="fa-solid fa-spinner animate-spin text-2xl mb-2 block"></i>ဒေတာများ ဆွဲယူတွက်ချက်နေပါသည်...</td></tr>`;
 
-            // Fix: Valid ဖြစ်တဲ့ Link များကိုသာ လက်ခံရန် စစ်ဆေးခြင်း
-            if(data.bgLogo && data.bgLogo.length > 50) {
-                let finalBgLogo = makeDirectLink(data.bgLogo);
-                // Sheet မှလာသော Data သည် Base64 ဖြစ်ပါက Truncated ဖြစ်/မဖြစ် စစ်ဆေးရန် ခက်ခဲသဖြင့်
-                // Drive Link (သို့) http ဖြင့်စသော Link များကိုသာ ဦးစားပေးသုံးပါမည်။
-                if (finalBgLogo.startsWith('http') || finalBgLogo.startsWith('data:image')) {
-                    localStorage.setItem('v5_bglogo_base64', finalBgLogo);
-                    savedBgLogoBase64 = finalBgLogo;
-                    applyBgLogo();
-                }
-            }
-            
-            if(data.signature && data.signature.length > 50) {
-                let finalSignature = makeDirectLink(data.signature);
-                if (finalSignature.startsWith('http') || finalSignature.startsWith('data:image')) {
-                    localStorage.setItem('v5_signature_base64', finalSignature);
-                    savedSignatureBase64 = finalSignature;
-                    loadSignaturePreview();
-                }
-            }
-            
-            refreshUI();
-        }
-    } catch(e) { console.log("Settings fetch error:", e); }
-}
-
-        async function saveSettingsToSheet() {
-    if(!WEB_APP_URL) return;
-    
-    const boats = JSON.parse(localStorage.getItem('v5_boat_ids') || '[]');
-    const depts = JSON.parse(localStorage.getItem('v5_departments') || '[]');
-    
-    try {
-        await fetch(WEB_APP_URL, {
-            method: "POST",
-            body: JSON.stringify({
-                action: "saveSettings",
-                bgLogo: typeof savedBgLogoBase64 !== 'undefined' ? savedBgLogoBase64 : "", 
-                signature: typeof savedSignatureBase64 !== 'undefined' ? savedSignatureBase64 : "",
-                boats: boats, 
-                depts: depts,
-                boatsData: boats, // နောက်ခံ Script ဗားရှင်းအားလုံးနှင့် အဆင်ပြေစေရန်
-                deptsData: depts
-            })
-        });
-    } catch(e) { 
-        console.log("Settings Sync Error:", e);
-        alert("စနစ်ချိတ်ဆက်မှု အမှားအယွင်းဖြစ်နေပါသည်။ API Link ကိုစစ်ဆေးပါ။"); 
-    }
-}
-
-        function loadDropdownOptions() {
-            const boats = JSON.parse(localStorage.getItem('v5_boat_ids') || '[]');
-            const depts = JSON.parse(localStorage.getItem('v5_departments') || '[]');
-            const fBoat = document.getElementById('inp_boatId');
-            const fDept = document.getElementById('inp_dept');
-            const rDept = document.getElementById('filterDept');
-            
-            fBoat.innerHTML = '<option value="">-- ရွေးပါ --</option>';
-            boats.forEach(b => fBoat.innerHTML += `<option value="${b}">${b}</option>`);
-            
-            fDept.innerHTML = '<option value="">-- ရွေးပါ --</option>';
-            rDept.innerHTML = '<option value="all">ဌာနအားလုံး (All)</option>';
-            depts.forEach(d => {
-                fDept.innerHTML += `<option value="${d}">${d}</option>`;
-                rDept.innerHTML += `<option value="${d}">${d}</option>`;
-            });
-        }
-
-        function updateSettingsLists() {
-            const boats = JSON.parse(localStorage.getItem('v5_boat_ids') || '[]');
-            const depts = JSON.parse(localStorage.getItem('v5_departments') || '[]');
-            const renderList = (arr, type) => arr.map((item, idx) => `
-                <li class="px-4 py-3 flex justify-between items-center hover:bg-white rounded-lg transition border-b border-slate-100 last:border-0 group">
-                    <span>${item}</span>
-                    <button type="button" onclick="deleteListItem('${type}', ${idx})" class="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition p-1"><i class="fa-solid fa-trash-can"></i></button>
-                </li>`).join('');
+            try {
+                let res = await fetch(`${WEB_APP_URL}?action=getData`);
+                let data = await res.json();
                 
-            document.getElementById('boatListGrid').innerHTML = boats.length ? renderList(boats, 'boat') : '<li class="p-3 text-slate-400 text-center">စာရင်းလွတ်နေပါသည်</li>';
-            document.getElementById('deptListGrid').innerHTML = depts.length ? renderList(depts, 'dept') : '<li class="p-3 text-slate-400 text-center">စာရင်းလွတ်နေပါသည်</li>';
-        }
+                const [y, m] = month.split('-');
+                const filtered = data.filter(r => {
+                    if(!r.filledDate) return false;
+                    const d = new Date(r.filledDate);
+                    if (isNaN(d.getTime())) {
+                        return r.filledDate.includes(`${m}/${y}`) || r.filledDate.includes(`${y}-${m}`);
+                    }
+                    return d.getFullYear() == y && String(d.getMonth() + 1).padStart(2, '0') == m;
+                });
+                
+                let totalLiter = 0;
+                let totalAmount = 0;
+                let tableHTML = "";
+                
+                if (filtered.length === 0) {
+                    tableHTML = `<tr><td colspan="11" class="p-10 text-center text-slate-400">ဤလအတွက် မှတ်တမ်းများ မရှိသေးပါ။</td></tr>`;
+                }
+                
+                // Ordered output matching datasheet structure
+                filtered.forEach(r => {
+                    let lit = parseFloat(r.liter) || 0;
+                    let amt = parseFloat(r.totalAmount) || 0;
+                    let p = parseFloat(r.price) || 0;
+                    let pd = parseFloat(r.pricePerDrum) || 0;
+                    
+                    totalLiter += lit;
+                    totalAmount += amt;
 
-        async function addListItem(type) {
-            const inputId = type === 'boat' ? 'newBoatInput' : 'newDeptInput';
-            const storageKey = type === 'boat' ? 'v5_boat_ids' : 'v5_departments';
-            const btnId = type === 'boat' ? 'btn-add-boat' : 'btn-add-dept';
-            const val = document.getElementById(inputId).value.trim();
-            if(!val) return;
-            
-            let btn = document.getElementById(btnId);
-            let originalHtml = btn.innerHTML;
-            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i>`;
-            
-            let list = JSON.parse(localStorage.getItem(storageKey) || '[]');
-            if(!list.includes(val)) {
-                list.push(val);
-                localStorage.setItem(storageKey, JSON.stringify(list));
-                await saveSettingsToSheet();
+                    tableHTML += `
+                        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                            <td class="td-style pl-6 font-mono font-bold text-slate-700">${r.id || ''}</td>
+                            <td class="td-style">${formatToDDMMYYYY(r.filledDate)}</td>
+                            <td class="td-style font-semibold text-slate-700">${r.itineraries || ''}</td>
+                            <td class="td-style text-indigo-600 font-bold">${r.boatId || ''}</td>
+                            <td class="td-style">${r.issuedDept || ''}</td>
+                            <td class="td-style">${formatToDDMMYYYY(r.issuedDate)}</td>
+                            <td class="td-style text-right font-mono">${Math.round(lit).toLocaleString()}</td>
+                            <td class="td-style text-right font-mono">${Math.round(p).toLocaleString()}</td>
+                            <td class="td-style text-right font-mono">${Math.round(pd).toLocaleString()}</td>
+                            <td class="td-style text-right font-mono font-bold text-slate-900">${Math.round(amt).toLocaleString()}</td>
+                            <td class="td-style pr-6 text-slate-500">${r.marks || ''}</td>
+                        </tr>
+                    `;
+                });
+                
+                document.getElementById('dashTotalLiter').innerText = Math.round(totalLiter).toLocaleString();
+                document.getElementById('dashTotalAmount').innerText = Math.round(totalAmount).toLocaleString();
+                document.getElementById('dashTotalTrips').innerText = filtered.length;
+                tbody.innerHTML = tableHTML;
+
+            } catch (error) {
+                console.error("Dashboard Fetch Error:", error);
+                tbody.innerHTML = `<tr><td colspan="11" class="p-10 text-center text-red-500">ဒေတာဆွဲယူရာတွင် အမှားအယွင်းရှိနေပါသည်။</td></tr>`;
             }
-            document.getElementById(inputId).value = '';
-            btn.innerHTML = originalHtml;
-            refreshUI();
-        }
+        }        setInterval(loadDashboardData, 300000); // 5 Mins Auto Refresh
 
-        async function deleteListItem(type, idx) {
-            const storageKey = type === 'boat' ? 'v5_boat_ids' : 'v5_departments';
-            let list = JSON.parse(localStorage.getItem(storageKey) || '[]');
-            list.splice(idx, 1);
-            localStorage.setItem(storageKey, JSON.stringify(list));
-            await saveSettingsToSheet();
-            refreshUI();
-        }
-
+        /* ================= 6. FORM & DRAFT OPERATIONS (addData & updateData) ================= */
         function calcPrice() {
-            const l = Math.round(parseFloat(document.getElementById('inp_liter').value)) || 0;
-            const pDrum = Math.round(parseFloat(document.getElementById('inp_priceDrum').value)) || 0;
-            const pLiter = l > 0 ? (pDrum / 220) : 0;
-            const total = l * pLiter;
-            
-            document.getElementById('inp_price').value = pLiter ? Math.round(pLiter) : "";
-            document.getElementById('inp_totalAmount').value = total ? Math.round(total) : "";
-            document.getElementById('inp_totalAmountDisplay').value = total ? Math.round(total).toLocaleString() : "";
+    const l = Math.round(parseFloat(document.getElementById('inp_liter').value)) || 0;
+    const pDrum = Math.round(parseFloat(document.getElementById('inp_priceDrum').value)) || 0;
+    const pLiter = l > 0 ? (pDrum / 220) : 0;
+    const calculatedTotal = l * pLiter; // မူရင်းတွက်ချက်ရရှိသော စုစုပေါင်းငွေ
+    
+    const vocInput = document.getElementById('inp_vocAmount').value;
+    const vocVal = parseFloat(vocInput);
+
+    let finalTotal = calculatedTotal;
+
+    // VOC Amount ထဲတွင် ဒေတာရှိပါက
+    if (vocInput !== "" && !isNaN(vocVal)) {
+        finalTotal = vocVal; // Total Amount ကော်လံတွင် VOC တန်ဖိုးကို ပြမည်
+        
+        // Total Amount ထဲမှ VOC ကိုနုတ်၍ ကွာခြားချက် ရှာမည်
+        const diff = calculatedTotal - vocVal; 
+        const formattedDiff = diff > 0 ? `+${Math.round(diff).toLocaleString()}` : `${Math.round(diff).toLocaleString()}`;
+        
+        // Marks ထဲတွင် အစွန်းထွက် +- ခြားနားချက်တန်ဖိုး ဖော်ပြပေးမည်
+        document.getElementById('inp_marks').value = `အစွန်းထွက် ( ${formattedDiff} )`;
+    }
+
+    document.getElementById('inp_price').value = pLiter ? Math.round(pLiter) : "";
+    document.getElementById('inp_totalAmount').value = finalTotal ? Math.round(finalTotal) : "";
+    document.getElementById('inp_totalAmountDisplay').value = finalTotal ? Math.round(finalTotal).toLocaleString() : "";
+}
+
+        /* ================= DRAFT & FORM HANDLING LOGIC ================= */
+
+// ၁။ Form မ် အခ်က္အလက္မ်ားကို Draft ဇယားထဲသို့ ခဏထည့္ျခင္း
+function addToDraft(e) {
+    e.preventDefault();
+    
+    const id = document.getElementById('inp_id').value;
+    const filledDate = document.getElementById('inp_filledDate').value;
+    const boatId = document.getElementById('inp_boatId').value;
+    const dept = document.getElementById('inp_dept').value;
+    const itineraries = document.getElementById('inp_itineraries').value;
+    const issuedDate = document.getElementById('inp_issuedDate').value;
+    const marks = document.getElementById('inp_marks').value;
+    const liter = document.getElementById('inp_liter').value;
+    const priceDrum = document.getElementById('inp_priceDrum').value;
+    const price = document.getElementById('inp_price').value;
+    const totalAmount = document.getElementById('inp_totalAmount').value;
+    const vocAmount = document.getElementById('inp_vocAmount').value;
+
+    const draftItem = {
+        id: id,
+        filledDate: filledDate,
+        itineraries: itineraries,
+        boatId: boatId,
+        dept: dept,
+        issuedDate: issuedDate,
+        liter: liter,
+        price: price,
+        priceDrum: priceDrum, 
+        totalAmount: totalAmount,
+        marks: marks,
+        _isServerData: (currentEditIndex !== -1 && DRAFT_DATA[currentEditIndex]) ? DRAFT_DATA[currentEditIndex]._isServerData : false,
+        isModified: currentEditIndex !== -1 ? true : false
+    };
+
+    if (currentEditIndex > -1) {
+        DRAFT_DATA[currentEditIndex] = draftItem;
+        currentEditIndex = -1;
+    } else {
+        DRAFT_DATA.push(draftItem);
+    }
+
+    renderDraftTable();
+    switchTab('draft-tab');
+    document.getElementById('entryForm').reset();
+    document.getElementById('inp_filledDate').valueAsDate = new Date();
+    document.getElementById('inp_issuedDate').valueAsDate = new Date();
+    fetchNextID();
+}
+
+// ၂။ Draft ဇယားကို UI တွင် ပြသပေးခြင်း
+function renderDraftTable() {
+    const tbody = document.getElementById('draftTableBody');
+    if (!tbody) return;
+
+    if (DRAFT_DATA.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-slate-400"><i class="fa-regular fa-folder-open text-3xl mb-2 text-slate-300 block"></i>အပေါ်မှ Form ကိုအရင်ဖြည့်ပါ သို့မဟုတ် ဒေတာပြန်ခေါ်ပါ။</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = DRAFT_DATA.map((r, idx) => `
+        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+            <td class="td-style pl-6 font-mono font-bold text-slate-700">${r.id || ''}</td>
+            <td class="td-style">${formatToDDMMYYYY(r.filledDate)}</td>
+            <td class="td-style font-bold text-slate-800">${r.itineraries || ''}</td>
+            <td class="td-style text-indigo-600 font-bold">${r.boatId || ''}</td>
+            <td class="td-style">${r.dept || r.issuedDept || ''}</td>
+            <td class="td-style text-emerald-600 font-bold">${formatToDDMMYYYY(r.issuedDate)}</td>
+            <td class="td-style text-right font-mono">${parseFloat(r.liter || 0).toLocaleString()}</td>
+<td class="td-style text-right font-mono font-bold text-slate-900">${Math.round(parseFloat(r.price || 0)).toLocaleString()}</td>
+<td class="td-style text-right font-mono font-bold text-slate-900">${Math.round(parseFloat(r.pricePerDrum || 0)).toLocaleString()}</td>
+            <td class="td-style text-right font-mono font-bold text-slate-900">${Math.round(parseFloat(r.totalAmount || 0)).toLocaleString()}</td>
+<td class="p-3 pr-6 text-slate-600 text-sm td-style break-words">${r.marks || ''}</td>
+            <td class="td-style text-center">
+                <span class="px-2 py-1 text-xs rounded-full font-bold ${r._isServerData ? (r.isModified ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700') : 'bg-emerald-100 text-emerald-700'}">
+                    ${r._isServerData ? (r.isModified ? 'Edited' : 'Fetched') : 'New Draft'}
+                </span>
+            </td>
+            <td class="td-style pr-6 text-center whitespace-nowrap space-x-1">
+                <button onclick="editDraftItem(${idx})" title="ပြင်ဆင်မည်" class="text-indigo-600 hover:text-indigo-800 p-1"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button onclick="deleteDraftItem(${idx})" title="ဖျက်မည်" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash-can"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// ၃။ Draft မှ ပြန်လည်ပြင်ဆင်ရန် Form သို့ ပို့ပေးခြင်း
+function editDraftItem(index) {
+    const item = DRAFT_DATA[index];
+    if (!item) return;
+
+    currentEditIndex = index;
+    document.getElementById('inp_id').value = item.id;
+    document.getElementById('inp_filledDate').value = item.filledDate;
+    document.getElementById('inp_boatId').value = item.boatId;
+    document.getElementById('inp_dept').value = item.dept || item.issuedDept;
+    document.getElementById('inp_itineraries').value = item.itineraries;
+    document.getElementById('inp_issuedDate').value = item.issuedDate;
+    document.getElementById('inp_marks').value = item.marks || '';
+    document.getElementById('inp_liter').value = item.liter;
+    document.getElementById('inp_priceDrum').value = item.priceDrum;
+    document.getElementById('inp_price').value = item.price;
+    document.getElementById('inp_totalAmount').value = item.totalAmount;
+    document.getElementById('inp_totalAmountDisplay').value = Math.round(parseFloat(item.totalAmount || 0)).toLocaleString();
+    document.getElementById('inp_vocAmount').value = item.vocAmount || '';
+
+    switchTab('form-tab');
+}
+
+// ၄။ Draft စာရင်းမှ ဖျက်ထုတ်ခြင်း
+function deleteDraftItem(index) {
+    if (confirm("ဤ Draft စာရင်းကို ဖျက်ရန် သေချာပါသလား?")) {
+        DRAFT_DATA.splice(index, 1);
+        renderDraftTable();
+    }
+}
+
+// ၅။ Form ကို အသစ်မှ ပြန်စခြင်း
+function startNewForm() {
+    currentEditIndex = -1;
+    document.getElementById('entryForm').reset();
+    document.getElementById('inp_filledDate').valueAsDate = new Date();
+    document.getElementById('inp_issuedDate').valueAsDate = new Date();
+    fetchNextID();
+    switchTab('form-tab');
+}
+
+// ၆။ Sheet ထဲရှိ ဒေတာများကို လအလိုက် ပြန်ခေါ်၍ ပြင်ဆင်ရန် (Fetch Data for Edit)
+async function fetchDataForEdit() {
+    const month = document.getElementById('fetchEditMonth').value;
+    if (!month) return alert("ကျေးဇူးပြု၍ လရွေးချယ်ပါ။");
+    if (!WEB_APP_URL) return alert("Google Web App Link မချိတ်ရသေးပါ။");
+
+    const btn = document.getElementById('btnFetchEdit');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> ဆွဲယူနေသည်...`;
+    btn.disabled = true;
+
+    try {
+        let res = await fetch(`${WEB_APP_URL}?action=getData`);
+        let data = await res.json();
+
+        const [y, m] = month.split('-');
+        let filtered = data.filter(r => {
+            if (!r.filledDate) return false;
+            let d = new Date(r.filledDate);
+            return d.getFullYear() == y && String(d.getMonth() + 1).padStart(2, '0') == m;
+        });
+
+        // Server Data အဖြစ် သတ်မှတ်ပြီး DRAFT_DATA သို့ ထည့်သွင်းခြင်း
+        DRAFT_DATA = filtered.map(item => ({
+            ...item,
+            _isServerData: true,
+            isModified: false
+        }));
+
+        renderDraftTable();
+        alert(`${filtered.length} ခု ခေါ်ယူပြီးပါပြီ။ ပြင်ဆင်လိုပါက Edit ကိုနှိပ်ပါ။`);
+    } catch (err) {
+        alert("ဒေတာဆွဲယူရာတွင် အမှားဖြစ်ပေါ်ခဲ့သည်: " + err.message);
+    }
+
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+}
+
+// ၇။ Draft မှတစ်ဆင့် Sheet သို့ addData သို့မဟုတ် updateData သို့ တိုက်ရိုက် ပို့ပေးခြင်း (အဓိက ပိုင်း)
+async function submitDraftToSheet() {
+    if (DRAFT_DATA.length === 0) return alert("သိမ်းဆည်းရန် Draft စာရင်း မရှိပါ။");
+    if (!WEB_APP_URL) return alert("Google Web App Link မချိတ်ရသေးပါ။ Settings တွင် သွားထည့်ပါ။");
+
+    const btn = document.getElementById('btnSubmitToSheet');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Sheet သို့ ပို့နေပါသည်...`;
+    btn.disabled = true;
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (let item of DRAFT_DATA) {
+        // မူရင်း Server Data ဖြစ်ပါက updateData သို့ ပို့မည်၊ အသစ်ဆိုပါက addData သို့ ပို့မည်
+        const actionType = item._isServerData ? "updateData" : "addData";
+
+        const payload = {
+            action: actionType,
+            id: item.id,
+            filledDate: item.filledDate,
+            itineraries: item.itineraries,
+            boatId: item.boatId,
+            issuedDept: item.dept || item.issuedDept,
+            issuedDate: item.issuedDate,
+            liter: item.liter,
+            price: item.price,
+            priceDrum: item.priceDrum,
+            totalAmount: item.totalAmount,
+            marks: item.marks || ''
+        };
+
+        try {
+            let res = await fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            let result = await res.json();
+            if (result.status === "success") {
+                successCount++;
+            } else {
+                failCount++;
+            }
+        } catch (err) {
+            failCount++;
+        }
+    }
+
+    alert(`သိမ်းဆည်းမှုပြီးစီးပါပြီ။\nအောင်မြင်: ${successCount} ခု\nမအောင်မြင်: ${failCount} ခု`);
+
+    if (failCount === 0) {
+        DRAFT_DATA = [];
+        renderDraftTable();
+        fetchNextID();
+    }
+
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+}
+        async function fetchDataForEdit() {
+            const month = document.getElementById('fetchEditMonth').value;
+            if(!month) return alert("ကျေးဇူးပြု၍ လ ရွေးချယ်ပါ။");
+            if(!WEB_APP_URL) return alert("Google Web App API Link မရှိပါ။");
+
+            const btn = document.getElementById('btnFetchEdit');
+            const orig = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i>...`;
+            btn.disabled = true;
+
+            try {
+                let res = await fetch(`${WEB_APP_URL}?action=getData`);
+                let data = await res.json();
+                
+                const [y, m] = month.split('-');
+                const filtered = data.filter(r => {
+                    if(!r.filledDate) return false;
+                    const d = new Date(r.filledDate);
+                    return d.getFullYear() == y && String(d.getMonth() + 1).padStart(2, '0') == m;
+                });
+
+                if(filtered.length === 0) {
+                    alert("ရွေးချယ်ထားသော လအတွက် စာရင်းများ ရှာမတွေ့ပါ။");
+                } else {
+                    // Mark as existing server data
+                    filtered.forEach(item => item._isServerData = true);
+                    DRAFT_DATA = filtered;
+                    renderDraftTable();
+                    alert(`${filtered.length} ခုသော စာရင်းများကို Draft ဇယားသို့ ခေါ်ယူပြီးပါပြီ။ ပြင်ဆင်ပြီးပါက 'Sheet သို့ သိမ်းမည်' ကို နှိပ်ပါ။`);
+                }
+            } catch(e) {
+                alert("ဒေတာဆွဲယူရာတွင် အမှားဖြစ်ပွားခဲ့ပါသည်: " + e.message);
+            }
+
+            btn.innerHTML = orig;
+            btn.disabled = false;
         }
 
-        /* ================= STORE INVENTORY & BALANCE LOGIC ================= */
+        function fetchNextID() {
+            let draftMax = 0;
+            if (DRAFT_DATA.length > 0) {
+                let newDrafts = DRAFT_DATA.filter(d => !d._isServerData);
+                if(newDrafts.length > 0) {
+                    let lastId = newDrafts[newDrafts.length - 1].id;
+                    let match = lastId.match(/MMFA-(\d+)/);
+                    if (match) draftMax = parseInt(match[1], 10);
+                }
+            }
+
+            if (!WEB_APP_URL) {
+                document.getElementById('inp_id').value = generateIdString(draftMax + 1);
+                return;
+            }
+
+            fetch(`${WEB_APP_URL}?action=getData`)
+                .then(res => res.json())
+                .then(rawData => {
+                    let sheetMax = 0;
+                    if (Array.isArray(rawData)) {
+                        rawData.forEach(row => {
+                             let idStr = row.id || "";
+                             let match = String(idStr).match(/MMFA-(\d+)/);
+                             if (match) {
+                                 let num = parseInt(match[1], 10);
+                                 if (num > sheetMax) sheetMax = num;
+                             }
+                        });
+                    }
+                    let nextNum = Math.max(sheetMax, draftMax) + 1;
+                    document.getElementById('inp_id').value = generateIdString(nextNum);
+                })
+                .catch((error) => { 
+                    console.error("Fetch ID Error:", error);
+                    document.getElementById('inp_id').value = generateIdString(draftMax + 1); 
+                });
+        }
+
+        function generateIdString(num) {
+            const today = new Date();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const year = today.getFullYear();
+            return `MMFA-${String(num).padStart(5, '0')}/${month}/${year}`;
+        }
+
+        /* ================= 7. STORE INVENTORY & BALANCE OPERATIONS ================= */
         function calcInvTotal() {
             const qty = parseFloat(document.getElementById('inv_qty').value) || 0;
             const price = parseFloat(document.getElementById('inv_unitPrice').value) || 0;
@@ -1653,7 +1539,7 @@ async function fetchSettingsFromSheet() {
             document.getElementById('inv_qty').value = record.qty;
             document.getElementById('inv_unit').value = record.unit;
             document.getElementById('inv_unitPrice').value = record.unitPrice;
-            document.getElementById('inv_marks').value = record.marks;
+            document.getElementById('inv_marks').value = record.marks || '';
             
             calcInvTotal();
             document.getElementById('btnSubmitInventory').innerHTML = `<i class="fa-solid fa-pen"></i> <span>ပြင်ဆင်ချက်ကို သိမ်းမည်</span>`;
@@ -1676,11 +1562,11 @@ async function fetchSettingsFromSheet() {
                 type: document.getElementById('inv_type').value,
                 itemName: document.getElementById('inv_itemName').value,
                 category: document.getElementById('inv_category').value,
-                qty: document.getElementById('inv_qty').value,
+                qty: parseFloat(document.getElementById('inv_qty').value) || 0,
                 unit: document.getElementById('inv_unit').value,
-                unitPrice: document.getElementById('inv_unitPrice').value,
-                totalAmount: document.getElementById('inv_totalAmount').value,
-                marks: document.getElementById('inv_marks').value
+                unitPrice: parseFloat(document.getElementById('inv_unitPrice').value) || 0,
+                totalAmount: parseFloat(document.getElementById('inv_totalAmount').value) || 0,
+                marks: document.getElementById('inv_marks').value || ''
             };
 
             try {
@@ -1691,12 +1577,7 @@ async function fetchSettingsFromSheet() {
                     resetInvForm();
                     fetchInventoryFromSheet();
                 } else {
-                    // Fallback to addInventory if update is not supported in GAS yet
-                    if(record.action === "updateInventory") {
-                       alert("မှတ်ချက်: သင့် Google Apps Script တွင် updateInventory function မရှိသေးပါက Error ပြနိုင်ပါသည်။ (" + (result.message || "Unknown error") + ")");
-                    } else {
-                       alert("အမှား: " + (result.message || "Unknown error"));
-                    }
+                    alert("အမှား: " + (result.message || "Unknown error"));
                 }
             } catch(err) {
                 alert("Google Sheet သို့ ချိတ်ဆက်၍ မရပါ။ API Link မှန်ကန်ကြောင်း စစ်ဆေးပါ: " + err.message);
@@ -1717,7 +1598,7 @@ async function fetchSettingsFromSheet() {
                 INVENTORY_DATA = data;
                 renderInventoryTable();
             } catch(err) {
-                tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-red-500">ဒေတာဆွဲယူ၍ မရပါ။ (Sheet တွင် getInventory API မရှိသေးပါက Script ကိုစစ်ဆေးပါ) Error: ${err.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-red-500">ဒေတာဆွဲယူ၍ မရပါ။ Error: ${err.message}</td></tr>`;
             }
         }
 
@@ -1747,409 +1628,58 @@ async function fetchSettingsFromSheet() {
         }
 
         async function generateInvBalanceReport() {
-    const tbody = document.getElementById('invBalanceTableBody');
+            const tbody = document.getElementById('invBalanceTableBody');
 
-    // ၁။ Inventory Data မရှိသေးပါက Sheet ထံမှ အလိုအလျောက် ဒေတာ လှမ်းဆွဲမည်
-    if (!INVENTORY_DATA || INVENTORY_DATA.length === 0) {
-        if (!WEB_APP_URL) {
-            alert("Google Web App Link မချိတ်ရသေးပါ။ Settings တွင် သွားထည့်ပါ။");
-            return;
-        }
-        
-        tbody.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-indigo-500">
-            <i class="fa-solid fa-spinner animate-spin text-2xl mb-2 block"></i>
-            Inventory ဒေတာများ အလိုအလျောက် ဆွဲယူတွက်ချက်နေပါသည်...
-        </td></tr>`;
-
-        try {
-            await fetchInventoryFromSheet();
-        } catch (error) {
-            console.error("Error fetching inventory:", error);
-        }
-    }
-
-    // ၂။ Data ဆွဲယူပြီးနောက်တွင်လည်း ဒေတာ မရှိသေးပါက အသိပေးရန်
-    if (!INVENTORY_DATA || INVENTORY_DATA.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-slate-400">Inventory စာရင်း ဒေတာများ မရှိသေးပါ။</td></tr>`;
-        return;
-    }
-
-    let balanceMap = {};
-
-    // Group by Item Name to calculate Balance
-    INVENTORY_DATA.forEach(r => {
-        let name = r.itemName ? r.itemName.trim() : "Unknown";
-        if (!balanceMap[name]) {
-            balanceMap[name] = {
-                itemName: name, 
-                category: r.category || "", 
-                unit: r.unit || "", 
-                totalIn: 0, 
-                totalOut: 0
-            };
-        }
-
-        let qty = parseFloat(r.qty) || 0;
-        if (r.type && r.type.includes('In')) {
-            balanceMap[name].totalIn += qty;
-        } else {
-            balanceMap[name].totalOut += qty;
-        }
-    });
-
-    INV_BALANCE_DATA = Object.values(balanceMap).map(item => {
-        item.balance = item.totalIn - item.totalOut;
-        return item;
-    });
-
-    if (INV_BALANCE_DATA.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-slate-400">လက်ကျန် စာရင်း မရှိသေးပါ။</td></tr>`;
-        return;
-    }
-
-    // ၃။ ဇယားထဲတွင် စာရင်းများ ထည့်သွင်းပြသမည်
-    tbody.innerHTML = INV_BALANCE_DATA.map((item, idx) => `
-        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-            <td class="td-style pl-6 font-mono font-bold text-slate-500">${idx + 1}</td>
-            <td class="td-style font-bold text-slate-800">${item.itemName}</td>
-            <td class="td-style text-slate-600">${item.category}</td>
-            <td class="td-style text-right font-mono text-emerald-600 font-bold">${item.totalIn.toLocaleString()}</td>
-            <td class="td-style text-right font-mono text-amber-600 font-bold">${item.totalOut.toLocaleString()}</td>
-            <td class="td-style text-right font-mono text-indigo-600 font-bold text-base">${item.balance.toLocaleString()}</td>
-            <td class="td-style pr-6 text-slate-500">${item.unit}</td>
-        </tr>
-    `).join('');
-}
-
-        async function exportInvBalanceToExcel() {
-            if (INV_BALANCE_DATA.length === 0) {
-                alert("ကျေးဇူးပြု၍ 'လက်ကျန် တွက်ချက်မည်' ခလုတ်ကို အရင်နှိပ်ပါ။");
-                return;
-            }
-
-            try {
-                const workbook = new ExcelJS.Workbook();
-                const ws = workbook.addWorksheet('Inventory_Balance');
-
-                ws.columns = [
-                    { key: 'no', width: 5 }, { key: 'itemName', width: 40 }, { key: 'category', width: 25 },
-                    { key: 'totalIn', width: 15 }, { key: 'totalOut', width: 15 }, { key: 'balance', width: 20 }, { key: 'unit', width: 10 }
-                ];
-
-                const titleText = `Store Inventory Balance Report - ${formatToDDMMYYYY(new Date().toISOString().split('T')[0])}`;
-                const titleRow = ws.addRow([titleText]);
-                ws.mergeCells(`A1:G1`);
-                titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1E40AF' } };
-                titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
-                titleRow.height = 25;
-
-                const headerRow = ws.addRow(['စဉ်', 'ပစ္စည်းအမည် (Item Name)', 'အမျိုးအစား (Category)', 'စုစုပေါင်း အဝင်', 'စုစုပေါင်း အထွက်', 'လက်ကျန် (Balance)', 'ယူနစ်']);
-                headerRow.height = 22;
-                headerRow.eachCell((cell) => {
-                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
-                    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-                    cell.alignment = { horizontal: 'center', vertical: 'middle' };
-                    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                });
+            if (!INVENTORY_DATA || INVENTORY_DATA.length === 0) {
+                if (!WEB_APP_URL) return alert("Google Web App Link မချိတ်ရသေးပါ။ Settings တွင် သွားထည့်ပါ။");
                 
-                let imageId = null;
-
-// ပုံ Data စစ်ဆေးခြင်း
-if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
-    // Local က Base64 ရှိရင် အဲဒီအတိုင်းသုံးမယ်
-    const rawBase64Data = savedSignatureBase64.split(',')[1]; 
-    imageId = workbook.addImage({ base64: rawBase64Data, extension: 'png' });
-} else {
-    // Local က ပုံမရှိရင် (သို့မဟုတ်) Error တက်နေရင် GitHub URL ကနေ ယူသုံးမယ်
-    try {
-        const imageUrl = "https://raw.githubusercontent.com/Naylin98/FuelManager3.5/main/signature.png";
-        const response = await fetch(imageUrl); // GitHub မှ ပုံဆွဲခြင်း
-        const blob = await response.blob();
-        
-        // Blob ကို Base64 ပြောင်းခြင်း
-        const base64Data = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result.split(',')[1]);
-            reader.readAsDataURL(blob);
-        });
-
-        imageId = workbook.addImage({ base64: base64Data, extension: 'png' });
-    } catch (e) {
-        console.error("ပုံတင်သွင်းရန် အဆင်မပြေပါ:", e);
-    }
-}
-
-                INV_BALANCE_DATA.forEach((item, index) => {
-                    const row = ws.addRow([ index + 1, item.itemName, item.category, item.totalIn, item.totalOut, item.balance, item.unit ]);
-                    row.eachCell(cell => { cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} }; });
-                    row.getCell(4).numFmt = '#,##0.00';
-                    row.getCell(5).numFmt = '#,##0.00';
-                    row.getCell(6).numFmt = '#,##0.00';
-                });
-
-                const sigSpaceRow = ws.addRow([]);
-                sigSpaceRow.height = 55;
-                if (imageId !== null) {
-                    ws.addImage(imageId, {
-                        tl: { col: 5.2, row: sigSpaceRow.number -1 },
-                        br: { col: 6.1, row: sigSpaceRow.number },
-                        editMode: 'oneCell'
-                    });
-                }
-
-                const recRow = ws.addRow(['', '', '', '','','Prepared By(ပြင်ဆင်သူ)', '']);
-                ws.mergeCells(`I${recRow.number}:K${recRow.number}`);
-                recRow.getCell(6).font = { bold: true, size: 10, color: { argb: 'FF1E3A8A' } };
-                recRow.getCell(6).alignment = { horizontal: 'center' };
-
-                const nameRow = ws.addRow(['', '', '', '','','NAY LIN HTIKE','']);
-                ws.mergeCells(`I${nameRow.number}:K${nameRow.number}`);
-                nameRow.getCell(6).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
-                nameRow.getCell(6).alignment = { horizontal: 'center' };
-
-                const buffer = await workbook.xlsx.writeBuffer();
-                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                saveAs(blob, `Inventory_Balance_${new Date().getTime()}.xlsx`);
-            } catch (err) {
-                alert("Excel ထုတ်ရာတွင် Error ဖြစ်နေပါသည်: " + err);
-            }
-        }
-        /* ============================================================= */
-
-        // DRAFT & FUEL REPORT LOGIC
-        function fetchDataForEdit() {
-            let monthVal = document.getElementById('fetchEditMonth').value;
-            if(!monthVal) return alert("ကျေးဇူးပြု၍ လ နှင့် နှစ် ရွေးချယ်ပါ။");
-            if(!WEB_APP_URL) return alert("API Link မချိတ်ရသေးပါ။");
-
-            let btn = document.getElementById('btnFetchEdit');
-            let oriTxt = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i>';
-            btn.disabled = true;
-
-            fetch(`${WEB_APP_URL}?action=getData`)
-            .then(res => res.json())
-            .then(rawData => {
-                const [y, m] = monthVal.split('-');
-                let data = rawData.map(r => {
-                    let deptStr = String(r.issuedDept || "");
-                    let isShifted = deptStr.includes("202") || deptStr.includes("T1") || deptStr.includes("-0");
-                    if (isShifted) {
-                        let calc_liter = 0;
-                        let p1L = parseFloat(r.liter) || 0; 
-                        let tAmt = parseFloat(r.pricePerDrum) || 0;
-                        if (p1L > 0) calc_liter = tAmt / p1L;
-                        return {
-                            id: r.id, filledDate: r.filledDate, itineraries: r.boatId, 
-                            issuedDate: (r.issuedDept === 0 || !r.issuedDept || String(r.issuedDept).includes("1970")) ? "" : r.issuedDept,
-                            boatId: r.itineraries, issuedDept: r.issuedDate, 
-                            liter: calc_liter, pricePerDrum: r.price, price: r.liter,
-                            totalAmount: r.pricePerDrum, marks: r.totalAmount
-                        };
-                    }
-                    return r; 
-                });
-
-                let filtered = data.filter(r => {
-                    if(!r.filledDate) return false;
-                    const d = new Date(r.filledDate);
-                    return d.getFullYear() == y && String(d.getMonth()+1).padStart(2,'0') == m;
-                });
-
-                if(filtered.length === 0) {
-                    alert("ရွေးချယ်ထားသောလအတွက် အချက်အလက်မရှိပါ။");
-                } else {
-                    filtered.forEach(r => {
-                        if(!DRAFT_DATA.find(d => d.id === r.id)) {
-                            r._isServerData = true; 
-                            DRAFT_DATA.push(r);
-                        }
-                    });
-                    renderDraftTable();
-                    alert(`${filtered.length} ကြောင်း ဆွဲယူရရှိပါသည်။`);
-                }
-                btn.innerHTML = oriTxt;
-                btn.disabled = false;
-            })
-            .catch(() => {
-                btn.innerHTML = oriTxt;
-                btn.disabled = false;
-                alert("ဒေတာဆွဲယူရာတွင် Error ဖြစ်နေပါသည်။");
-            });
-        }
-
-        function addToDraft(e) {
-            e.preventDefault();
-            const calTotal = parseFloat(document.getElementById('inp_totalAmount').value) || 0;
-            const vocStr = document.getElementById('inp_vocAmount').value;
-            
-            let finalTotalAmount = calTotal;
-            let originalMarks = document.getElementById('inp_marks').value;
-            let finalMarks = originalMarks;
-            
-            if (vocStr.trim() !== "") {
-                let vocAmount = parseFloat(vocStr) || 0;
-                let diff = calTotal - vocAmount;
-                finalTotalAmount = vocAmount; 
-                if (diff !== 0) {
-                    let sign = diff > 0 ? "+" : ""; 
-                    let diffText = `အစွန်းထွက် (${sign}${diff})`;
-                    finalMarks = originalMarks ? originalMarks + ", " + diffText : diffText;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-indigo-500"><i class="fa-solid fa-spinner animate-spin text-2xl mb-2 block"></i>Inventory ဒေတာများ အလိုအလျောက် ဆွဲယူတွက်ချက်နေပါသည်...</td></tr>`;
+                try {
+                    await fetchInventoryFromSheet();
+                } catch (error) {
+                    console.error("Error fetching inventory:", error);
                 }
             }
 
-            const record = {
-                id: document.getElementById('inp_id').value,
-                filledDate: document.getElementById('inp_filledDate').value,
-                itineraries: document.getElementById('inp_itineraries').value,
-                issuedDate: document.getElementById('inp_issuedDate').value,
-                boatId: document.getElementById('inp_boatId').value,
-                issuedDept: document.getElementById('inp_dept').value,
-                liter: document.getElementById('inp_liter').value,
-                price: document.getElementById('inp_price').value,
-                pricePerDrum: document.getElementById('inp_priceDrum').value,
-                totalAmount: finalTotalAmount, 
-                marks: finalMarks 
-            };
-            
-            if (currentEditIndex !== -1) {
-                if(DRAFT_DATA[currentEditIndex]._isServerData) record._isServerData = true;
-                DRAFT_DATA[currentEditIndex] = record;
-                currentEditIndex = -1; 
-                document.getElementById('btnSubmitDraft').innerHTML = `<i class="fa-solid fa-arrow-down"></i><span>Draft စာရင်းသို့ ထည့်မည်</span>`;
-            } else {
-                DRAFT_DATA.push(record); 
-            }
-            
-            switchTab('draft-tab');
-            renderDraftTable();
-
-            document.getElementById('inp_liter').value = "";
-            document.getElementById('inp_priceDrum').value = "";
-            document.getElementById('inp_price').value = "";
-            document.getElementById('inp_totalAmount').value = "";
-            document.getElementById('inp_totalAmountDisplay').value = "";
-            document.getElementById('inp_vocAmount').value = ""; 
-            document.getElementById('inp_marks').value = "";
-            
-            fetchNextID(); 
-        }
-        
-        function startNewForm() {
-            currentEditIndex = -1; 
-            document.getElementById('btnSubmitDraft').innerHTML = `<i class="fa-solid fa-arrow-down"></i><span>Draft စာရင်းသို့ ထည့်မည်</span>`;
-            document.getElementById('inp_liter').value = "";
-            document.getElementById('inp_priceDrum').value = "";
-            document.getElementById('inp_price').value = "";
-            document.getElementById('inp_totalAmount').value = "";
-            document.getElementById('inp_totalAmountDisplay').value = "";
-            document.getElementById('inp_vocAmount').value = ""; 
-            document.getElementById('inp_marks').value = "";
-            document.getElementById('inp_itineraries').value = "";
-            
-            const today = new Date();
-            document.getElementById('inp_filledDate').valueAsDate = today;
-            document.getElementById('inp_issuedDate').valueAsDate = today;
-
-            fetchNextID();
-            switchTab('form-tab');
-            document.getElementById('inp_itineraries').focus();
-        }
-
-        function editDraft(idx) {
-            currentEditIndex = idx;
-            const record = DRAFT_DATA[idx];
-
-            document.getElementById('inp_id').value = record.id;
-            let fDate = new Date(record.filledDate);
-            if(!isNaN(fDate)) document.getElementById('inp_filledDate').valueAsDate = fDate;
-            let iDate = new Date(record.issuedDate);
-            if(!isNaN(iDate)) document.getElementById('inp_issuedDate').valueAsDate = iDate;
-
-            document.getElementById('inp_itineraries').value = record.itineraries;
-            document.getElementById('inp_boatId').value = record.boatId;
-            document.getElementById('inp_dept').value = record.issuedDept;
-            document.getElementById('inp_liter').value = Math.round(parseFloat(record.liter));
-            document.getElementById('inp_priceDrum').value = Math.round(parseFloat(record.pricePerDrum));
-            document.getElementById('inp_marks').value = record.marks || "";
-            document.getElementById('inp_vocAmount').value = ""; 
-
-            calcPrice(); 
-            document.getElementById('btnSubmitDraft').innerHTML = `<i class="fa-solid fa-pen"></i><span>ပြင်ဆင်ချက်ကို အတည်ပြုမည်</span>`;
-            switchTab('form-tab');
-        }
-
-        function removeDraft(idx) {
-            DRAFT_DATA.splice(idx, 1);
-            renderDraftTable();
-            if(currentEditIndex === -1) fetchNextID(); 
-        }
-
-        function renderDraftTable() {
-            const tbody = document.getElementById('draftTableBody');
-            const btn = document.getElementById('btnSubmitToSheet');
-            
-            if(DRAFT_DATA.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-slate-400"><i class="fa-regular fa-folder-open text-3xl mb-2 text-slate-300 block"></i>Form တွင် အရင်ဖြည့်ပါ သို့မဟုတ် အမှားပြင်ရန် ဆွဲယူပါ။</td></tr>`;
-                btn.disabled = true;
+            if (!INVENTORY_DATA || INVENTORY_DATA.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-slate-400">Inventory စာရင်း ဒေတာများ မရှိသေးပါ။</td></tr>`;
                 return;
             }
-            
-            btn.disabled = false;
-            tbody.innerHTML = DRAFT_DATA.map((r, idx) => `
-                <tr class="hover:bg-indigo-50/30 transition">
-                    <td class="td-style pl-6 font-mono font-bold text-slate-700">${r.id}</td>
-                    <td class="td-style">${formatToDDMMYYYY(r.filledDate)}</td>
-                    <td class="td-style font-semibold text-slate-600">${r.itineraries || ''}</td>
-                    <td class="td-style text-emerald-600 font-bold">${formatToDDMMYYYY(r.issuedDate)}</td>
-                    <td class="td-style text-indigo-600 font-bold">${r.boatId}</td>
-                    <td class="td-style">${r.issuedDept}</td>
-                    <td class="td-style text-right font-mono">${Math.round(r.liter)}</td>
-                    <td class="td-style text-right font-mono font-bold text-slate-900">${Math.round(r.totalAmount).toLocaleString()}</td>
-                    <td class="td-style text-center">
-                        ${r._isServerData ? '<span class="text-[10px] bg-amber-100 text-amber-700 px-2 py-1 rounded font-bold">Edit Mode</span>' : '<span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded font-bold">New</span>'}
-                    </td>
-                    <td class="td-style pr-6 text-center whitespace-nowrap">
-                        <button onclick="editDraft(${idx})" title="ပြင်ဆင်မည်" class="text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded transition"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="removeDraft(${idx})" title="ဖျက်မည်" class="text-slate-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded transition"><i class="fa-solid fa-trash-can"></i></button>
-                    </td>
+
+            let balanceMap = {};
+            INVENTORY_DATA.forEach(r => {
+                let name = r.itemName ? r.itemName.trim() : "Unknown";
+                if (!balanceMap[name]) {
+                    balanceMap[name] = { itemName: name, category: r.category || "", unit: r.unit || "", totalIn: 0, totalOut: 0 };
+                }
+
+                let qty = parseFloat(r.qty) || 0;
+                if (r.type && r.type.includes('In')) {
+                    balanceMap[name].totalIn += qty;
+                } else {
+                    balanceMap[name].totalOut += qty;
+                }
+            });
+
+            INV_BALANCE_DATA = Object.values(balanceMap).map(item => {
+                item.balance = item.totalIn - item.totalOut;
+                return item;
+            });
+
+            tbody.innerHTML = INV_BALANCE_DATA.map((item, idx) => `
+                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="td-style pl-6 font-mono font-bold text-slate-500">${idx + 1}</td>
+                    <td class="td-style font-bold text-slate-800">${item.itemName}</td>
+                    <td class="td-style text-slate-600">${item.category}</td>
+                    <td class="td-style text-right font-mono text-emerald-600 font-bold">${item.totalIn.toLocaleString()}</td>
+                    <td class="td-style text-right font-mono text-amber-600 font-bold">${item.totalOut.toLocaleString()}</td>
+                    <td class="td-style text-right font-mono text-indigo-600 font-bold text-base">${item.balance.toLocaleString()}</td>
+                    <td class="td-style pr-6 text-slate-500">${item.unit}</td>
                 </tr>
             `).join('');
         }
 
-        async function submitDraftToSheet() {
-            if(!WEB_APP_URL) return alert("Google Web App Link မချိတ်ရသေးပါ။ Settings တွင် သွားထည့်ပါ။");
-            if(DRAFT_DATA.length === 0) return;
-
-            const btn = document.getElementById('btnSubmitToSheet');
-            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>ပေးပို့နေပါသည် (${DRAFT_DATA.length})...</span>`;
-            btn.disabled = true;
-
-            let successCount = 0;
-            let errors = [];
-
-            for(let i = 0; i < DRAFT_DATA.length; i++) {
-                let record = DRAFT_DATA[i];
-                record.action = record._isServerData ? "updateData" : "addData";
-                try {
-                    let res = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(record) });
-                    let result = await res.json();
-                    if(result.status === "success") successCount++;
-                    else errors.push(`Row ${i+1}: ${result.message}`);
-                } catch(e) { errors.push(`Row ${i+1}: Connection Error`); }
-            }
-
-            if(errors.length === 0) {
-                alert(`အချက်အလက် ${successCount} ခုစလုံးကို Sheet ထဲသို့ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။`);
-                DRAFT_DATA = []; 
-                fetchNextID(); 
-            } else {
-                alert(`အချို့ဒေတာများ ပို့ရာတွင် Error တက်ပါသည်။\nအောင်မြင်: ${successCount}\nErrors:\n${errors.join('\n')}`);
-            }
-            
-            btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Sheet သို့ သိမ်းမည်</span>`;
-            renderDraftTable();
-        }
+        /* ================= 8. REPORTS & EXCEL EXPORTS ================= */
 
         function toggleFilterView() {
             const rType = document.getElementById('reportType').value;
@@ -2424,8 +1954,102 @@ if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
                 document.getElementById('reportTotalLiter').innerText = "0";
             });
         }
+
+async function exportInvBalanceToExcel() {
+            if (INV_BALANCE_DATA.length === 0) {
+                alert("ကျေးဇူးပြု၍ 'လက်ကျန် တွက်ချက်မည်' ခလုတ်ကို အရင်နှိပ်ပါ။");
+                return;
+            }
+
+            try {
+                const workbook = new ExcelJS.Workbook();
+                const ws = workbook.addWorksheet('Inventory_Balance');
+
+                ws.columns = [
+                    { key: 'no', width: 5 }, { key: 'itemName', width: 40 }, { key: 'category', width: 25 },
+                    { key: 'totalIn', width: 15 }, { key: 'totalOut', width: 15 }, { key: 'balance', width: 20 }, { key: 'unit', width: 10 }
+                ];
+
+                const titleText = `Store Inventory Balance Report - ${formatToDDMMYYYY(new Date().toISOString().split('T')[0])}`;
+                const titleRow = ws.addRow([titleText]);
+                ws.mergeCells(`A1:G1`);
+                titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1E40AF' } };
+                titleRow.getCell(1).alignment = { horizontal: 'center', vertical: 'middle' };
+                titleRow.height = 25;
+
+                const headerRow = ws.addRow(['စဉ်', 'ပစ္စည်းအမည် (Item Name)', 'အမျိုးအစား (Category)', 'စုစုပေါင်း အဝင်', 'စုစုပေါင်း အထွက်', 'လက်ကျန် (Balance)', 'ယူနစ်']);
+                headerRow.height = 22;
+                headerRow.eachCell((cell) => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF172554' } };
+                    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                    cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
+                });
+                
+                let imageId = null;
+
+// ပုံ Data စစ်ဆေးခြင်း
+if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
+    // Local က Base64 ရှိရင် အဲဒီအတိုင်းသုံးမယ်
+    const rawBase64Data = savedSignatureBase64.split(',')[1]; 
+    imageId = workbook.addImage({ base64: rawBase64Data, extension: 'png' });
+} else {
+    // Local က ပုံမရှိရင် (သို့မဟုတ်) Error တက်နေရင် GitHub URL ကနေ ယူသုံးမယ်
+    try {
+        const imageUrl = "https://raw.githubusercontent.com/Naylin98/FuelManager3.5/main/signature.png";
+        const response = await fetch(imageUrl); // GitHub မှ ပုံဆွဲခြင်း
+        const blob = await response.blob();
         
-async function exportToExcel() {
+        // Blob ကို Base64 ပြောင်းခြင်း
+        const base64Data = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
+            reader.readAsDataURL(blob);
+        });
+
+        imageId = workbook.addImage({ base64: base64Data, extension: 'png' });
+    } catch (e) {
+        console.error("ပုံတင်သွင်းရန် အဆင်မပြေပါ:", e);
+    }
+}
+
+                INV_BALANCE_DATA.forEach((item, index) => {
+                    const row = ws.addRow([ index + 1, item.itemName, item.category, item.totalIn, item.totalOut, item.balance, item.unit ]);
+                    row.eachCell(cell => { cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} }; });
+                    row.getCell(4).numFmt = '#,##0.00';
+                    row.getCell(5).numFmt = '#,##0.00';
+                    row.getCell(6).numFmt = '#,##0.00';
+                });
+
+                const sigSpaceRow = ws.addRow([]);
+                sigSpaceRow.height = 55;
+                if (imageId !== null) {
+                    ws.addImage(imageId, {
+                        tl: { col: 5.2, row: sigSpaceRow.number -1 },
+                        br: { col: 6.1, row: sigSpaceRow.number },
+                        editMode: 'oneCell'
+                    });
+                }
+
+                const recRow = ws.addRow(['', '', '', '','','Prepared By(ပြင်ဆင်သူ)', '']);
+                ws.mergeCells(`I${recRow.number}:K${recRow.number}`);
+                recRow.getCell(6).font = { bold: true, size: 10, color: { argb: 'FF1E3A8A' } };
+                recRow.getCell(6).alignment = { horizontal: 'center' };
+
+                const nameRow = ws.addRow(['', '', '', '','','NAY LIN HTIKE','']);
+                ws.mergeCells(`I${nameRow.number}:K${nameRow.number}`);
+                nameRow.getCell(6).font = { bold: true, size: 10, color: { argb: 'FFDC2626' } };
+                nameRow.getCell(6).alignment = { horizontal: 'center' };
+
+                const buffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                saveAs(blob, `Inventory_Balance_${new Date().getTime()}.xlsx`);
+            } catch (err) {
+                alert("Excel ထုတ်ရာတွင် Error ဖြစ်နေပါသည်: " + err);
+            }
+        }
+
+        async function exportToExcel() {
             try {
                 if (!isReportGenerated) {
                     alert("ကျေးဇူးပြု၍ 'ရှာဖွေမည်' ခလုတ်ကို အရင်နှိပ်ပြီး Report ထုတ်ပါ။");
@@ -2886,6 +2510,323 @@ if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
 
             const buffer = await workbook.xlsx.writeBuffer();
             saveAs(new Blob([buffer]), `Yearly_Summary_Report_${startY}_${endY}.xlsx`);
+        }
+
+        /* ================= 9. SETTINGS & UTILITY FUNCTIONS ================= */
+        function saveWebAppUrl() {
+            const urlVal = document.getElementById('webAppUrlInput').value.trim();
+            if(!urlVal) return alert("URL ထည့်ပါ။");
+            localStorage.setItem('v5_google_web_app_url', urlVal);
+            WEB_APP_URL = urlVal;
+            updateStatusIndicator(true);
+            alert("API URL သိမ်းဆည်းပြီးပါပြီ။");
+            fetchSettingsFromSheet();
+            fetchNextID();
+        }
+
+        function updateStatusIndicator(isConnected) {
+            const pulse = document.getElementById('statusPulse');
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            if(isConnected) {
+                pulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
+                dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500";
+                text.className = "text-emerald-400 font-bold";
+                text.innerText = "Link ချိတ်ဆက်ထားသည်";
+            } else {
+                pulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75";
+                dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500";
+                text.className = "text-red-400 font-bold";
+                text.innerText = "Link မချိတ်ရသေးပါ";
+            }
+        }
+
+        function applyBgLogo() {
+            const imgSrc = savedBgLogoBase64 ? savedBgLogoBase64 : defaultBgLogoImage;
+            const authOverlay = document.getElementById('authOverlay');
+            if(authOverlay) authOverlay.style.backgroundImage = `url('${imgSrc}')`;
+            document.querySelectorAll('.system-logo').forEach(img => { 
+                img.src = imgSrc; 
+                img.onerror = function() { this.onerror = null; this.src = defaultBgLogoImage; };
+            });
+        }
+
+        function saveBgLogo() {
+            const fileInput = document.getElementById('bgLogoUpload');
+            if (fileInput.files.length === 0) return alert("ကျေးဇူးပြု၍ ပုံရွေးချယ်ပါ။");
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const base64String = e.target.result;
+                localStorage.setItem('v5_bglogo_base64', base64String);
+                savedBgLogoBase64 = base64String;
+                applyBgLogo();
+                await saveSettingsToSheet();
+                alert("နောက်ခံနှင့် လိုဂိုပုံ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
+                fileInput.value = ""; 
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetBgLogo() {
+            localStorage.removeItem('v5_bglogo_base64');
+            savedBgLogoBase64 = "";
+            applyBgLogo();
+            saveSettingsToSheet();
+            alert("မူလပုံစံသို့ ပြန်လည်ပြောင်းလဲပြီးပါပြီ။");
+        }
+
+        function loadSignaturePreview() {
+    const img = document.getElementById('signaturePreview');
+    const txt = document.getElementById('noSignatureText');
+    if (savedSignatureBase64) {
+        img.src = savedSignatureBase64;
+        // ပုံ Load လုပ်ရာတွင် Error ဖြစ်ပါက Default ပုံကို ပြသရန်
+        img.onerror = function() {
+            this.onerror = null;
+            this.src = defaultSignatureImage;
+        };
+        img.classList.remove('hidden');
+        txt.classList.add('hidden');
+    } else {
+        img.classList.add('hidden');
+        txt.classList.remove('hidden');
+    }
+}
+        function saveSignature() {
+    const fileInput = document.getElementById('signatureUpload');
+    if (fileInput.files.length === 0) return alert("ကျေးဇူးပြု၍ ပုံရွေးချယ်ပါ။");
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    reader.onload = async function(e) { // async ပြောင်းထားသည်
+        const base64String = e.target.result;
+        localStorage.setItem('v5_signature_base64', base64String);
+        savedSignatureBase64 = base64String;
+        loadSignaturePreview();
+        await saveSettingsToSheet(); // Google Sheet သို့ ပို့ရန်
+        alert("လက်မှတ်ပုံ (Signature) အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
+        fileInput.value = ""; 
+    };
+    reader.readAsDataURL(file);
+}
+
+
+        async function fetchSettingsFromSheet() {
+            if(!WEB_APP_URL) return;
+            try {
+                let res = await fetch(`${WEB_APP_URL}?action=getSettings`, { redirect: "follow" });
+                let data = await res.json();
+                
+                if(data) {
+                    let fetchedBoats = data.boats || data.boatsData || [];
+                    let fetchedDepts = data.depts || data.deptsData || [];
+                    
+                    if(fetchedBoats.length > 0) localStorage.setItem('v5_boat_ids', JSON.stringify(fetchedBoats));
+                    if(fetchedDepts.length > 0) localStorage.setItem('v5_departments', JSON.stringify(fetchedDepts));
+
+const makeDirectLink = (url) => {
+                if (url && url.includes("drive.google.com")) {
+                    let match = url.match(/id=([^&]+)/) || url.match(/d\/([a-zA-Z0-9_-]+)/);
+                    if (match) return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+                }
+                return url;
+            };
+
+            // Fix: Valid ဖြစ်တဲ့ Link များကိုသာ လက်ခံရန် စစ်ဆေးခြင်း
+            if(data.bgLogo && data.bgLogo.length > 50) {
+                let finalBgLogo = makeDirectLink(data.bgLogo);
+                // Sheet မှလာသော Data သည် Base64 ဖြစ်ပါက Truncated ဖြစ်/မဖြစ် စစ်ဆေးရန် ခက်ခဲသဖြင့်
+                // Drive Link (သို့) http ဖြင့်စသော Link များကိုသာ ဦးစားပေးသုံးပါမည်။
+                if (finalBgLogo.startsWith('http') || finalBgLogo.startsWith('data:image')) {
+                    localStorage.setItem('v5_bglogo_base64', finalBgLogo);
+                    savedBgLogoBase64 = finalBgLogo;
+                    applyBgLogo();
+                }
+            }
+            
+            if(data.signature && data.signature.length > 50) {
+                let finalSignature = makeDirectLink(data.signature);
+                if (finalSignature.startsWith('http') || finalSignature.startsWith('data:image')) {
+                    localStorage.setItem('v5_signature_base64', finalSignature);
+                    savedSignatureBase64 = finalSignature;
+                    loadSignaturePreview();
+                }
+            }
+            
+            refreshUI();
+        }
+    } catch(e) { console.log("Settings fetch error:", e); }
+}
+
+        async function saveSettingsToSheet() {
+            if(!WEB_APP_URL) return;
+            const boats = JSON.parse(localStorage.getItem('v5_boat_ids') || '[]');
+            const depts = JSON.parse(localStorage.getItem('v5_departments') || '[]');
+            
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "saveSettings",
+                        bgLogo: savedBgLogoBase64 || "", 
+                        signature: savedSignatureBase64 || "",
+                        boats: boats, 
+                        depts: depts
+                    })
+                });
+            } catch(e) { console.log("Settings Sync Error:", e); }
+        }
+
+        function loadDropdownOptions() {
+            const boats = JSON.parse(localStorage.getItem('v5_boat_ids') || '[]');
+            const depts = JSON.parse(localStorage.getItem('v5_departments') || '[]');
+            const fBoat = document.getElementById('inp_boatId');
+            const fDept = document.getElementById('inp_dept');
+            const rDept = document.getElementById('filterDept');
+            
+            fBoat.innerHTML = '<option value="">-- ရွေးချယ်ရန် --</option>';
+            boats.forEach(b => fBoat.innerHTML += `<option value="${b}">${b}</option>`);
+            
+            fDept.innerHTML = '<option value="">-- ရွေးချယ်ရန် --</option>';
+            rDept.innerHTML = '<option value="all">ဌာနအားလုံး (All)</option>';
+            depts.forEach(d => {
+                fDept.innerHTML += `<option value="${d}">${d}</option>`;
+                rDept.innerHTML += `<option value="${d}">${d}</option>`;
+            });
+        }
+
+        function updateSettingsLists() {
+            const boats = JSON.parse(localStorage.getItem('v5_boat_ids') || '[]');
+            const depts = JSON.parse(localStorage.getItem('v5_departments') || '[]');
+            const renderList = (arr, type) => arr.map((item, idx) => `
+                <li class="px-4 py-3 flex justify-between items-center hover:bg-white rounded-lg transition border-b border-slate-100 last:border-0 group">
+                    <span>${item}</span>
+                    <button type="button" onclick="deleteListItem('${type}', ${idx})" class="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition p-1"><i class="fa-solid fa-trash-can"></i></button>
+                </li>`).join('');
+                
+            document.getElementById('boatListGrid').innerHTML = boats.length ? renderList(boats, 'boat') : '<li class="p-3 text-slate-400 text-center">စာရင်းလွတ်နေပါသည်</li>';
+            document.getElementById('deptListGrid').innerHTML = depts.length ? renderList(depts, 'dept') : '<li class="p-3 text-slate-400 text-center">စာရင်းလွတ်နေပါသည်</li>';
+        }
+
+        async function addListItem(type) {
+            const inputId = type === 'boat' ? 'newBoatInput' : 'newDeptInput';
+            const storageKey = type === 'boat' ? 'v5_boat_ids' : 'v5_departments';
+            const val = document.getElementById(inputId).value.trim();
+            if(!val) return;
+            
+            let list = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            if(!list.includes(val)) {
+                list.push(val);
+                localStorage.setItem(storageKey, JSON.stringify(list));
+                await saveSettingsToSheet();
+            }
+            document.getElementById(inputId).value = '';
+            refreshUI();
+        }
+
+        async function deleteListItem(type, idx) {
+            const storageKey = type === 'boat' ? 'v5_boat_ids' : 'v5_departments';
+            let list = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            list.splice(idx, 1);
+            localStorage.setItem(storageKey, JSON.stringify(list));
+            await saveSettingsToSheet();
+            refreshUI();
+        }
+
+        function formatToDDMMYYYY(dateString) {
+            if(!dateString) return "";
+            let d = new Date(dateString);
+            if (isNaN(d.getTime())) {
+                if (dateString.includes('-')) {
+                    let parts = dateString.split('-');
+                    if (parts.length === 3) {
+                        let y = parts[0].length === 4 ? parts[0] : parts[2];
+                        let m = String(parts[1]).padStart(2, '0');
+                        let day = String(parts[0].length === 4 ? parts[2] : parts[0]).padStart(2, '0');
+                        return `${day}/${m}/${y}`;
+                    }
+                }
+                return dateString;
+            }
+            let day = String(d.getDate()).padStart(2, '0');
+            let month = String(d.getMonth() + 1).padStart(2, '0');
+            let year = d.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        async function handleFinishedMonthClick() {
+            if(!WEB_APP_URL) return alert("API Link မချိတ်ရသေးပါ။");
+
+            const btn = document.getElementById('btnFinishedMonth');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Loading...`;
+            btn.disabled = true;
+
+            try {
+                let res = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: "setFinishedMonthStatus" })
+                });
+                let result = await res.json();
+
+                if(result.status === 'success') {
+                    alert("အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
+                    updateFinishedMonthUI();
+                } else {
+                    alert("အမှား: " + (result.message || "Unknown error"));
+                }
+            } catch (err) {
+                alert("အမှားတစ်ခုခုဖြစ်နေပါသည်။ ချိတ်ဆက်မှုကို စစ်ဆေးပါ။");
+            }
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+
+        async function updateFinishedMonthUI() {
+            if(!WEB_APP_URL) return;
+
+            try {
+                let res = await fetch(`${WEB_APP_URL}?action=getFinishedMonthStatus`);
+                let data = await res.json();
+                
+                const statusText = document.getElementById('reportFinishedStatus');
+                const btn = document.getElementById('btnFinishedMonth');
+
+                if (!statusText || !btn) return;
+
+                const showRecordingNextMonth = () => {
+                    statusText.innerHTML = `<i class="fa-solid fa-pen-nib mr-2"></i>နောက်လအတွက်စာရင်းသွင်းနေပါသည်`;
+                    statusText.classList.remove('hidden', 'text-emerald-600', 'bg-emerald-50', 'border-emerald-200');
+                    statusText.classList.add('text-indigo-600', 'bg-indigo-50', 'border-indigo-200');
+                    btn.style.display = 'inline-block';
+                };
+                
+                if (data.status !== "FINISHED") {
+                    showRecordingNextMonth();
+                    return;
+                }
+
+                let isOver7Days = false;
+                if (data.timestamp) {
+                    let finishedDate = new Date(data.timestamp);
+                    let today = new Date();
+                    let diffDays = (today.getTime() - finishedDate.getTime()) / (1000 * 3600 * 24);
+                    if (diffDays >= 0.1) isOver7Days = true;
+                }
+
+                if (isOver7Days) {
+                    showRecordingNextMonth();
+                } else {
+                    statusText.textContent = "Finished Last Month ( ပြုစုပြီးစီးပါပြီ )";
+                    statusText.classList.remove('hidden', 'text-indigo-600', 'bg-indigo-50', 'border-indigo-200');
+                    statusText.classList.add('text-emerald-600', 'bg-emerald-50', 'border-emerald-200');
+                    btn.style.display = 'none';
+                }
+
+            } catch (err) {
+                console.error("Failed to fetch finished status:", err);
+            }
         }
     </script>
 </body>
