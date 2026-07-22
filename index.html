@@ -1965,12 +1965,18 @@ async function exportInvBalanceToExcel() {
                 const workbook = new ExcelJS.Workbook();
                 const ws = workbook.addWorksheet('Inventory_Balance');
 
+                const d = new Date();
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const year = d.getFullYear();
+                const today = `${day}-${month}-${year}`;
+
                 ws.columns = [
                     { key: 'no', width: 5 }, { key: 'itemName', width: 40 }, { key: 'category', width: 25 },
                     { key: 'totalIn', width: 15 }, { key: 'totalOut', width: 15 }, { key: 'balance', width: 20 }, { key: 'unit', width: 10 }
                 ];
 
-                const titleText = `Store Inventory Balance Report - ${formatToDDMMYYYY(new Date().toISOString().split('T')[0])}`;
+                const titleText = `Store Inventory Balance Report - ${today}`;
                 const titleRow = ws.addRow([titleText]);
                 ws.mergeCells(`A1:G1`);
                 titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1E40AF' } };
@@ -2043,7 +2049,7 @@ if (savedSignatureBase64 && savedSignatureBase64.startsWith('data:image')) {
 
                 const buffer = await workbook.xlsx.writeBuffer();
                 const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                saveAs(blob, `Inventory_Balance_${new Date().getTime()}.xlsx`);
+                saveAs(blob, `Inventory_Balance_${today}.xlsx`);
             } catch (err) {
                 alert("Excel ထုတ်ရာတွင် Error ဖြစ်နေပါသည်: " + err);
             }
