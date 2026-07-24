@@ -110,6 +110,7 @@
                         <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="dashboard-tab" checked><span>Dashboard</span></label>
                         <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="form-tab" checked><span>Form သွင်းရန်</span></label>
                         <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="draft-tab" checked><span>Draft စစ်ရန်</span></label>
+                        <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="inventory-item-list-tab" checked><span>Inventory Item List</span></label>
                         <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="inventory-tab" checked><span>Store Inventory</span></label>
                         <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="inv-balance-tab" checked><span>Inventory လက်ကျန်</span></label>
                         <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" class="tab-perm-cb rounded text-indigo-600 focus:ring-0" value="report-tab"><span>Reports</span></label>
@@ -1134,7 +1135,7 @@
                 allowedTabs = ['dashboard-tab', 'form-tab', 'draft-tab', 'inventory-tab', 'inv-balance-tab'];
             }
             
-            const allTabs = ['dashboard-tab', 'form-tab', 'draft-tab', 'inventory-tab', 'inv-balance-tab', 'report-tab', 'settings-tab'];
+            const allTabs = ['dashboard-tab', 'form-tab', 'draft-tab','inventory-item-list-tab', 'inventory-tab', 'inv-balance-tab', 'report-tab', 'settings-tab'];
             allTabs.forEach(tabId => {
                 let btn = document.getElementById('btn-' + tabId);
                 if (btn) {
