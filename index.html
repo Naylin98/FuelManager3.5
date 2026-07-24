@@ -128,7 +128,14 @@
 
     <!-- Mobile Backdrop Overlay -->
     <div id="sidebarOverlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/60 z-20 hidden lg:hidden transition-opacity duration-300"></div>
-
+     <!-- ================= IMAGE PREVIEW MODAL ================= -->
+<div id="imagePreviewModal" class="fixed inset-0 z-[200] hidden items-center justify-center bg-black/80 backdrop-blur-sm transition-opacity duration-300 opacity-0" onclick="closeImageModal()">
+    <!-- Close Button -->
+    <span class="absolute top-4 right-6 text-white text-4xl font-bold cursor-pointer hover:text-red-500 transition-colors" onclick="closeImageModal()">&times;</span>
+    
+    <!-- Image Container -->
+    <img id="modalZoomImage" onclick="event.stopPropagation()" class="max-w-[90%] max-h-[90%] rounded-xl shadow-2xl object-contain transform scale-95 transition-transform duration-300" src="" alt="Zoomed Image">
+</div>
     <!-- ================= 2. SIDEBAR NAVIGATION ================= -->
     <div id="mainSidebar" class="fixed lg:static inset-y-0 left-0 z-30 w-72 bg-gradient-header text-slate-200 flex flex-col shrink-0 h-full shadow-2xl transition-transform duration-300 transform -translate-x-full lg:translate-x-0">
         <div class="p-6 border-b border-slate-700/50 flex items-center justify-between shrink-0">
@@ -157,6 +164,10 @@
                 <i class="fa-solid fa-list-check w-5 text-center text-lg"></i>
                 <span>စစ်ဆေးရန် Draft</span>
             </button>
+            <button onclick="switchTab('inventory-item-list-tab')" id="btn-inventory-item-list-tab" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition duration-200 font-bold text-sm">
+    <i class="fa-solid fa-list-check w-5 text-center text-lg"></i>
+    <span>Inventory Item List</span>
+</button>
             <button onclick="switchTab('inventory-tab')" id="btn-inventory-tab" class="w-full flex items-center space-x-3 px-4 py-3.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition duration-200 font-bold text-sm">
                 <i class="fa-solid fa-boxes-stacked w-5 text-center text-lg"></i>
                 <span>Store Inventory</span>
@@ -490,6 +501,7 @@
                                         <option value="General Store">General Store (အထွေထွေ)</option>
                                     </select>
                                 </div>
+                                   
                             </div>
                         </div>
 
@@ -500,12 +512,27 @@
                                     <div class="grid grid-cols-1 gap-4 mb-4">
                                         <div>
                                             <label class="form-label text-indigo-900">Item Name (ပစ္စည်းအမည်)</label>
-                                            <input type="text" id="inv_itemName" required placeholder="ဥပမာ - Engine Oil 20W-50 / Filter / Rope" class="form-input border-indigo-200">
+                                            <select id="inv_itemName" onchange="autoLoadItemImage()" required class="form-input border-indigo-200 bg-white">
+    <option value="">-- ပစ္စည်းအမည် ရွေးချယ်ပါ --</option>
+</select>
                                         </div>
                                         <div>
                                             <label class="form-label text-slate-600">Marks / Remarks (မှတ်ချက်)</label>
                                             <input type="text" id="inv_marks" placeholder="မှတ်သားရန်ရှိပါက..." class="form-input">
                                         </div>
+
+                                        <div class="mb-4">
+    <label class="block text-gray-700 font-bold mb-2 text-xs">ပစ္စည်း ဓာတ်ပုံ (Auto Preview)</label>
+    <div class="flex items-center gap-4">
+        <!-- ဖိုင်ရွေးရန် Input ကို ဖျောက်ထားမည် -->
+        <input type="file" id="itemImage" accept="image/*" class="hidden w-full px-3 py-2 border rounded" onchange="previewSelectedImage(event)">
+        
+        <!-- ပုံ Preview ပြသမည့် နေရာ -->
+        <div id="imagePreviewContainer" class="hidden w-24 h-24 border border-indigo-200 rounded overflow-hidden flex-shrink-0 bg-gray-100 shadow-sm">
+            <img id="imagePreview" src="" alt="Preview" class="w-full h-full object-cover">
+        </div>
+    </div>
+</div>
                                     </div>
                                 </div>
                             </div>
@@ -568,6 +595,7 @@
                                     <th class="th-style text-slate-200 pl-6 border-b-0">ID</th>
                                     <th class="th-style text-slate-200 border-b-0">Date</th>
                                     <th class="th-style text-slate-200 border-b-0">Type</th>
+                                    <th class="th-style text-slate-200 border-b-0">Image</th>
                                     <th class="th-style text-slate-200 border-b-0">Item Name</th>
                                     <th class="th-style text-slate-200 border-b-0">Category</th>
                                     <th class="th-style text-slate-200 text-right border-b-0">Qty</th>
@@ -575,6 +603,7 @@
                                     <th class="th-style text-slate-200 text-right border-b-0">Unit Price</th>
                                     <th class="th-style text-slate-200 border-b-0">Marks</th>
                                     <th class="th-style text-slate-200 pr-6 text-center border-b-0">Action</th>
+
                                 </tr>
                             </thead>
                             <tbody id="inventoryTableBody" class="divide-y divide-slate-100 font-medium bg-white">
@@ -613,6 +642,7 @@
                             <thead class="sticky top-0 z-10 shadow-sm">
                                 <tr class="bg-slate-800">
                                     <th class="th-style text-slate-200 pl-6 border-b-0">စဉ်</th>
+                                    <th class="th-style text-slate-200 border-b-0">ဓာတ်ပုံ (Image)</th>
                                     <th class="th-style text-slate-200 border-b-0">ပစ္စည်းအမည် (Item Name)</th>
                                     <th class="th-style text-slate-200 border-b-0">အမျိုးအစား (Category)</th>
                                     <th class="th-style text-emerald-400 text-right border-b-0">စုစုပေါင်း အဝင် (In)</th>
@@ -623,7 +653,7 @@
                             </thead>
                             <tbody id="invBalanceTableBody" class="divide-y divide-slate-100 font-medium bg-white">
                                 <tr>
-                                    <td colspan="7" class="p-10 text-center text-slate-400">
+                                    <td colspan="8" class="p-10 text-center text-slate-400">
                                         အပေါ်ရှိ 'လက်ကျန် တွက်ချက်မည်' ကိုနှိပ်၍ စာရင်းကြည့်ပါ။
                                     </td>
                                 </tr>
@@ -855,6 +885,67 @@
                     </div>
                 </div>
             </div>
+
+                 <!-- TAB 8: INVENTORY ITEM LIST TAB -->
+<div id="inventory-item-list-tab" class="tab-content hidden max-w-7xl mx-auto space-y-6">
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-gradient-to-r from-slate-800 to-slate-700 px-4 sm:px-6 py-4">
+            <h2 class="text-sm sm:text-base font-bold text-white flex items-center space-x-2">
+                <i class="fa-solid fa-clipboard-list text-emerald-400"></i>
+                <span>Inventory Item List သစ်ထည့်ရန်</span>
+            </h2>
+        </div>
+
+        <form id="newItemListForm" class="p-4 sm:p-6 md:p-8" onsubmit="saveNewInventoryItem(event)">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="form-label text-slate-700">Item Name and Code (ပစ္စည်းအမည် နှင့် ကုဒ်)</label>
+                    <input type="text" id="newItemNameCode" required placeholder="ဥပမာ - Engine Oil (EO-001)" class="form-input mt-2 border-slate-300">
+                </div>
+                <div>
+                    <label class="form-label text-slate-700">Item Image (ပစ္စည်းဓာတ်ပုံ)</label>
+                    <input type="file" id="newItemImageFile" accept="image/*" required class="form-input mt-2 border-slate-300">
+                </div>
+            </div>
+            <div class="flex justify-end pt-4">
+                <button type="submit" id="btnSubmitNewItem" class="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-lg transition duration-200 flex items-center space-x-2">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>List သို့ သိမ်းမည်</span>
+                </button>
+            </div>
+        </form>
+<!-- Inventory Item List ဇယားပြသမည့်နေရာ -->
+<div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-6">
+    <div class="bg-slate-50 border-b border-slate-200 px-4 sm:px-6 py-4 flex justify-between items-center">
+        <h3 class="text-sm font-bold text-slate-800 flex items-center space-x-2">
+            <i class="fa-solid fa-list text-indigo-600"></i>
+            <span>လက်ရှိ ပစ္စည်းအမည်နှင့် ဓာတ်ပုံ စာရင်းများ</span>
+        </h3>
+        <button onclick="fetchInventoryItemsList()" class="px-3 py-1.5 bg-indigo-100 text-indigo-700 font-bold text-xs rounded-lg hover:bg-indigo-200 transition">
+            <i class="fa-solid fa-rotate mr-1"></i> Refresh List
+        </button>
+    </div>
+    <div class="overflow-auto custom-scrollbar max-h-[400px]">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-slate-800 text-slate-200 sticky top-0 z-10">
+                <tr>
+                    <th class="th-style pl-6">No.</th>
+                    <th class="th-style">Image</th>
+                    <th class="th-style">Item Name & Code</th>
+                </tr>
+            </thead>
+            <tbody id="itemListTableBody" class="divide-y divide-slate-100">
+                <tr>
+                    <td colspan="3" class="p-8 text-center text-slate-400">
+                        <i class="fa-solid fa-spinner animate-spin text-xl mb-2 block"></i> ဒေတာများ ဆွဲယူနေပါသည်...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+    </div>
+</div>
         </main>
     </div>
 
@@ -878,13 +969,19 @@
         let currentInvEditId = null;
         let globalGrandTotalAmount = 0;
         let globalGrandTotalLiter = 0;
+        let currentItemImageBase64 = "";
+        let ITEM_LIST_DATA = []; // ပစ္စည်းစာရင်းများ သိမ်းထားရန်
+
+
+
 
         /* ================= 2. INITIALIZATION & SYSTEM LOAD ================= */
         window.onload = function() {
             initStorage();
             loadSignaturePreview();
             applyBgLogo();
-            
+            fetchInventoryItemsList();
+
             const initToday = new Date();
             const initCurrentMonth = initToday.getFullYear() + '-' + String(initToday.getMonth() + 1).padStart(2, '0');
             if (document.getElementById('dashMonth')) {
@@ -1056,11 +1153,12 @@
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(tabId).classList.remove('hidden');
             
-            const tabs = ['dashboard-tab','form-tab', 'draft-tab', 'inventory-tab', 'inv-balance-tab', 'report-tab', 'settings-tab'];
+            const tabs = ['dashboard-tab','form-tab', 'draft-tab', 'inventory-item-list-tab','inventory-tab', 'inv-balance-tab', 'report-tab', 'settings-tab'];
             const titles = {    
                 'dashboard-tab': 'Dashboard စာရင်းချုပ်', 
                 'form-tab': 'ဆီထုတ်ပေးမှု မှတ်တမ်းအသစ်သွင်းရန်', 
                 'draft-tab': 'စစ်ဆေးရန် ယာယီစာရင်းများ (Draft & Edit)',
+                'inventory-item-list-tab': 'ပစ္စည်းစာရင်းနှင့် ဓါတ်ပုံများသွင်းရန်',
                 'inventory-tab': 'Store Inventory ပစ္စည်းအဝင်/အထွက် စာရင်းသွင်းရန်',
                 'inv-balance-tab': 'Store Inventory ပစ္စည်းလက်ကျန် စာရင်း',
                 'report-tab': 'လချုပ် / နှစ်ချုပ် / စိတ်ကြိုက် Report', 
@@ -1517,75 +1615,94 @@ async function submitDraftToSheet() {
             return `INV-${year}-${num}`;
         }
 
-        function resetInvForm() {
-            document.getElementById('inventoryForm').reset();
-            document.getElementById('inv_date').valueAsDate = new Date();
-            document.getElementById('inv_id').value = generateInvId();
-            currentInvEditId = null;
-            document.getElementById('btnSubmitInventory').innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Inventory Sheet သို့ သိမ်းမည်</span>`;
+       function resetInvForm() {
+    document.getElementById('inventoryForm').reset();
+    document.getElementById('inv_date').valueAsDate = new Date();
+    document.getElementById('inv_id').value = generateInvId();
+    currentInvEditId = null;
+    
+    // Image ကိုပါ Reset လုပ်မည်
+    document.getElementById('itemImage').value = "";
+    document.getElementById('imagePreviewContainer').classList.add('hidden');
+    document.getElementById('imagePreview').src = "";
+    currentItemImageBase64 = "";
+
+    document.getElementById('btnSubmitInventory').innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>Inventory Sheet သို့ သိမ်းမည်</span>`;
+}
+
+function editInventory(id) {
+    let record = INVENTORY_DATA.find(r => r.id === id);
+    if(!record) return;
+    currentInvEditId = record.id;
+    
+    document.getElementById('inv_id').value = record.id;
+    let fDate = new Date(record.date);
+    if(!isNaN(fDate)) document.getElementById('inv_date').valueAsDate = fDate;
+    document.getElementById('inv_type').value = record.type;
+    document.getElementById('inv_itemName').value = record.itemName;
+    document.getElementById('inv_category').value = record.category;
+    document.getElementById('inv_qty').value = record.qty;
+    document.getElementById('inv_unit').value = record.unit;
+    document.getElementById('inv_unitPrice').value = record.unitPrice;
+    document.getElementById('inv_marks').value = record.marks || '';
+    
+    // ပုံရှိပါက ပြန်ခေါ်ပြမည်
+    if (record.itemImage) {
+        currentItemImageBase64 = record.itemImage;
+        document.getElementById('imagePreview').src = record.itemImage;
+        document.getElementById('imagePreviewContainer').classList.remove('hidden');
+    } else {
+        currentItemImageBase64 = "";
+        document.getElementById('imagePreview').src = "";
+        document.getElementById('imagePreviewContainer').classList.add('hidden');
+    }
+
+    calcInvTotal();
+    document.getElementById('btnSubmitInventory').innerHTML = `<i class="fa-solid fa-pen"></i> <span>ပြင်ဆင်ချက်ကို သိမ်းမည်</span>`;
+    document.getElementById('inventory-tab').scrollIntoView({ behavior: 'smooth' });
+}
+
+async function saveInventoryEntry(e) {
+    e.preventDefault();
+    if(!WEB_APP_URL) return alert("Google Web App Link မချိတ်ရသေးပါ။ Settings တွင် သွားထည့်ပါ။");
+
+    const btn = document.getElementById('btnSubmitInventory');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>သိမ်းဆည်းနေပါသည်...</span>`;
+    btn.disabled = true;
+
+    const record = {
+        action: currentInvEditId ? "updateInventory" : "addInventory",
+        id: document.getElementById('inv_id').value,
+        date: document.getElementById('inv_date').value,
+        type: document.getElementById('inv_type').value,
+        itemName: document.getElementById('inv_itemName').value,
+        category: document.getElementById('inv_category').value,
+        qty: parseFloat(document.getElementById('inv_qty').value) || 0,
+        unit: document.getElementById('inv_unit').value,
+        unitPrice: parseFloat(document.getElementById('inv_unitPrice').value) || 0,
+        totalAmount: parseFloat(document.getElementById('inv_totalAmount').value) || 0,
+        marks: document.getElementById('inv_marks').value || '',
+        itemImage: currentItemImageBase64 // ပုံ Data ကို Payload တွင် ထည့်မည်
+    };
+
+    try {
+        let res = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(record) });
+        let result = await res.json();
+        if(result.status === "success") {
+            alert("Inventory စာရင်းကို Google Sheet ထဲသို့ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
+            resetInvForm();
+            fetchInventoryFromSheet();
+        } else {
+            alert("အမှား: " + (result.message || "Unknown error"));
         }
+    } catch(err) {
+        alert("Google Sheet သို့ ချိတ်ဆက်၍ မရပါ။ API Link မှန်ကန်ကြောင်း စစ်ဆေးပါ: " + err.message);
+    }
 
-        function editInventory(id) {
-            let record = INVENTORY_DATA.find(r => r.id === id);
-            if(!record) return;
-            currentInvEditId = record.id;
-            
-            document.getElementById('inv_id').value = record.id;
-            let fDate = new Date(record.date);
-            if(!isNaN(fDate)) document.getElementById('inv_date').valueAsDate = fDate;
-            document.getElementById('inv_type').value = record.type;
-            document.getElementById('inv_itemName').value = record.itemName;
-            document.getElementById('inv_category').value = record.category;
-            document.getElementById('inv_qty').value = record.qty;
-            document.getElementById('inv_unit').value = record.unit;
-            document.getElementById('inv_unitPrice').value = record.unitPrice;
-            document.getElementById('inv_marks').value = record.marks || '';
-            
-            calcInvTotal();
-            document.getElementById('btnSubmitInventory').innerHTML = `<i class="fa-solid fa-pen"></i> <span>ပြင်ဆင်ချက်ကို သိမ်းမည်</span>`;
-            document.getElementById('inventory-tab').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        async function saveInventoryEntry(e) {
-            e.preventDefault();
-            if(!WEB_APP_URL) return alert("Google Web App Link မချိတ်ရသေးပါ။ Settings တွင် သွားထည့်ပါ။");
-
-            const btn = document.getElementById('btnSubmitInventory');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> <span>သိမ်းဆည်းနေပါသည်...</span>`;
-            btn.disabled = true;
-
-            const record = {
-                action: currentInvEditId ? "updateInventory" : "addInventory",
-                id: document.getElementById('inv_id').value,
-                date: document.getElementById('inv_date').value,
-                type: document.getElementById('inv_type').value,
-                itemName: document.getElementById('inv_itemName').value,
-                category: document.getElementById('inv_category').value,
-                qty: parseFloat(document.getElementById('inv_qty').value) || 0,
-                unit: document.getElementById('inv_unit').value,
-                unitPrice: parseFloat(document.getElementById('inv_unitPrice').value) || 0,
-                totalAmount: parseFloat(document.getElementById('inv_totalAmount').value) || 0,
-                marks: document.getElementById('inv_marks').value || ''
-            };
-
-            try {
-                let res = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify(record) });
-                let result = await res.json();
-                if(result.status === "success") {
-                    alert("Inventory စာရင်းကို Google Sheet ထဲသို့ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
-                    resetInvForm();
-                    fetchInventoryFromSheet();
-                } else {
-                    alert("အမှား: " + (result.message || "Unknown error"));
-                }
-            } catch(err) {
-                alert("Google Sheet သို့ ချိတ်ဆက်၍ မရပါ။ API Link မှန်ကန်ကြောင်း စစ်ဆေးပါ: " + err.message);
-            }
-
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-        }
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+}
 
         async function fetchInventoryFromSheet() {
             if(!WEB_APP_URL) return;
@@ -1601,83 +1718,101 @@ async function submitDraftToSheet() {
                 tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-red-500">ဒေတာဆွဲယူ၍ မရပါ။ Error: ${err.message}</td></tr>`;
             }
         }
+function renderInventoryTable() {
+    const tbody = document.getElementById('inventoryTableBody');
+    if(!INVENTORY_DATA || INVENTORY_DATA.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="11" class="p-10 text-center text-slate-400"><i class="fa-solid fa-boxes-stacked text-3xl mb-2 text-slate-300 block"></i>Inventory စာရင်းများ မရှိသေးပါ။</td></tr>`;
+        return;
+    }
 
-        function renderInventoryTable() {
-            const tbody = document.getElementById('inventoryTableBody');
-            if(!INVENTORY_DATA || INVENTORY_DATA.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="p-10 text-center text-slate-400"><i class="fa-solid fa-boxes-stacked text-3xl mb-2 text-slate-300 block"></i>Inventory စာရင်းများ မရှိသေးပါ။</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = INVENTORY_DATA.map(r => `
-                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                    <td class="td-style pl-6 font-mono font-bold text-slate-700">${r.id || ''}</td>
-                    <td class="td-style">${formatToDDMMYYYY(r.date)}</td>
-                    <td class="td-style font-bold ${r.type && r.type.includes('In') ? 'text-emerald-600' : 'text-amber-600'}">${r.type || ''}</td>
-                    <td class="td-style font-bold text-slate-800">${r.itemName || ''}</td>
-                    <td class="td-style text-slate-600">${r.category || ''}</td>
-                    <td class="td-style text-right font-mono font-bold">${parseFloat(r.qty || 0).toLocaleString()}</td>
-                    <td class="td-style text-slate-500">${r.unit || ''}</td>
-                    <td class="td-style text-right font-mono">${Math.round(parseFloat(r.unitPrice || 0)).toLocaleString()}</td>
-                    <td class="td-style text-slate-600">${r.marks || ''}</td>
-                    <td class="td-style pr-6 text-center whitespace-nowrap">
-                        <button onclick="editInventory('${r.id}')" title="ပြင်ဆင်မည်" class="text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded transition"><i class="fa-solid fa-pen-to-square"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        }
+    tbody.innerHTML = INVENTORY_DATA.map(r => `
+        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+            <td class="td-style pl-6 font-mono font-bold text-slate-700">${r.id || ''}</td>
+            <td class="td-style">${formatToDDMMYYYY(r.date)}</td>
+            <td class="td-style font-bold ${r.type && r.type.includes('In') ? 'text-emerald-600' : 'text-amber-600'}">${r.type || ''}</td>
+            <td class="td-style">
+                            ${r.itemImage ? `<img src="${r.itemImage}" onclick="openImageModal(this.src)" class="w-10 h-10 object-cover rounded shadow-sm border border-slate-200 cursor-pointer hover:opacity-80 transition" alt="Item">` : `<div class="w-10 h-10 bg-slate-100 rounded flex items-center justify-center text-slate-400 text-xs"><i class="fa-solid fa-image"></i></div>`}
+                        </td>
+            <td class="td-style font-bold text-slate-800">${r.itemName || ''}</td>
+            <td class="td-style text-slate-600">${r.category || ''}</td>
+            <td class="td-style text-right font-mono font-bold">${parseFloat(r.qty || 0).toLocaleString()}</td>
+            <td class="td-style text-slate-500">${r.unit || ''}</td>
+            <td class="td-style text-right font-mono">${Math.round(parseFloat(r.unitPrice || 0)).toLocaleString()}</td>
+            <td class="td-style text-slate-600">${r.marks || ''}</td>
+            <td class="td-style pr-6 text-center whitespace-nowrap">
+                <button onclick="editInventory('${r.id}')" title="ပြင်ဆင်မည်" class="text-blue-500 hover:text-blue-700 hover:bg-blue-50 p-1.5 rounded transition"><i class="fa-solid fa-pen-to-square"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
 
         async function generateInvBalanceReport() {
-            const tbody = document.getElementById('invBalanceTableBody');
+    const tbody = document.getElementById('invBalanceTableBody');
 
-            if (!INVENTORY_DATA || INVENTORY_DATA.length === 0) {
-                if (!WEB_APP_URL) return alert("Google Web App Link မချိတ်ရသေးပါ။ Settings တွင် သွားထည့်ပါ။");
-                
-                tbody.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-indigo-500"><i class="fa-solid fa-spinner animate-spin text-2xl mb-2 block"></i>Inventory ဒေတာများ အလိုအလျောက် ဆွဲယူတွက်ချက်နေပါသည်...</td></tr>`;
-                try {
-                    await fetchInventoryFromSheet();
-                } catch (error) {
-                    console.error("Error fetching inventory:", error);
-                }
-            }
-
-            if (!INVENTORY_DATA || INVENTORY_DATA.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-10 text-center text-slate-400">Inventory စာရင်း ဒေတာများ မရှိသေးပါ။</td></tr>`;
-                return;
-            }
-
-            let balanceMap = {};
-            INVENTORY_DATA.forEach(r => {
-                let name = r.itemName ? r.itemName.trim() : "Unknown";
-                if (!balanceMap[name]) {
-                    balanceMap[name] = { itemName: name, category: r.category || "", unit: r.unit || "", totalIn: 0, totalOut: 0 };
-                }
-
-                let qty = parseFloat(r.qty) || 0;
-                if (r.type && r.type.includes('In')) {
-                    balanceMap[name].totalIn += qty;
-                } else {
-                    balanceMap[name].totalOut += qty;
-                }
-            });
-
-            INV_BALANCE_DATA = Object.values(balanceMap).map(item => {
-                item.balance = item.totalIn - item.totalOut;
-                return item;
-            });
-
-            tbody.innerHTML = INV_BALANCE_DATA.map((item, idx) => `
-                <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                    <td class="td-style pl-6 font-mono font-bold text-slate-500">${idx + 1}</td>
-                    <td class="td-style font-bold text-slate-800">${item.itemName}</td>
-                    <td class="td-style text-slate-600">${item.category}</td>
-                    <td class="td-style text-right font-mono text-emerald-600 font-bold">${item.totalIn.toLocaleString()}</td>
-                    <td class="td-style text-right font-mono text-amber-600 font-bold">${item.totalOut.toLocaleString()}</td>
-                    <td class="td-style text-right font-mono text-indigo-600 font-bold text-base">${item.balance.toLocaleString()}</td>
-                    <td class="td-style pr-6 text-slate-500">${item.unit}</td>
-                </tr>
-            `).join('');
+    if (!INVENTORY_DATA || INVENTORY_DATA.length === 0) {
+        if (!WEB_APP_URL) return alert("Google Web App Link မချိတ်ရသေးပါ။ Settings တွင် သွားထည့်ပါ။");
+        
+        tbody.innerHTML = `<tr><td colspan="8" class="p-10 text-center text-indigo-500"><i class="fa-solid fa-spinner animate-spin text-2xl mb-2 block"></i>Inventory ဒေတာများ အလိုအလျောက် ဆွဲယူတွက်ချက်နေပါသည်...</td></tr>`;
+        try {
+            await fetchInventoryFromSheet();
+        } catch (error) {
+            console.error("Error fetching inventory:", error);
         }
+    }
+
+    if (!INVENTORY_DATA || INVENTORY_DATA.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="p-10 text-center text-slate-400">Inventory စာရင်း ဒေတာများ မရှိသေးပါ။</td></tr>`;
+        return;
+    }
+
+    let balanceMap = {};
+    INVENTORY_DATA.forEach(r => {
+        let name = r.itemName ? r.itemName.trim() : "Unknown";
+        if (!balanceMap[name]) {
+            balanceMap[name] = { 
+                itemName: name, 
+                category: r.category || "", 
+                unit: r.unit || "", 
+                itemImage: r.itemImage || "", // ပုံကို သိမ်းဆည်းရန်
+                totalIn: 0, 
+                totalOut: 0 
+            };
+        }
+
+        // နောက်ဆုံးထည့်ထားတဲ့ ပုံအသစ်ရှိရင် အပ်ဒိတ်လုပ်မည်
+        if (r.itemImage && !balanceMap[name].itemImage) {
+            balanceMap[name].itemImage = r.itemImage;
+        }
+
+        let qty = parseFloat(r.qty) || 0;
+        if (r.type && r.type.includes('In')) {
+            balanceMap[name].totalIn += qty;
+        } else {
+            balanceMap[name].totalOut += qty;
+        }
+    });
+
+    INV_BALANCE_DATA = Object.values(balanceMap).map(item => {
+        item.balance = item.totalIn - item.totalOut;
+        return item;
+    });
+
+    tbody.innerHTML = INV_BALANCE_DATA.map((item, idx) => `
+        <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+            <td class="td-style pl-6 font-mono font-bold text-slate-500">${idx + 1}</td>
+            <td class="td-style">
+                            ${item.itemImage ? `<img src="${item.itemImage}" onclick="openImageModal(this.src)" class="w-10 h-10 object-cover rounded shadow-sm border border-slate-200 cursor-pointer hover:opacity-80 transition" alt="Item">` : `<div class="w-10 h-10 bg-slate-100 rounded flex items-center justify-center text-slate-400 text-xs"><i class="fa-solid fa-image"></i></div>`}
+                        </td>
+            <td class="td-style font-bold text-slate-800">${item.itemName}</td>
+            <td class="td-style text-slate-600">${item.category}</td>
+            <td class="td-style text-right font-mono text-emerald-600 font-bold">${item.totalIn.toLocaleString()}</td>
+            <td class="td-style text-right font-mono text-amber-600 font-bold">${item.totalOut.toLocaleString()}</td>
+            <td class="td-style text-right font-mono text-indigo-600 font-bold text-base">${item.balance.toLocaleString()}</td>
+            <td class="td-style pr-6 text-slate-500">${item.unit}</td>
+        </tr>
+    `).join('');
+}
+
 
         /* ================= 8. REPORTS & EXCEL EXPORTS ================= */
 
@@ -1956,10 +2091,7 @@ async function submitDraftToSheet() {
         }
 
 async function exportInvBalanceToExcel() {
-            if (INV_BALANCE_DATA.length === 0) {
-                alert("ကျေးဇူးပြု၍ 'လက်ကျန် တွက်ချက်မည်' ခလုတ်ကို အရင်နှိပ်ပါ။");
-                return;
-            }
+             
 
             try {
                 const workbook = new ExcelJS.Workbook();
@@ -1969,14 +2101,14 @@ async function exportInvBalanceToExcel() {
                 const day = String(d.getDate()).padStart(2, '0');
                 const month = String(d.getMonth() + 1).padStart(2, '0');
                 const year = d.getFullYear();
-                const today = `${day}-${month}-${year}`;
+                const today = `${day}-${month}-${year}`; 
 
                 ws.columns = [
                     { key: 'no', width: 5 }, { key: 'itemName', width: 40 }, { key: 'category', width: 25 },
                     { key: 'totalIn', width: 15 }, { key: 'totalOut', width: 15 }, { key: 'balance', width: 20 }, { key: 'unit', width: 10 }
                 ];
 
-                const titleText = `Store Inventory Balance Report - ${today}`;
+                const titleText = `My Mergui Store Inventory Balance Report - ${today}`;
                 const titleRow = ws.addRow([titleText]);
                 ws.mergeCells(`A1:G1`);
                 titleRow.getCell(1).font = { bold: true, size: 14, color: { argb: 'FF1E40AF' } };
@@ -2759,7 +2891,197 @@ const makeDirectLink = (url) => {
             let year = d.getFullYear();
             return `${day}/${month}/${year}`;
         }
+        
 
+         /* ================= IMAGE ZOOM PREVIEW FUNCTIONS ================= */
+function openImageModal(imageSrc) {
+    if (!imageSrc) return; // ပုံမရှိလျှင် အလုပ်မလုပ်ရန်
+    
+    const modal = document.getElementById('imagePreviewModal');
+    const modalImg = document.getElementById('modalZoomImage');
+    
+    modalImg.src = imageSrc;
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    
+    // Animation Effect လုပ်ဆောင်ရန်
+    setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        modalImg.classList.remove('scale-95');
+        modalImg.classList.add('scale-100');
+    }, 10);
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('imagePreviewModal');
+    const modalImg = document.getElementById('modalZoomImage');
+    
+    // ပိတ်မည့် Animation ပြသရန်
+    modal.classList.add('opacity-0');
+    modalImg.classList.remove('scale-100');
+    modalImg.classList.add('scale-95');
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        modalImg.src = ""; // ပိတ်သွားချိန်တွင် src ကို ရှင်းလင်းရန်
+    }, 300);
+}
+        // ပုံရွေးလိုက်သည့်အခါ Preview ပြသပေးမည့် Function
+function previewSelectedImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            currentItemImageBase64 = e.target.result; // Base64 data အနေနဲ့ သိမ်းမည်
+            const previewImg = document.getElementById('imagePreview');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            
+            previewImg.src = currentItemImageBase64;
+            previewContainer.classList.remove('hidden');
+        }
+        reader.readAsDataURL(file);
+    }else {
+        // ဖိုင်မရွေးထားလျှင် ပြန်ဖျောက်ထားမည်
+        previewImage.src = "";
+        previewContainer.classList.add('hidden');
+    }
+}
+
+// ၃။ Inventory Items List ကို Sheet မှ ဆွဲယူ၍ Table နှင့် Dropdown ထဲသို့ ထည့်သွင်းရန်
+async function fetchInventoryItemsList() {
+    const tableBody = document.getElementById('itemListTableBody');
+    const selectDropdown = document.getElementById('inv_itemName');
+
+    if (tableBody) {
+        tableBody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-slate-400"><i class="fa-solid fa-spinner animate-spin text-xl mb-2 block"></i> ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>`;
+    }
+
+    if (!WEB_APP_URL) {
+        if (tableBody) tableBody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-red-400">Google Web App Link မချိတ်ရသေးပါ။</td></tr>`;
+        return;
+    }
+
+    try {
+        let res = await fetch(`${WEB_APP_URL}?action=getItemList`);
+        let data = await res.json();
+        ITEM_LIST_DATA = Array.isArray(data) ? data : [];
+
+        // က။ Item List ဇယား (Table) ကို ဖြည့်စွက်မည်
+        if (tableBody) {
+            if (ITEM_LIST_DATA.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-slate-400">Item List စာရင်းများ မရှိသေးပါ။</td></tr>`;
+            } else {
+                tableBody.innerHTML = ITEM_LIST_DATA.map((item, idx) => `
+                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="td-style pl-6 font-bold text-slate-600">${idx + 1}</td>
+                        <td class="td-style">
+                            ${item.image ? `<img src="${item.image}" onclick="openImageModal(this.src)" class="w-12 h-12 object-cover rounded shadow-sm border border-slate-200 cursor-pointer hover:opacity-80 transition" alt="Item Image">` : `<div class="w-12 h-12 bg-slate-100 rounded flex items-center justify-center text-slate-400 text-xs"><i class="fa-solid fa-image"></i></div>`}
+                        </td>
+                        <td class="td-style font-bold text-slate-800">${item.itemNameCode || item.name || ''}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // ခ။ Inventory Form ရှိ Select Dropdown (<select id="inv_itemName">) ထဲသို့ အမည်များ ဖြည့်ပါမည်
+        if (selectDropdown) {
+            let optionsHTML = `<option value="">-- ပစ္စည်းအမည် ရွေးချယ်ပါ --</option>`;
+            ITEM_LIST_DATA.forEach(item => {
+                const name = item.itemNameCode || item.name || '';
+                optionsHTML += `<option value="${name}">${name}</option>`;
+            });
+            selectDropdown.innerHTML = optionsHTML;
+        }
+
+    } catch (err) {
+        console.error("Fetch Item List Error:", err);
+        if (tableBody) {
+            tableBody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-red-500">Item List ဆွဲယူရာတွင် အမှားရှိနေပါသည်: ${err.message}</td></tr>`;
+        }
+    }
+}
+
+// ၄။ Dropdown တွင် ပစ္စည်းအမည် ရွေးလိုက်ပါက ယင်းပစ္စည်း၏ ဓာတ်ပုံကို Auto Load ပြပေးရန်
+function autoLoadItemImage() {
+    const selectedName = document.getElementById('inv_itemName').value;
+    const imgPreview = document.getElementById('imagePreview');
+    const container = document.getElementById('imagePreviewContainer');
+
+    if (!selectedName) {
+        currentItemImageBase64 = "";
+        if (imgPreview) imgPreview.src = "";
+        if (container) container.classList.add('hidden');
+        return;
+    }
+
+    // ITEM_LIST_DATA ထဲမှ ရွေးချယ်ထားသော ပစ္စည်းကို ရှာဖွေမည်
+    const foundItem = ITEM_LIST_DATA.find(item => (item.itemNameCode || item.name) === selectedName);
+    if (foundItem && foundItem.image) {
+        currentItemImageBase64 = foundItem.image;
+        if (imgPreview) imgPreview.src = foundItem.image;
+        if (container) container.classList.remove('hidden');
+    } else {
+        currentItemImageBase64 = "";
+        if (imgPreview) imgPreview.src = "";
+        if (container) container.classList.add('hidden');
+    }
+}
+
+// ၅။ Item List အသစ် သိမ်းဆည်းရန် Form Submission Logic
+async function saveNewInventoryItem(e) {
+    e.preventDefault();
+    if (!WEB_APP_URL) return alert("Google Web App Link မချိတ်ရသေးပါ။ Settings တွင် သွားထည့်ပါ။");
+
+    const btn = document.getElementById('btnSubmitNewItem');
+    const nameCode = document.getElementById('newItemNameCode').value;
+    const fileInput = document.getElementById('newItemImageFile');
+
+    if (!fileInput.files || fileInput.files.length === 0) {
+        return alert("ကျေးဇူးပြု၍ ပစ္စည်းဓာတ်ပုံ ရွေးချယ်ပါ။");
+    }
+
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> သိမ်းဆည်းနေပါသည်...`;
+
+    reader.onload = async function(event) {
+        const imageBase64 = event.target.result;
+
+        const payload = {
+            action: "addInventoryItem",
+            itemNameCode: nameCode,
+            image: imageBase64
+        };
+
+        try {
+            let res = await fetch(WEB_APP_URL, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+            let result = await res.json();
+
+            if (result.status === "success") {
+                alert("Inventory Item စာရင်း အသစ်ကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။");
+                document.getElementById('newItemListForm').reset();
+                fetchInventoryItemsList();
+            } else {
+                alert("အမှား: " + (result.message || "Unknown error"));
+            }
+        } catch (err) {
+            alert("Sheet သို့ ပို့ရာတွင် အမှားရှိပါသည်: " + err.message);
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> <span>List သို့ သိမ်းမည်</span>`;
+    };
+
+    reader.readAsDataURL(file);
+}
+
+// Tabs များ Navigation လုပ်ရာတွင် အလုပ်လုပ်စေရန် မူလ switchTab() function ၏ array ထဲတွင် 'inventory-item-list-tab' ကို ထပ်တိုးပေးပါ။
         async function handleFinishedMonthClick() {
             if(!WEB_APP_URL) return alert("API Link မချိတ်ရသေးပါ။");
 
